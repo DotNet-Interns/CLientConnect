@@ -8,12 +8,12 @@ export function useUserInfo (){
     return userInfo
 }
 
-export default UserProvider = (props)=>{
+export default function UserProvider(props){
      const [loggedIn , setLoggedIn] = useState(false);
      const [contextUser , setContextUser] = useState({});
 
      return (
-        <userContext.Provider>
+        <userContext.Provider value={{loggedIn , setContextUser , setLoggedIn , contextUser}}>
             {
                 props.children
             }
