@@ -17,17 +17,7 @@ namespace Backend.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<User>()
-            //    .HasMany(u => u.Notes)  // A User has many Notes as creator
-            //    .WithOne(n => n.Creator) // Each Note has one Creator user
-            //    .HasForeignKey(n => n.CreatedBy) // Foreign key in Note
-            //    .OnDelete(DeleteBehavior.Cascade); // Cascade delete when User is deleted
-
-            //modelBuilder.Entity<User>()
-            //    .HasMany(u => u.Notes)  // A User has many Notes as Updator
-            //    .WithOne(n => n.Updator) // Each Note has one Updator user
-            //    .HasForeignKey(n => n.UpdatedBy) // Foreign key in Note
-            //    .OnDelete(DeleteBehavior.Cascade); // Cascade delete when User is deleted
+           
 
             modelBuilder.Entity<Customer>()
              .HasMany(c => c.Notes)  // A Customer has many Notes 
@@ -47,6 +37,12 @@ namespace Backend.Models
              .WithOne(e => e.Customer) // Each Email has one Customer 
              .HasForeignKey(e => e.CID) // Foreign key in Email
              .OnDelete(DeleteBehavior.Cascade); // Cascade delete when Customer is deleted
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();  // This ensures the Email column is unique
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
