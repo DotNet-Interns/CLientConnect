@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Backend.Middlewares;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Backend
 {
@@ -14,37 +13,18 @@ namespace Backend
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-
-
-            //Using JWT
-            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
-            builder.Services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-.AddJwtBearer(x =>
-{
-    x.RequireHttpsMetadata = false; // Set to true in production
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false
-    };
-});
-
+            builder.Services.AddSingleton<JwtTokenService>(); // Use Scoped for JWT service
             builder.Services.AddDbContext<ClientConnectContext>(options =>
-           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddScoped<UserService>();
+            // No need to register middleware as a service
+             //builder.Services.AddScoped<Authenticate>(); // Comment or remove this line
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(); 
+            
 
             var app = builder.Build();
 
@@ -56,10 +36,8 @@ namespace Backend
             }
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<Authenticate>(); 
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
