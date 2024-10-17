@@ -14,14 +14,17 @@ namespace Backend.Controllers
         public class AuthController : Controller
         {
             private readonly ClientConnectContext _context;
-            public AuthController(ClientConnectContext context) { _context = context; }
+            private readonly UserService _userservice;
+
+        public AuthController(ClientConnectContext context, UserService userservice) { _context = context; _userservice = userservice; }
         [HttpPost]    
         public async Task<ActionResult<User>> Login(string email, string password)
             {
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if(BCrypt.Net.BCrypt.Verify(password, user.Password))
+            if(user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
-                return user;
+                var token = await _userservice.GenerateJwtToken(user);
+                return Ok(new { Token = token });
             }
             return Unauthorized();
         }
