@@ -14,7 +14,7 @@ CREATE TABLE Users (
     LastName VARCHAR(10) NOT NULL,
     Email VARCHAR(50) NOT NULL UNIQUE,
     Password VARCHAR(255) NOT NULL,
-    Role VARCHAR(20) CHECK (Role IN ('ADMIN', 'SM')),
+    Role VARCHAR(20) CHECK (Role IN ('ADMIN', 'SR')),
     CreatedAt DATETIME DEFAULT GETDATE(),
     UserStatus VARCHAR(10) CHECK (UserStatus IN ('ACTIVE', 'INACTIVE'))
 );
