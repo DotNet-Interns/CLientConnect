@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using BCrypt.Net;
 
 namespace Backend.Controllers
 {
@@ -77,6 +78,8 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
