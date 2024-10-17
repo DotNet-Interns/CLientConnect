@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Backend/Migrations/20241017061337_initialSetup.cs
-    public partial class initialSetup : Migration
-========
-    public partial class initial : Migration
->>>>>>>> 3bc6a26b5d5e1b3c49424d5dfc3dab501cafa3d3:Backend/Migrations/20241017062731_initial.cs
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -126,6 +122,43 @@ namespace Backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "clientInteractions",
+                columns: table => new
+                {
+                    CIID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoteId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    InteractionTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_clientInteractions", x => x.CIID);
+                    table.ForeignKey(
+                        name: "FK_clientInteractions_Notes_NoteId",
+                        column: x => x.NoteId,
+                        principalTable: "Notes",
+                        principalColumn: "NoteID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_clientInteractions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_clientInteractions_NoteId",
+                table: "clientInteractions",
+                column: "NoteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_clientInteractions_UserId",
+                table: "clientInteractions",
+                column: "UserId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_CreatedBy",
                 table: "Customers",
@@ -157,13 +190,16 @@ namespace Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "clientInteractions");
+
+            migrationBuilder.DropTable(
                 name: "Emails");
 
             migrationBuilder.DropTable(
-                name: "Notes");
+                name: "Phones");
 
             migrationBuilder.DropTable(
-                name: "Phones");
+                name: "Notes");
 
             migrationBuilder.DropTable(
                 name: "Customers");
