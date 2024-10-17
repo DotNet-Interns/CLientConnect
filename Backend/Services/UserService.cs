@@ -30,7 +30,7 @@ public class UserService
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Issuer"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(30), // Set expiration time
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

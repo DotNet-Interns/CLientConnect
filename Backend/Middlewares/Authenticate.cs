@@ -38,7 +38,7 @@ namespace Backend.Middlewares
                 return;
             }
 
-            var token = context.Request.Headers["Auth_Token"].FirstOrDefault();
+            var token = context.Request.Headers["Authorization"].FirstOrDefault();
 
             if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
             {

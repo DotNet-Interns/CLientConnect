@@ -1,24 +1,17 @@
 ﻿using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
-using Backend.Models; // Adjust according to your actual namespace
-using Backend.Services; // Adjust according to your actual namespace
-using System.Linq; // For querying the user data
+using Backend.Services;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
-    public class UserCredentials
-    {
-        public string Username { get; set; }
-        public string Password { get; set; } }
-
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly ClientConnectContext _context; 
-        private readonly JwtTokenService _jwtTokenService; 
+        private readonly ClientConnectContext _context;
+        private readonly JwtTokenService _jwtTokenService;
 
         public AuthController(ClientConnectContext context, JwtTokenService jwtTokenService)
         {
@@ -27,26 +20,24 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromForm] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // Validate input
+        
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
                 return BadRequest("Email and password are required.");
             }
 
-            // Find user by email
-            var user = await _context.Users // Assuming Users is your DbSet<User>
+            var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            // Check if user exists and password matches
+       
             if (user == null || !VerifyPassword(request.Password, user.Password))
             {
                 return Unauthorized("Invalid email or password.");
             }
 
-            // Generate JWT token
-            var token = _jwtTokenService.GenerateJwtToken(user.Email, user.Role.ToString()); // Assuming Role is a property in User model
+            var token = _jwtTokenService.GenerateJwtToken(user.Email, user.Role.ToString());
 
             return Ok(new { Token = token });
         }
