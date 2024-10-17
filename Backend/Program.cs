@@ -1,5 +1,7 @@
 
+using Backend.Middlewares;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -14,8 +16,11 @@ namespace Backend
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddSingleton<JwtTokenService>();
             builder.Services.AddDbContext<ClientConnectContext>(options =>
-           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<Authenticate>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -33,6 +38,7 @@ namespace Backend
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseMiddleware<Authenticate>();
 
 
             app.MapControllers();
