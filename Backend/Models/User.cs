@@ -43,7 +43,7 @@ namespace Backend.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(256)]
         public string Password { get; set; }
 
         [Required]
