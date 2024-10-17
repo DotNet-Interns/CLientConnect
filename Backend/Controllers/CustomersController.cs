@@ -9,6 +9,18 @@ using Backend.Models;
 
 namespace Backend.Controllers
 {
+    public class RegisterCustomer 
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+
+        public string Company { get; set; }
+        public int CreatedBy { get; set; }
+        public string Position { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+    }
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
@@ -75,12 +87,28 @@ namespace Backend.Controllers
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
+        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomer registerCustomer)
         {
+            Customer customer = new Customer();
+            customer.FirstName = registerCustomer.FirstName;
+            customer.LastName = registerCustomer.LastName;
+            customer.Address = registerCustomer.Address;
+            customer.Company = registerCustomer.Company;
+            customer.CreatedBy = registerCustomer.CreatedBy;
+            customer.Position = registerCustomer.Position;
+
+            Phone phone = new Phone();
+            phone.PhoneNumber = registerCustomer.PhoneNumber;
+            customer.PhoneNumbers.Add(phone);
+
+            Email email = new Email();
+            email.email = registerCustomer.Email;
+            customer.Emails.Add(email);
+
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCustomer", new { id = customer.CID }, customer);
+            return Created();      
         }
 
         // DELETE: api/Customers/5

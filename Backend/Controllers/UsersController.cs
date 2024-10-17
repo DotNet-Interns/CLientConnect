@@ -10,6 +10,14 @@ using BCrypt.Net;
 
 namespace Backend.Controllers
 {
+    public class UserRequest
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -76,14 +84,18 @@ namespace Backend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult> PostUser([FromBody] UserRequest request)
         {
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-            _context.Users.Add(user);
+            request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            User user = new User();
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
+            user.Password = request.Password;
+            _context.Add(user);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.UserID }, user);
+            return Created();
+           
         }
 
         // DELETE: api/Users/5

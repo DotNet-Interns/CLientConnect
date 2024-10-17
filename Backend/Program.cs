@@ -12,11 +12,18 @@ namespace Backend
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            
+            builder.WebHost.ConfigureKestrel(serverop =>
+            {
+                serverop.ListenAnyIP(5100);
+            });
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddSingleton<JwtTokenService>(); // Use Scoped for JWT service
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 
             // No need to register middleware as a service
              //builder.Services.AddScoped<Authenticate>(); // Comment or remove this line
