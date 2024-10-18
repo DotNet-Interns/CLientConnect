@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+// import Cookies from 'js-cookie;'
 import '../styles/Login.css'; // Import the CSS file
+
+import * as helpers from "../Utils/validation";
+import * as cookie from "../Utils/cookie";
 // import * as helpers from "../Utils/validation";
 import { loginValidation } from '../Utils/validation';
 import axios from "axios"
@@ -30,6 +34,7 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         if(loginValidation(formData , setErrors)){
             try {
                 const response = await axios.post(`http://172.20.68.11:5100/api/Auth`,{
@@ -46,7 +51,7 @@ const Login = () => {
     };
 
     return (
-        <div className="login d-flex  justify-content-center align-items-center vh-100">
+        <div className="login d-flex text-light  justify-content-center align-items-center vh-100">
 
             <div className="login-container p-3 border rounded-3">
                 <h3 className="text-center mb-4">Login</h3>

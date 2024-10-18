@@ -38,7 +38,9 @@ namespace Backend.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            var token = _jwtTokenService.GenerateJwtToken(user.Email, user.Role.ToString());
+            var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
+
+           
 
             return Ok(new { Token = token });
         }
