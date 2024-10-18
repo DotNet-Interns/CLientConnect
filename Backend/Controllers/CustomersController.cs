@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
+
+    
     public class RegisterCustomer 
     {
         public string FirstName { get; set; }
@@ -26,10 +29,14 @@ namespace Backend.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly JwtTokenService _jwtTokenService ;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CustomersController(ClientConnectContext context)
+        public CustomersController(ClientConnectContext context , JwtTokenService jwtTokenService,IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/Customers
@@ -89,12 +96,15 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomer registerCustomer)
         {
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+            
             Customer customer = new Customer();
             customer.FirstName = registerCustomer.FirstName;
             customer.LastName = registerCustomer.LastName;
             customer.Address = registerCustomer.Address;
             customer.Company = registerCustomer.Company;
-            customer.CreatedBy = registerCustomer.CreatedBy;
+            customer.CreatedBy = Int32.Parse(userPayload.UserId);
+
             customer.Position = registerCustomer.Position;
 
             Phone phone = new Phone();

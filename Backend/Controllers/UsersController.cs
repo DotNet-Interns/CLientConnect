@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using BCrypt.Net;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Backend.Controllers
 {
@@ -23,6 +24,7 @@ namespace Backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly JwtSecurityToken _jwtSecurityToken;
 
         public UsersController(ClientConnectContext context)
         {
@@ -37,9 +39,10 @@ namespace Backend.Controllers
         }
 
         // GET: api/Users/5
-        [HttpGet("{id}")]
+        [HttpGet("/get")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
+
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)

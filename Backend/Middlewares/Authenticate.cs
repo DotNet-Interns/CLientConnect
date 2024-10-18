@@ -42,9 +42,9 @@ namespace Backend.Middlewares
 
             var token = _jwtTokenService.GetJwtToken(context);
 
-            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
+            if (!string.IsNullOrEmpty(token))
             {
-                token = token.Substring("Bearer ".Length).Trim();
+                
 
                 if (!_jwtTokenService.VerifyJwtToken(token))
                 {

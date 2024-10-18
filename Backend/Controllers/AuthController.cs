@@ -39,9 +39,18 @@ namespace Backend.Controllers
 
             var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
 
-           
+            Response.Cookies.Append(
+ "AccessToken",
+ token,
+ new CookieOptions
+ {
+     Path = "/",
+     HttpOnly = true,
+     Secure = true,
+     MaxAge = TimeSpan.FromDays(2)
+ });
 
-            return Ok(new { Token = token });
+            return Ok();
         }
 
         private bool VerifyPassword(string enteredPassword, string storedHash)

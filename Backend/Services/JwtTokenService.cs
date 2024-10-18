@@ -2,8 +2,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Azure.Core;
 using Backend.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using NuGet.Protocol;
 
 namespace Backend.Services
@@ -61,27 +63,30 @@ namespace Backend.Services
 
         public string GetJwtToken(HttpContext context)
         {
-            Console.WriteLine("here");
-            var token = context.Request.Headers["Authorization"].FirstOrDefault();
-           var  newtoken = token.Substring("Bearer ".Length).Trim();
-            
-            var handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken payload = (JwtSecurityToken)handler.ReadToken(newtoken);
-            
-            Console.WriteLine(payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata").Value);
-            Console.WriteLine(payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value);
+            // Extract the cookie (if needed)
+            string token = null;
+            if (context.Request.Cookies.ContainsKey("AccessToken"))
+            {
+                token = context.Request.Cookies["AccessToken"];
+                return token;
+            }
 
-            return token;
-        } 
+           
+           
+
+            // Return null or handle the case where token is not found
+            return null;
+        }
+
 
         public Payload GetJwtPayload(HttpContext context)
         {
-           
-            var token = context.Request.Headers["Authorization"].FirstOrDefault();
-            var trimed_token = token.Substring("Bearer ".Length).Trim();
+
+            var token = GetJwtToken(context);
+            
 
             var handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken payload = (JwtSecurityToken)handler.ReadToken(trimed_token);
+            JwtSecurityToken payload = (JwtSecurityToken)handler.ReadToken(token);
 
             string UserId = payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata").Value;
             string Role = payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
