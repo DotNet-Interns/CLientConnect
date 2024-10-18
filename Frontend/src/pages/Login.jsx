@@ -31,7 +31,10 @@ const Login = () => {
         helpers.loginValidation(formData,setErrors);
 
         try {
-            const response = await axios.post("http://localhost:5100/api/Auth");
+            const response = await axios.post("https://localhost:44363/api/Auth",{
+                Password : formData.password,
+                Email : formData.email
+            });
             console.log(response);
             
         } catch (error) {
