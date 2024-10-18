@@ -31,11 +31,11 @@ namespace Backend.Models
         public int UserID { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(10)]
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(10)]
         public string LastName { get; set; }
 
         [Required,MaxLength(50)]
