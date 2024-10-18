@@ -23,6 +23,8 @@ namespace Backend.Middlewares
             _allowedRoutes = new HashSet<string>
             {
                 "/api/Auth",
+                "/api/Users"
+
             };
         }
 
@@ -38,7 +40,7 @@ namespace Backend.Middlewares
                 return;
             }
 
-            var token = context.Request.Headers["Authorization"].FirstOrDefault();
+            var token = _jwtTokenService.GetJwtToken(context);
 
             if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
             {
