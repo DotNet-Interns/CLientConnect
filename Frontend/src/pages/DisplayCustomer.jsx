@@ -3,8 +3,8 @@ import "../styles/DisplayCustomer.css";
 import { IoOptions } from "react-icons/io5";
 import { MdOutlineEdit, MdDeleteOutline, MdCopyAll } from "react-icons/md";
 import { FaEdit } from 'react-icons/fa';
+import * as cookie from "../Utils/cookie";
 import axios from 'axios';
-import Cookies from 'js-cookie'; // Import js-cookie
 
 function NoteCard() {
     return (
@@ -19,26 +19,31 @@ function NoteCard() {
 }
 
 function DisplayCustomer() {
-    const [customers, setCustomers] = useState([]);
+    const [customers, setCustomers] = useState(null);
+    const [phone, setPhones] = useState([]);
+    const [email, setEmail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeMenuIndex, setActiveMenuIndex] = useState(null);
-
-    // const authtoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiMyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNhbGVzUmVwcmVzZW50YXRpdmUiLCJqdGkiOiJjNGI4NzU2ZS1kZWU4LTQ5NGQtOWZlZS1jNzRjNmJkYzRhNDkiLCJleHAiOjE3MjkyNzMxODIsImlzcyI6IkNsaWVudENvbm5lY3QiLCJhdWQiOiJDbGllbnRDb25uZWN0In0.3JUOysGkG4Qg2mfKtkLli_J3AcJbRyAedAO7xCSBk_U;"
+    const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
 
     useEffect(() => {
-        // Fetch customers from the API
         const fetchCustomers = async () => {
             try {
-                const response = await axios.get("http://172.20.68.11:5100/api/Customers/1", {
-                   withCredentials:true
+                const CustomerResponse = await axios.get("http://172.20.68.11:5100/api/Customers/2", {
+                    headers: { Authorization: `Bearer ${authToken}` }
                 });
-                
-                // // Set the token in cookies
-                // Cookies.set('AccessToken', authtoken, { expires: 7, sameSite: 'None', secure: true });
+                const PhoneResponse = await axios.get("http://172.20.68.11:5100/api/Phones/2", {
+                    headers: { Authorization: `Bearer ${authToken}` }
+                });
+                const EmailResponse = await axios.get("http://172.20.68.11:5100/api/Emails/2", {
+                    headers: { Authorization: `Bearer ${authToken}` }
+                });
 
+                console.log(CustomerResponse.data, PhoneResponse.data, EmailResponse.data);
                 
-                console.log(response);
-                setCustomers(response.data);
+                setCustomers(CustomerResponse.data);
+                setEmail(EmailResponse.data);
+                setPhones(PhoneResponse.data);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching customer data:", error);
@@ -46,7 +51,7 @@ function DisplayCustomer() {
             }
         };
         fetchCustomers();
-    }, []);
+    }, [authToken]);
 
     const handleOptionsClick = (index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -56,11 +61,13 @@ function DisplayCustomer() {
         return <p>Loading...</p>;
     }
 
+    if (!customers) {
+        return <p>No customer data available</p>;
+    }
+
     return (
         <div className='d-flex align-items-center justify-center mt-3'>
-            {/* Container */}
             <div className='d-flex flex-column justify-content-start container gap-3 p-3 align-items-center main-container rounded-4 shadow-lg'>
-
                 {/* Name */}
                 <div className='w-50 p-1 d-flex align-items-center justify-content-center rounded-2 customerContainer'>
                     <h2 className='text-white'>Customer: {customers.firstName} {customers.lastName}</h2>
@@ -86,7 +93,68 @@ function DisplayCustomer() {
                             <p>{customers.position}</p>
                         </div>
 
-                        {/* Other Customer Details */}
+                        {/* Contact details */}
+                        <div className="container">
+                            <div className="d-flex flex-column align-items-start justify-content-start">
+                                <h4>Contact Details</h4>
+
+                                <h5 className='text-secondary my-2'>Phone Numbers</h5>
+                                <ul className="list-group w-100">
+                                    {phone.map((phone, index) => (
+                                        <li
+                                            key={index}
+                                            className="list-group-item d-flex justify-content-between align-items-center phone-number"
+                                        >
+                                            {phone.phoneNumber}
+                                            <div className="position-relative">
+                                                <IoOptions className="options-icon" onClick={() => handleOptionsClick(index)} />
+                                                {activeMenuIndex === index && (
+                                                    <div className="dropdown-menu show">
+                                                        <button className="dropdown-item" onClick={() => alert('Edit')}>
+                                                            <MdOutlineEdit /> Edit
+                                                        </button>
+                                                        <button className="dropdown-item" onClick={() => alert('Delete')}>
+                                                            <MdDeleteOutline /> Delete
+                                                        </button>
+                                                        <button className="dropdown-item" onClick={() => alert('Copy')}>
+                                                            <MdCopyAll /> Copy
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <h5 className='text-secondary my-2'>Email Address</h5>
+                                <ul className="list-group w-100">
+                                    {email.map((email, index) => (
+                                        <li
+                                            key={index}
+                                            className="list-group-item d-flex justify-content-between align-items-center phone-number"
+                                        >
+                                            {email.email}
+                                            <div className="position-relative">
+                                                <IoOptions className="options-icon" onClick={() => handleOptionsClick(index + phone.length)} />
+                                                {activeMenuIndex === index + phone.length && (
+                                                    <div className="dropdown-menu show">
+                                                        <button className="dropdown-item" onClick={() => alert('Edit')}>
+                                                            <MdOutlineEdit /> Edit
+                                                        </button>
+                                                        <button className="dropdown-item" onClick={() => alert('Delete')}>
+                                                            <MdDeleteOutline /> Delete
+                                                        </button>
+                                                        <button className="dropdown-item" onClick={() => alert('Copy')}>
+                                                            <MdCopyAll /> Copy
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Customer Notes */}

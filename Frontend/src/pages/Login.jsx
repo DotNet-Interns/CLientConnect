@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+// import Cookies from 'js-cookie;'
 import '../styles/Login.css'; // Import the CSS file
 import * as helpers from "../Utils/validation";
+import * as cookie from "../Utils/cookie";
 import axios from "axios"
 
 
@@ -29,14 +31,15 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         helpers.loginValidation(formData,setErrors);
+        
 
         try {
-            const response = await axios.post("https://localhost:44363/api/Auth",{
+            const response = await axios.post("http://172.20.68.11:5100/api/Auth",{
                 Password : formData.password,
                 Email : formData.email
             });
-            console.log(response);
-            
+            console.log(response)
+           cookie.setCookie("Auth_Token",response.data.token,1)
         } catch (error) {
             console.log(error);
             
