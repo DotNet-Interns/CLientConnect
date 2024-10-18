@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/Login.css'; // Import the CSS file
-import * as helpers from "../Utils/validation";
+// import * as helpers from "../Utils/validation";
+import { loginValidation } from '../Utils/validation';
 import axios from "axios"
+const server = import.meta.env.VITE_SERVER;
 
 
 
@@ -28,18 +30,18 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        helpers.loginValidation(formData,setErrors);
-
-        try {
-            const response = await axios.post("https://localhost:44363/api/Auth",{
-                Password : formData.password,
-                Email : formData.email
-            });
-            console.log(response);
-            
-        } catch (error) {
-            console.log(error);
-            
+        if(loginValidation(formData , setErrors)){
+            try {
+                const response = await axios.post(`http://172.20.68.11:5100/api/Auth`,{
+                    Password : formData.password,
+                    Email : formData.email
+                });
+                console.log(response);
+                
+            } catch (error) {
+                console.log(error);
+                
+            }
         }
     };
 
