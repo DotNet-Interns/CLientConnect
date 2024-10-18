@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 
 namespace Backend.Controllers
 {
@@ -39,18 +40,18 @@ namespace Backend.Controllers
 
             var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
 
-            Response.Cookies.Append(
- "AccessToken",
- token,
- new CookieOptions
- {
-     Path = "/",
-     HttpOnly = true,
-     Secure = true,
-     MaxAge = TimeSpan.FromDays(2)
- });
+ //           Response.Cookies.Append(
+ //"AccessToken",
+ //token,
+ //new CookieOptions
+ //{
+ //    Path = "/",
+ //    HttpOnly = true,
+ //    Secure = true,
+ //    MaxAge = TimeSpan.FromDays(2)
+ //});
 
-            return Ok();
+            return Ok(new {token});
         }
 
         private bool VerifyPassword(string enteredPassword, string storedHash)

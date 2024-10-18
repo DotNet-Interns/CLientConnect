@@ -57,6 +57,23 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
+            //notes
+    //        List<Note> notes = await _context.Notes
+    //    .Where(n => n.CreatedFor == id)  // Filter notes by customer ID
+    //    .ToListAsync();
+    //        //phonenos
+    //        List<int> phones = await _context.Phones
+    //.Where(p => p.CID == id)
+    //.Select(p => p.PID)  // Select only the 'Number' property
+    //.ToListAsync();
+    //        //emails
+    //        List<int> ph = await _context.Phones
+    //.Where(p => p.CID == id)
+    //.Select(p => p.PID)  // Select only the 'Number' property
+    //.ToListAsync();
+    //        customer.Notes = notes;
+    //        //customer.PhoneNumbers = phones;
+    //        customer.Emails = emails;
             return customer;
         }
 

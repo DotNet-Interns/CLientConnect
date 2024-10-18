@@ -63,20 +63,21 @@ namespace Backend.Services
 
         public string GetJwtToken(HttpContext context)
         {
-            // Extract the cookie (if needed)
-            string token = null;
-            if (context.Request.Cookies.ContainsKey("AccessToken"))
+            // Check for the token in the Authorization header
+            string token = context.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
             {
-                token = context.Request.Cookies["AccessToken"];
-                return token;
+                // Extract the token after "Bearer "
+                return token.Substring("Bearer ".Length).Trim();
             }
 
            
-           
 
-            // Return null or handle the case where token is not found
+            // Return null if token is not found in both locations
             return null;
         }
+
 
 
         public Payload GetJwtPayload(HttpContext context)

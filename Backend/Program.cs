@@ -23,15 +23,26 @@ namespace Backend
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowSpecificOrigins",
+            //        policy =>
+            //        {
+            //            policy.WithOrigins("http://172.20.68.21:5173")  // Replace with your frontend URL
+            //                  .AllowAnyHeader()
+            //                  .AllowAnyMethod()
+            //                  .AllowCredentials();  // Enable credentials (cookies, authorization headers)
+            //        });
+            //});
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigins",
                     policy =>
                     {
-                        policy.AllowAnyOrigin() // Add allowed domains
+                        policy.AllowAnyOrigin()  // Replace with your frontend URL
                               .AllowAnyHeader()
-                              .AllowAnyMethod();
-                               // If needed
+                              .AllowAnyMethod()
+                              ;  // Enable credentials (cookies, authorization headers)
                     });
             });
 
@@ -53,7 +64,7 @@ namespace Backend
             app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigins");
             app.UseMiddleware<Authenticate>(); 
-            app.UseAuthorization();
+            //app.UseAuthorization();
             app.MapControllers();
 
             app.Run();
