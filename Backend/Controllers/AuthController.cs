@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers
 {
@@ -18,7 +19,7 @@ namespace Backend.Controllers
             _context = context;
             _jwtTokenService = jwtTokenService;
         }
-
+        [EnableCors("AnotherPolicy")]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {

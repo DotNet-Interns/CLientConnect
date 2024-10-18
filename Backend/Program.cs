@@ -12,7 +12,20 @@ namespace Backend
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            
+            builder.Services.AddCors(options =>
+            {
+               
+
+                options.AddPolicy("AnotherPolicy",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173")
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                    });
+            });
+
+
             builder.WebHost.ConfigureKestrel(serverop =>
             {
                 serverop.ListenAnyIP(5100);
@@ -35,6 +48,9 @@ namespace Backend
 
             var app = builder.Build();
 
+            app.UseCors();
+
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -43,7 +59,7 @@ namespace Backend
             }
 
             app.UseHttpsRedirection();
-            app.UseMiddleware<Authenticate>(); 
+            //app.UseMiddleware<Authenticate>(); 
             app.UseAuthorization();
             app.MapControllers();
 
