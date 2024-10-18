@@ -10,7 +10,7 @@ namespace Backend.Models
         public int PID { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(10)]
         public string PhoneNumber { get; set; }
 
         [Required]
