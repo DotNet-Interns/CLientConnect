@@ -77,6 +77,20 @@ namespace Backend.Services
                 return false;
             }
         }
+
+        public static ClaimsPrincipal GetClaimsFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            // Validate the token (optional, but recommended)
+            if (handler.CanReadToken(token))
+            {
+                var jwtToken = handler.ReadJwtToken(token);
+                return new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims));
+            }
+
+            return null; // Or handle the case when the token is not valid
+        }
     }
 
 }
