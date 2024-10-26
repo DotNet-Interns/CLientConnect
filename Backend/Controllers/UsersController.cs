@@ -136,7 +136,7 @@ namespace Backend.Controllers
             return NoContent();
         }
 
-        public bool CheckUserRole()
+        private bool CheckUserRole()
         {
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             if (userPayload.Role == "SalesRepresentative")

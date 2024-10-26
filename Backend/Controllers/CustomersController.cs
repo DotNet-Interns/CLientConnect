@@ -10,8 +10,16 @@ using Backend.Services;
 
 namespace Backend.Controllers
 {
+    public class CustomerDto
+    {
+        public int CID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public List<int> Notes { get; set; }
+        public List<int> PhoneNumbers { get; set; }
+        public List<int> Emails { get; set; }
+    }
 
-    
     public class RegisterCustomer 
     {
         public string FirstName { get; set; }
@@ -48,7 +56,7 @@ namespace Backend.Controllers
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
@@ -57,25 +65,23 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            //notes
-    //        List<Note> notes = await _context.Notes
-    //    .Where(n => n.CreatedFor == id)  // Filter notes by customer ID
-    //    .ToListAsync();
-    //        //phonenos
-    //        List<int> phones = await _context.Phones
-    //.Where(p => p.CID == id)
-    //.Select(p => p.PID)  // Select only the 'Number' property
-    //.ToListAsync();
-    //        //emails
-    //        List<int> ph = await _context.Phones
-    //.Where(p => p.CID == id)
-    //.Select(p => p.PID)  // Select only the 'Number' property
-    //.ToListAsync();
-    //        customer.Notes = notes;
-    //        //customer.PhoneNumbers = phones;
-    //        customer.Emails = emails;
-            return customer;
+            List<int> notes = await _context.Notes.Where(n => n.CreatedFor == id).Select(n=> n.NoteID).ToListAsync();
+            List<int> phones = await _context.Phones.Where(p => p.CID == id).Select(p=>p.PID).ToListAsync();
+            List<int> emails = await _context.Emails.Where(p => p.CID == id).Select(e=>e.EID).ToListAsync();
+
+            var customerDto = new CustomerDto
+            {
+                CID = customer.CID,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Notes = notes,
+                PhoneNumbers = phones,
+                Emails = emails
+            };
+
+            return customerDto;
         }
+
 
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
