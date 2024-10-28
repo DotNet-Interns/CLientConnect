@@ -34,10 +34,9 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         if(loginValidation(formData , setErrors)){
             try {
-                const response = await axios.post(`http://172.20.68.11:5100/api/Auth`,{
+                const response = await axios.post(`${server}/api/Auth`,{
                     Password : formData.password,
                     Email : formData.email
                 });
