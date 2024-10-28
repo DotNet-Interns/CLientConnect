@@ -13,7 +13,7 @@ namespace Backend.Middlewares
             _next = next;
             _jwtTokenService = jwtTokenService;
             
-            _notAllowedRoutes = new HashSet<string> { "/api/Users/:id" };
+            _notAllowedRoutes = new HashSet<string> { "" };
             
         }
 

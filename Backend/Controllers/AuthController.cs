@@ -4,6 +4,7 @@ using Backend.Services;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -21,7 +22,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
         
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
@@ -50,9 +51,5 @@ namespace Backend.Controllers
         }
     }
 
-    public class LoginRequest
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    
 }

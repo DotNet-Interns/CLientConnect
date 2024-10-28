@@ -7,49 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Services;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
-    public class CustomerDto
-    {
-        public int CID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public string Company { get; set; }
-
-        public string Position { get; set; }
-
-        public string Address { get; set; }
-
-        public List<PhoneDto> PhoneNumbers { get; set; }
-        public List<EmailDto> Emails { get; set; }
-    }
-
-    public class PhoneDto
-    {
-        public int pid { get; set; }
-        public string phone { get; set; }
-    }
-
-    public class EmailDto
-    {
-        public int eid { get; set; }
-        public string email { get; set; }
-    }
-
-    public class RegisterCustomer 
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Address { get; set; }
-
-        public string Company { get; set; }
-        public int CreatedBy { get; set; }
-        public string Position { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-    }
+  
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
@@ -163,7 +125,7 @@ namespace Backend.Controllers
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomer registerCustomer)
+        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomerDto registerCustomer)
         {
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             
@@ -199,8 +161,14 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
+            if(customer.Status == CustomerStatus.Inactive)
+            {
+                customer.Status = CustomerStatus.Active;
+            }
+            else { customer.Status = CustomerStatus.Inactive; }
+            
 
-            _context.Customers.Remove(customer);
+            _context.Entry(customer).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return NoContent();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -43,15 +44,20 @@ namespace Backend.Controllers
 
         // PUT: api/Phones/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhone(int id, Phone phone)
+        [HttpPut()]
+        public async Task<IActionResult> PutPhone([FromBody]PhoneDto phone)
         {
-            if (id != phone.PID)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(phone).State = EntityState.Modified;
+            //if (id != phone.pid)
+            //{
+            //    return BadRequest();
+            //}
+            Console.WriteLine(phone.phone);
+            Phone newPhone = _context.Phones.Find(phone.pid);
+            newPhone.PhoneNumber = phone.phone;
+            
+
+            _context.Entry(newPhone).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +65,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PhoneExists(id))
+                if (!PhoneExists(phone.pid))
                 {
                     return NotFound();
                 }
@@ -75,12 +81,17 @@ namespace Backend.Controllers
         // POST: api/Phones
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Phone>> PostPhone(Phone phone)
+        public async Task<ActionResult<Phone>> PostPhone([FromBody]AddPhoneDto phone)
         {
-            _context.Phones.Add(phone);
+
+            Phone currPhone = new Phone();
+            currPhone.PhoneNumber = phone.PhoneNumber;
+            currPhone.CID = phone.CID;
+            _context.Phones.Add(currPhone);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPhone", new { id = phone.PID }, phone);
+            return CreatedAtAction("GetPhone", new { id = currPhone.PID }, currPhone);
+            
         }
 
         // DELETE: api/Phones/5
