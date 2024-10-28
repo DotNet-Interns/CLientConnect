@@ -1,62 +1,17 @@
-.scrolling-wrapper{
-	overflow-x: auto;
-}
-
-body{
-	background-color: black;
-	color: #fff;
-	font-family: 'system-ui';
-}
-
-h1{
-	font-weight: 700;
-	font-size: 3.4em;
-}
-
-.subtitle{
-	font-size: 1.25em;
-	opacity: 0.65;
-}
-
-.card-block{
-	background-color: black;
-	height: 300px !important;
-	/* width: 200px; */
-	background-color: #fff;
-	border: none;
-	background-position: center;
-	background-size: cover;
-	transition: all 0.2s ease-in-out !important;
-	border-radius: 24px;
-	&:hover{
-		transform: translateY(-5px);
-		box-shadow: none;
-		opacity: 0.9;
-	}
-}
-
-
-
-
-
-/* Targeting the scrollbar track */
-::-webkit-scrollbar {
-	height: 8px; /* Height of the scrollbar */
+div.scrollmenu {
+	/* background-color: #333; */
+	overflow: auto;
+	white-space: nowrap;
   }
   
-  /* Styling the scrollbar itself */
-  ::-webkit-scrollbar-thumb {
-	background-color: #888; /* Color of the scrollbar */
-	border-radius: 4px; /* Rounded corners */
+  div.scrollmenu a {
+	display: inline-block;
+	color: white;
+	text-align: center;
+	padding: 14px;
+	text-decoration: none;
   }
   
-  /* Styling when hovered */
-  ::-webkit-scrollbar-thumb:hover {
-	background-color: #555; /* Darker color on hover */
+  div.scrollmenu a:hover {
+	background-color: #777;
   }
-  
-  /* Optional: Styling the scrollbar track background */
-  ::-webkit-scrollbar-track {
-	background-color: #f1f1f1; /* Track color */
-  }
-  
