@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import * as helpers from '../Utils/validation.js';
-// import CreateEmergenciesTable from '../../../utils/CreateEmergenciesTable';
+// import * as helpers from '../Utils/validation.js';
+import validateCustomerData from '../Utils/validation.js';
+import axios from 'axios';
+const server = import.meta.env.VITE_SERVER;
 
 function AddCustomer() {
     console.log("AddCustomer")
@@ -11,10 +13,8 @@ function AddCustomer() {
         Company_name: "",
         Position: "",
         email: "",
-        phone : ""
+        phone: ""
     })
-
-
 
     const [ValidationErrors, setValidationErrors] = useState({
         firstName: "",
@@ -23,7 +23,7 @@ function AddCustomer() {
         Company_name: "",
         Position: "",
         email: "",
-        phone : ""
+        phone: ""
     })
 
     const handleChange = (event) => {
@@ -42,9 +42,32 @@ function AddCustomer() {
         });
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        helpers.validateCustomerData(customerData , setValidationErrors);
+        // helpers.validateCustomerData(customerData , setValidationErrors);
+        // validateCustomerData(customerData , setValidationErrors);
+
+        if (validateCustomerData(customerData, setValidationErrors)) {
+            try {
+                const response = await axios.post(`${server}/api/Customers`,
+                    {
+                        firstName: customerData.firstName,
+                        lastName: customerData.lastName,
+                        address: customerData.Address,
+                        company: customerData.Company_name,
+                        createdBy: "Kelvin",
+                        position: customerData.Position,
+                        phoneNumber: customerData.phone,
+                        email: customerData.email
+                    }
+                )
+                console.log(response);
+                
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
     }
 
     return (
@@ -90,7 +113,7 @@ function AddCustomer() {
 
                 <div className="form-group">
                     <label htmlFor="Phone_field">Phone</label>
-                    <input onChange={handleChange} name='phone' value={customerData.phone} className="form-control" id="Phone_field"  placeholder="Enter Phone Number" />
+                    <input onChange={handleChange} name='phone' value={customerData.phone} className="form-control" id="Phone_field" placeholder="Enter Phone Number" />
                     <small>{ValidationErrors.phone}</small>
                 </div>
 

@@ -1,0 +1,86 @@
+.main-container {
+    width: 97%;
+    margin: auto;
+    min-height: 90vh;
+}
+
+.customerBg {
+    background-color: #0e2e5e;
+}
+
+.Container {
+    background: #eee;
+    border: solid 2px #cfcccc;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.notes {
+
+    height: 30vh;
+    overflow: hidden;
+    min-width: 20vw;
+
+}
+
+.notes:hover {
+    scale: 105%;
+
+}
+
+.note-container {
+    background-color: #003c75b6;
+    /* background:#0e2e5e; */
+}
+
+.phone-number {
+    position: relative;
+}
+
+.options-icon {
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.customerContainer {
+    background-color: #0e2e5eee;
+    box-shadow: 0px 2px 12px rgb(109, 109, 109);
+}
+
+.btn-add {
+    
+    cursor: pointer;
+    border: 3px solid #081f4b83;
+    
+}
+.btn-add:hover{
+    box-shadow: 2px 2px 2px #9fc1ff73 ;
+    scale: 105%;
+}

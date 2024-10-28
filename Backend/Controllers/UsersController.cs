@@ -86,6 +86,10 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult> PostUser([FromBody] UserRequest request)
         {
+            if (user.Role == 0)
+            {
+                return Unauthorized();
+            }
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User();
             user.FirstName = request.FirstName;
