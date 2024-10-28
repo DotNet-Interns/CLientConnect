@@ -1,4 +1,5 @@
 ﻿using Backend.Controllers;
+using Backend.Models;
 
 namespace Backend.Dtos
 {
@@ -13,6 +14,8 @@ namespace Backend.Dtos
         public string Position { get; set; }
 
         public string Address { get; set; }
+
+        public CustomerStatus Status { get; set; }
 
         public List<PhoneDto> PhoneNumbers { get; set; }
         public List<EmailDto> Emails { get; set; }

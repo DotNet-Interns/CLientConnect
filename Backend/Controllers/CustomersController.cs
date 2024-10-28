@@ -82,6 +82,7 @@ namespace Backend.Controllers
                 LastName = customer.LastName,
                 Company = customer.Company,
                 Position = customer.Position,
+                Status = customer.Status,
                 PhoneNumbers = customerPhones ,
                 Emails = customerEmails,
                 Address = customer.Address
@@ -153,10 +154,11 @@ namespace Backend.Controllers
         }
 
         // DELETE: api/Customers/5
-        [HttpDelete("{id}")]
+        [HttpPut("toggleStatus/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            Console.Write(id);
+            Customer customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -165,13 +167,17 @@ namespace Backend.Controllers
             {
                 customer.Status = CustomerStatus.Active;
             }
-            else { customer.Status = CustomerStatus.Inactive; }
+            else
+            {
+                customer.Status = CustomerStatus.Inactive;
+            }
+            
             
 
             _context.Entry(customer).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool CustomerExists(int id)

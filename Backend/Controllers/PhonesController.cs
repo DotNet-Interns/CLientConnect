@@ -98,7 +98,19 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhone(int id)
         {
+
+            
+
+
             var phone = await _context.Phones.FindAsync(id);
+
+            List<Phone> phones = await _context.Phones.Where(p => p.CID == phone.CID).ToListAsync();
+            
+            if(phones.Count == 1)
+            {
+                return NoContent();
+            }
+            
             if (phone == null)
             {
                 return NotFound();

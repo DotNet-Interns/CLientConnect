@@ -99,10 +99,19 @@ namespace Backend.Controllers
         public async Task<IActionResult> DeleteEmail(int id)
         {
             var email = await _context.Emails.FindAsync(id);
+
+
+            List<Email> emails = await _context.Emails.Where(e => e.CID == email.CID).ToListAsync();
+
+            if (emails.Count == 1)
+            {
+                return NoContent();
+            }
             if (email == null)
             {
                 return NotFound();
             }
+
 
             _context.Emails.Remove(email);
             await _context.SaveChangesAsync();

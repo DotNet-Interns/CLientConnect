@@ -33,6 +33,11 @@ namespace Backend.Controllers
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
+            if(user.Status== UserStatus.Inactive)
+            {
+                return Unauthorized();
+            }
+
        
             if (user == null || !VerifyPassword(request.Password, user.Password))
             {
