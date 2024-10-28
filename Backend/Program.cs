@@ -63,7 +63,8 @@ namespace Backend
 
             app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigins");
-            app.UseMiddleware<Authenticate>(); 
+            app.UseMiddleware<Authenticate>();
+            app.UseMiddleware<RoleCheck>();
             //app.UseAuthorization();
             app.MapControllers();
 

@@ -42,7 +42,7 @@ namespace Backend.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
+        // GET: /get
         [HttpGet("/get")]
         public async Task<ActionResult<User>> GetUser()
         {

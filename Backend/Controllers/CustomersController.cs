@@ -15,9 +15,27 @@ namespace Backend.Controllers
         public int CID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public List<int> Notes { get; set; }
-        public List<int> PhoneNumbers { get; set; }
-        public List<int> Emails { get; set; }
+
+        public string Company { get; set; }
+
+        public string Position { get; set; }
+
+        public string Address { get; set; }
+
+        public List<PhoneDto> PhoneNumbers { get; set; }
+        public List<EmailDto> Emails { get; set; }
+    }
+
+    public class PhoneDto
+    {
+        public int pid { get; set; }
+        public string phone { get; set; }
+    }
+
+    public class EmailDto
+    {
+        public int eid { get; set; }
+        public string email { get; set; }
     }
 
     public class RegisterCustomer 
@@ -66,17 +84,47 @@ namespace Backend.Controllers
             }
 
             List<int> notes = await _context.Notes.Where(n => n.CreatedFor == id).Select(n=> n.NoteID).ToListAsync();
-            List<int> phones = await _context.Phones.Where(p => p.CID == id).Select(p=>p.PID).ToListAsync();
-            List<int> emails = await _context.Emails.Where(p => p.CID == id).Select(e=>e.EID).ToListAsync();
+            List<string> phones = await _context.Phones.Where(p => p.CID == id).Select(p=>p.PhoneNumber).ToListAsync();
+            List<string> emails = await _context.Emails.Where(p => p.CID == id).Select(e=>e.email).ToListAsync();
+
+            List<Phone> phone = await _context.Phones.Where(p => p.CID == id).ToListAsync();
+            List<Email> email = await _context.Emails.Where(e => e.CID == id).ToListAsync();
+
+            List<PhoneDto> customerPhones = [];
+            List<EmailDto> customerEmails = [];
+            foreach (var item in phone)
+            {
+                PhoneDto currPhone = new PhoneDto();
+                currPhone.phone = item.PhoneNumber;
+                currPhone.pid = item.PID;
+
+                customerPhones.Add(currPhone);
+
+            }
+
+            foreach (var item in email)
+            {
+               EmailDto currEmail = new EmailDto();
+                currEmail.email = item.email;
+                currEmail.eid = item.EID;
+
+                customerEmails.Add(currEmail);
+
+            }
+
+
+
 
             var customerDto = new CustomerDto
             {
                 CID = customer.CID,
                 FirstName = customer.FirstName,
                 LastName = customer.LastName,
-                Notes = notes,
-                PhoneNumbers = phones,
-                Emails = emails
+                Company = customer.Company,
+                Position = customer.Position,
+                PhoneNumbers = customerPhones ,
+                Emails = customerEmails,
+                Address = customer.Address
             };
 
             return customerDto;
