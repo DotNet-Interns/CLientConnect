@@ -36,7 +36,7 @@ namespace Backend.Controllers
         }
 
         //GET: api/Users
-       [HttpGet]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -46,9 +46,9 @@ namespace Backend.Controllers
         [HttpGet("/get")]
         public async Task<ActionResult<User>> GetUser()
         {
-            
+
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
-            
+
 
             var user = await _context.Users.FindAsync(Int32.Parse(userPayload.UserId));
 

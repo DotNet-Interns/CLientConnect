@@ -83,9 +83,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            List<int> notes = await _context.Notes.Where(n => n.CreatedFor == id).Select(n=> n.NoteID).ToListAsync();
-            List<string> phones = await _context.Phones.Where(p => p.CID == id).Select(p=>p.PhoneNumber).ToListAsync();
-            List<string> emails = await _context.Emails.Where(p => p.CID == id).Select(e=>e.email).ToListAsync();
+            
 
             List<Phone> phone = await _context.Phones.Where(p => p.CID == id).ToListAsync();
             List<Email> email = await _context.Emails.Where(e => e.CID == id).ToListAsync();

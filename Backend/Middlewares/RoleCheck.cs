@@ -13,7 +13,7 @@ namespace Backend.Middlewares
             _next = next;
             _jwtTokenService = jwtTokenService;
             
-            _notAllowedRoutes = new HashSet<string> { "" };
+            _notAllowedRoutes = new HashSet<string> { "/api/Users/:id" };
             
         }
 
@@ -25,7 +25,7 @@ namespace Backend.Middlewares
 
             if (_notAllowedRoutes.Contains(requestPath))
             {
-                
+                Console.WriteLine("called");
                 if (CheckUserRole(context))
                 {
                     await _next(context);
