@@ -30,16 +30,18 @@ namespace Backend.Controllers
 
         // GET: api/Emails/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Email>> GetEmail(int id)
+        public async Task<ActionResult<EmailDto>> GetEmail(int id)
         {
             var email = await _context.Emails.FindAsync(id);
+            
 
             if (email == null)
             {
                 return NotFound();
             }
+            EmailDto emailData = new EmailDto { eid = email.EID, email = email.email };
 
-            return email;
+            return emailData;
         }
 
         // PUT: api/Emails/5

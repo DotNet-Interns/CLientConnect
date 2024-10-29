@@ -8,11 +8,7 @@ namespace Backend.Controllers
 {
     
 
-    public class CreateClientInteractionDto
-    {
-        public int NoteId { get; set; }
-        public int UserId { get; set; }
-    }
+    
 
     [Route("api/[controller]")]
     [ApiController]

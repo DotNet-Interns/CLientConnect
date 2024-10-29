@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.Dtos;
+using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -7,42 +8,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
-    public class RecentNoteDto
-    {
-        public int NoteID { get; set; }
-        public string Title { get; set; }
-        public string Summary { get; set; }
-        public NoteStatus Status { get; set; }
-        public DateTime ExpectedCompletion { get; set; }
-        public string CreatedBy { get; set; }
-        public string UpdatedBy { get; set; }
-        public string CreatedFor { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class AdminDashboardDto
-    {
-        public int totalCustomer { get; set; }
-        public int activeCustomers { get; set; }
-        public int inactiveCustomers { get; set; }
-        public int recentInteraction { get; set; }
-        public int totalSalesReps { get; set; }
-        public int pendingNotes { get; set; }
-        public int CompletedNotesThisMonth { get; set; }
-        public List<RecentNoteDto> recentNotes { get; set; }
-    }
-
-    public class SRDashboardDto
-    {
-        public int totalCustomer { get; set; }
-        public int activeCustomers { get; set; }
-        public int inactiveCustomers { get; set; }
-        public int recentInteraction { get; set; }
-        public int customersCreatedByYou { get; set; }
-        public int customerInteractionsThisMonths { get; set; }
-        public int CompletedNotesThisMonth { get; set; }
-        public List<RecentNoteDto> recentNotes { get; set; }
-    }
+    
 
 
     [Route("api/[controller]")]
@@ -92,7 +58,7 @@ namespace Backend.Controllers
                     CreatedAt = note.CreatedAt
                 })
                 .ToListAsync();
-           adto.recentNotes =  adto.recentNotes.GetRange(0, 10);
+           adto.recentNotes =  adto.recentNotes.GetRange(0, adto.recentNotes.Count() > 10 ? 10 : adto.recentNotes.Count());
 
             return adto;
         }
@@ -137,7 +103,8 @@ namespace Backend.Controllers
                })
                .ToListAsync();
 
-            srdto.recentNotes = srdto.recentNotes.GetRange(0, 10);
+            
+            srdto.recentNotes = srdto.recentNotes.GetRange(0, srdto.recentNotes.Count() > 10 ? 10 : srdto.recentNotes.Count());
 
             return srdto;
         }
