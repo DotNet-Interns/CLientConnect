@@ -79,30 +79,18 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
             console.log(`Deleting ${field} for customer ${Id}`);
         }
-        else if(action==="CustomerActivate"){
+
+
+        else if(action==="CustomerToggle"){
 
             try {
-                alert(`http://172.20.68.11:5100/api/${field}/${Id}`)
-                const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`, {
+                alert(`${authToken}`)
+                const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`,{}, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
-
             } catch (error) {
-                console.log(`Unable to Activate User ${field}: ${error}`);
-                alert(`Unable to Activate User ${field}`);
-            }
-        }
-        else if(action==="CustomerInActivate"){
-
-            try {
-                alert(`http://172.20.68.11:5100/api/${field}/toggleStatus/${Id}`)
-                const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`, {
-                    headers: { Authorization: `Bearer ${authToken}` }
-                });
-
-            } catch (error) {
-                console.log(`Unable to delete ${field}: ${error}`);
-                alert(`Unable to delete ${field}`);
+                console.log(`Unable to toggle status ${field}: ${error}`);
+                alert(`Unable to toggle Status ${field}`);
             }
         }
         onClose(); // Close modal after action
@@ -124,15 +112,9 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
                 </h3>
 
                 {
-                    action === "CustomerInActivate" &&
+                    action === "CustomerToggle" &&
                     <div className="modal-body">
-                        <p>Are you sure you want to Inactivate this User?</p>
-                    </div>
-                }
-                {
-                    action === "CustomerActivate" &&
-                    <div className="modal-body">
-                        <p>Are you sure you want to activate this User?</p>
+                        <p>Are you sure you want to change status of this Customer?</p>
                     </div>
                 }
 

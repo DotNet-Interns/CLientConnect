@@ -96,3 +96,9 @@
     height: 10px;
     width: 90px;
 }
+.customer-address {
+    max-width: 100%;
+    white-space: normal; 
+    word-wrap: break-word; /* Breaks long words if needed */
+    overflow-wrap: break-word;
+}
