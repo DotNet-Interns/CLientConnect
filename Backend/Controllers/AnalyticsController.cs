@@ -5,33 +5,38 @@ using System.ComponentModel;
 
 namespace Backend.Controllers
 {
+    public class AdminDashboardDto
+    {
+        public int totalCustomer { get; set; }
+
+        public int activeCustomers { get; set; }
+
+
+        public int inactiveCustomers { get; set; }
+        public int recentInteraction { get; set; }
+
+        public int totalSalesReps { get; set; }
+
+        public int pendingNotes { get; set; }
+        public int CompletedNotesThisMonth { get; set; }
+
+
+    }
+    [Route("api/[controller]")]
+    [ApiController]
+
     public class AnalyticsController : ControllerBase
     {
-        public class AdminDashboardDto
-        {
-            public int totalCustomer { get; set; }
-
-            public int activeCustomers { get; set; }
-
-
-            public int inactiveCustomers { get; set; }
-            public int recentInteraction { get; set; }
-
-            public int totalSalesReps { get; set; }
-
-            public int pendingNotes { get; set; }
-            public int CompletedNotesThisMonth { get; set; }
-
-
-        }
+       
         private readonly ClientConnectContext _context;
+
         public AnalyticsController(ClientConnectContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult> AdminDashboard()
+        public async Task<ActionResult<AdminDashboardDto>> AdminDashboard()
         {
             AdminDashboardDto adto = new AdminDashboardDto();
              adto.activeCustomers = _context.Customers.Count(c => c.Status== CustomerStatus.Active);
@@ -47,7 +52,7 @@ namespace Backend.Controllers
 
             adto.CompletedNotesThisMonth = _context.Notes.Count(n => n.Status == NoteStatus.Completed && n.CreatedAt >= startOfMonth && n.CreatedAt <= DateTime.Now);
 
-            return Ok();
+            return adto;
         }
 
     }
