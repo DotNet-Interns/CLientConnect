@@ -6,7 +6,7 @@ const server = import.meta.env.VITE_SERVER;
 
 const RoleCheck = () => {
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
-    console.log(contextUser);
+    //console.log(contextUser);
 
     if (contextUser?.role === 0) {
         return <AdminDashBoard />;

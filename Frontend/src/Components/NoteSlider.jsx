@@ -1,24 +1,21 @@
 import React from 'react'
 import "../styles/NoteSlider.css"
 import NoteCard from './NoteCard'
+import ConvertDate from '../Utils/ConvertDate';
 
-function NoteSlider() {
+function NoteSlider({notes}) {
+    
+    
     return (
         <div className="scrollmenu">
-            <NoteCard id={1} />
-            <NoteCard id={2} />
-            <NoteCard id={3} />
-            <NoteCard id={4} />
-            <NoteCard id={5} />
-            <NoteCard id={6} />
-            <NoteCard id={7} />
-            <NoteCard id={8} />
-            <NoteCard id={9} />
-            <NoteCard id={10} />
-            <NoteCard id={11} />
-            <NoteCard id={12} />
-            <NoteCard id={13} />
-            <NoteCard id={14} />
+            {
+                notes?.map((item,index)=>{
+                    let DateAndTime  = ConvertDate(item.createdAt)
+                    return <NoteCard Title={item.title} Content={item.summary} CreatedDate={DateAndTime}  key={index} />
+                })
+            }
+            
+            
         </div>
     )
 }
