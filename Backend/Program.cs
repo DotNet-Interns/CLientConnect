@@ -11,6 +11,7 @@ namespace Backend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             //Added dependency to get http context in controllers to get the jwt payload
             builder.Services.AddHttpContextAccessor();
             builder.WebHost.ConfigureKestrel(serverop =>
@@ -53,6 +54,9 @@ namespace Backend
             
 
             var app = builder.Build();
+
+            app.UseCors();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Services;
 using Microsoft.AspNetCore.Http;
@@ -55,6 +56,9 @@ namespace Backend.Middlewares
                     await context.Response.WriteAsync("Unauthorized Token");
                     return;
                 }
+                var claims = JwtTokenService.GetClaimsFromToken(token);
+                var uid = claims.FindFirst(ClaimTypes.PrimarySid);
+                Console.Write(uid);
             }
             else
             {

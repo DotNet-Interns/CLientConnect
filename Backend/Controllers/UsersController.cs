@@ -103,6 +103,7 @@ namespace Backend.Controllers
             if (CheckUserRole())
             {
                return Unauthorized(new { message = "Invalid role" });
+
             }
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User();
