@@ -1,6 +1,7 @@
 ﻿using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace Backend.Controllers
 {
@@ -10,6 +11,12 @@ namespace Backend.Controllers
         public int NoteId { get; set; }
         public int UserId { get; set; }
         public DateTime InteractionTime { get; set; }
+    }
+
+    public class CreateClientInteractionDto
+    {
+        public int NoteId { get; set; }
+        public int UserId { get; set; }
     }
 
     [Route("api/[controller]")]
@@ -62,6 +69,37 @@ namespace Backend.Controllers
             }
 
             return Ok(interactions);
+        }
+
+        [HttpPost("create/")]
+        public async Task<ActionResult<ClientInteraction>> CreateClientInteractionDto([FromBody] CreateClientInteractionDto interaction)
+        {
+            if (!NoteExists(interaction.NoteId) || !UserExists(interaction.UserId))
+            {
+                return NotFound("Note or User not found.");
+            }
+            ClientInteraction newInteraction = new ClientInteraction
+            {
+                NoteId = interaction.NoteId,
+                UserId = interaction.UserId,
+                InteractionTime = DateTime.Now
+            };
+
+            _context.clientInteractions.Add(newInteraction);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetInteractionById", new { id = newInteraction.CIID }, newInteraction);
+        }
+
+        private bool NoteExists(int id)
+        {
+            return _context.Notes.Any(i => i.NoteID == id);
+        }
+
+        private bool UserExists(int id)
+        {
+            return _context.Users.Any(e => e.UserID == id);
         }
 
 
