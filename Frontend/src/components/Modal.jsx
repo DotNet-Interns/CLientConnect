@@ -82,7 +82,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
         else if(action==="CustomerActivate"){
 
             try {
-                console.log(`http://172.20.68.11:5100/api/${field}/${Id}`)
+                alert(`http://172.20.68.11:5100/api/${field}/${Id}`)
                 const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
@@ -95,7 +95,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
         else if(action==="CustomerInActivate"){
 
             try {
-                console.log(`http://172.20.68.11:5100/api/${field}/toggleStatus/${Id}`)
+                alert(`http://172.20.68.11:5100/api/${field}/toggleStatus/${Id}`)
                 const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
