@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import "../styles/CustomModal.css"; // Add any required styles here for your modal layout
+import "../../styles/CustomModal.css"; // Add any required styles here for your modal layout
 import axios from 'axios';
-import * as cookie from "../Utils/cookie";
+import * as cookie from "../../Utils/cookie";
 
 function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
     const [inputValue, setInputValue] = useState(currentValue);
@@ -27,9 +27,9 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
             }
             else if (field == "Phones") {
                 data["phoneNumber"] = inputValue;
-            }
+            }http://172.20.68.11:5100
             try {
-                const response = await axios.post(`http://172.20.68.11:5100/api/${field}`, data, {
+                const response = await axios.post(`/api/${field}`, data, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
 
@@ -84,7 +84,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
         else if(action==="CustomerToggle"){
 
             try {
-                alert(`${authToken}`)
+              
                 const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`,{}, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });

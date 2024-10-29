@@ -14,7 +14,7 @@ import { setCookie } from '../Utils/cookie';
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({ email: '', password: '' });
-    const {loggedIn , setLoggedIn} = useUserInfo();
+    const {loggedIn , setContextUser , setLoggedIn , contextUser} = useUserInfo();
 
     const handleChange = (event) => {
         setFormData((prevValue) => {
@@ -44,6 +44,7 @@ const Login = () => {
                 console.log(response.data);
                 setLoggedIn(true);
                 setCookie("Auth_Token",response.data.token,1);
+                setContextUser(response.data.user)
             } catch (error) {
                 console.log(error);
                 
