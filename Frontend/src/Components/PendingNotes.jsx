@@ -1,14 +1,14 @@
 import React from 'react'
 
-function RecentInteractions() {
+function PendingNotes() {
   return (
     <div>
         <h2>
-            Recent Interactions
+            Pending Notes
         </h2>
         <h1>50</h1>
     </div>
   )
 }
 
-export default RecentInteractions
+export default PendingNotes
