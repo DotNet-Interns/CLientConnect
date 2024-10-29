@@ -12,6 +12,8 @@ import Navbar from './Components/Navbar';
 import { useUserInfo } from './Contexts/User';
 import { getCookie } from './Utils/cookie';
 import axios from 'axios';
+import Customers from './pages/Customers';
+import Users from './pages/Users';
 const server = import.meta.env.VITE_SERVER;
 // import AdminDashBoard from './pages/AdminDashBoard';
 
@@ -58,6 +60,8 @@ function App() {
         <Route path='/addSR' element={<AddSR />} />
         <Route path='/addCustomer' element={<AddCustomer />} />
         <Route path='/view/customer' element={<DisplayCustomer />} />
+        <Route path='/customers' element={<Customers />} />
+        <Route path='/users' element={<Users />} />
       </Routes>
 
 

@@ -19,7 +19,7 @@ function Navbar() {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto">
                         {/* Search Field */}
-                        <li className="nav-item">
+                        <li className="nav-item mx-3">
                             <div className="d-flex bg-light rounded-1  align-items-center">
                                 <input 
                                     className="form-control focus-ring focus-ring-dark border-0 rounded-1 " 
