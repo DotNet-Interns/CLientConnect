@@ -1,25 +1,35 @@
 import { useEffect, useRef, useState } from "react";
-import "../styles/NoteCard.css"
+import "../styles/NoteCard.css";
 
-function NoteCard({ Title, Content, IDate ,id }) {
+function NoteCard({ Title = "", Content = "", IDate = "", id, initialStatus = 0, onEdit, onStatusChange }) {
     const [noteCard, setNoteCard] = useState(false);
+    const [status, setStatus] = useState(initialStatus);
     const noteCardRef = useRef(null);
 
-    // console.log(id);
-    
     const handleNoteCardClick = () => {
         setNoteCard(true);
-        document.getElementById("blurer").style.display = "block"
-    }
+        document.getElementById("blurer").style.display = "block";
+    };
 
+    const handleEdit = () => {
+        if (onEdit) {
+            onEdit(id); // Call the edit function passed down as prop
+        }
+    };
+
+    const handleStatusChange = () => {
+        const newStatus = status === 0 ? 1 : 0; // Toggle status
+        setStatus(newStatus);
+        if (onStatusChange) {
+            onStatusChange(id, newStatus); // Call the status change function passed down as prop
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!noteCardRef.current.contains(event.target)) {
+            if (noteCardRef.current && !noteCardRef.current.contains(event.target)) {
                 setNoteCard(false);
-                document.getElementById("blurer").style.display = "none"
-                console.log("Clicked");
-                
+                document.getElementById("blurer").style.display = "none";
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -28,24 +38,31 @@ function NoteCard({ Title, Content, IDate ,id }) {
         };
     }, []);
 
-
     return (
         <>
-            <div onClick={handleNoteCardClick} style={{display : "inline-block"}} className='pointer note col-3 p-3 m-3'>
-                <h3 className='bg-secondary rounded-1 text-light p-1'>Title</h3>
-                <p className="noteContent">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vero dicta modi, eveniet pariatur placeat rem eos ducimus iusto ex optio, voluptate alias quo, quaerat corporis! Tenetur animi repellendus explicabo quia! Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquam a quos nihil sit voluptates ad tenetur, fugiat eum dolore quia modi rerum saepe quasi, veritatis consequuntur voluptatem voluptate facilis minus?
-                </p>
-                <p>Interaction Date :12/5/2023</p>
+            <div onClick={handleNoteCardClick} className='note-card-container pointer'>
+                <h3 className='note-card-title'>{Title}</h3>
+                <p className="note-card-content">{Content}</p>
+                <p className="note-card-date">Interaction Date: {IDate}</p>
             </div>
 
-            <div style={{display : noteCard ? "block" : "none"}} id="Note-Pop-up" ref={noteCardRef} >
-                Hello World
-            </div>
+            {noteCard && (
+                <div id="Note-Pop-up" ref={noteCardRef} className="note-card-popup">
+                    <h3 className="note-card-title h3 text-light text-capitalize">{Title}</h3>
+                    <p className="popup-content border  p-3 rounded-2">{Content}</p>
+                    <p className="popup-date">Interaction Date: {IDate}</p>
+                    <div className="popup-actions">
+                        <button onClick={handleEdit} className="edit-button">Edit</button>
+                        <button onClick={handleStatusChange} className="status-button">
+                            {status === 0 ? 'Mark as Complete' : 'Mark as Incomplete'}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div id="blurer"></div>
         </>
     );
 }
 
-export default NoteCard
+export default NoteCard;

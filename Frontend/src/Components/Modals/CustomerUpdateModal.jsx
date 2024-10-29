@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import "../styles/CustomModal.css";
+import "../../styles/CustomModal.css";
 import axios from 'axios';
-import * as cookie from "../Utils/cookie";
+import * as cookie from "../../Utils/cookie";
 
 function CustomerUpdateModal({ isOpen, onClose, customerId, currentDetails = {} }) {
     const [firstName, setFirstName] = useState(currentDetails.firstName || "");

@@ -7,6 +7,8 @@ import AddCustomer from './pages/AddCustomer';
 import DisplayCustomer from './pages/DisplayCustomer';
 import { RoleCheck } from './Utils/RoleCheck';
 import ProtectedRoute from './Utils/ProtectedRoute';
+import AdminDashBoard from './pages/AdminDashBoard';
+import Navbar from './Components/Navbar';
 import { useUserInfo } from './Contexts/User';
 import { getCookie } from './Utils/cookie';
 import axios from 'axios';
@@ -42,11 +44,9 @@ function App() {
     getUser();
   }, [])
 
-
   return (
     <>
-
-
+      <Navbar/>
       <Routes>
         <Route path='/' element={
           <ProtectedRoute>
