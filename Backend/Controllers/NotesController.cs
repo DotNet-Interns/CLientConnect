@@ -56,6 +56,16 @@ namespace Backend.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                var interaction = new ClientInteraction
+                {
+                    NoteId = note.NoteID, 
+                    UserId = note.CreatedBy,
+                    InteractionTime = DateTime.Now 
+                };
+
+                _context.clientInteractions.Add(interaction);
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -80,23 +90,19 @@ namespace Backend.Controllers
             _context.Notes.Add(note);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNote", new { id = note.NoteID }, note);
-        }
-
-        // DELETE: api/Notes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNote(int id)
-        {
-            var note = await _context.Notes.FindAsync(id);
-            if (note == null)
+            
+            var interaction = new ClientInteraction
             {
-                return NotFound();
-            }
+                NoteId = note.NoteID, 
+                UserId = note.CreatedBy, 
+                InteractionTime = DateTime.Now
+            };
 
-            _context.Notes.Remove(note);
+            _context.clientInteractions.Add(interaction);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+
+            return CreatedAtAction("GetNote", new { id = note.NoteID }, note);
         }
 
         private bool NoteExists(int id)

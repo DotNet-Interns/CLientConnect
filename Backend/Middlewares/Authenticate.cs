@@ -34,6 +34,7 @@ namespace Backend.Middlewares
             // Check if the request path is in the list of allowed routes
             var requestPath = context.Request.Path.ToString();
             Console.Write(requestPath);
+            
             // Allow access to the specified routes without token verification
             if (_allowedRoutes.Contains(requestPath))
             {
@@ -43,9 +44,11 @@ namespace Backend.Middlewares
 
             var token = _jwtTokenService.GetJwtToken(context);
 
-            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
+            
+
+            if (!string.IsNullOrEmpty(token))
             {
-                token = token.Substring("Bearer ".Length).Trim();
+                Console.Write("at auth");
 
                 if (!_jwtTokenService.VerifyJwtToken(token))
                 {
