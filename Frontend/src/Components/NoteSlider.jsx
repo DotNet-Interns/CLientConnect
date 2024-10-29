@@ -1,45 +1,24 @@
 import React from 'react'
 import "../styles/NoteSlider.css"
+import NoteCard from './NoteCard'
 
 function NoteSlider() {
     return (
-        <div>
-            <div className="container-fluid">
-                
-                <div className="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4 pt-2">
-
-                    <div className="col-3">
-                        <div className="card card-block card-1"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-2"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-3"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-4"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-5"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-6"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-7"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-8"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-9"></div>
-                    </div>
-                    <div className="col-3">
-                        <div className="card card-block card-10"></div>
-                    </div>
-                </div>
-            </div>
+        <div className="scrollmenu">
+            <NoteCard id={1} />
+            <NoteCard id={2} />
+            <NoteCard id={3} />
+            <NoteCard id={4} />
+            <NoteCard id={5} />
+            <NoteCard id={6} />
+            <NoteCard id={7} />
+            <NoteCard id={8} />
+            <NoteCard id={9} />
+            <NoteCard id={10} />
+            <NoteCard id={11} />
+            <NoteCard id={12} />
+            <NoteCard id={13} />
+            <NoteCard id={14} />
         </div>
     )
 }
