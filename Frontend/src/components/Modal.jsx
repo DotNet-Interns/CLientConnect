@@ -84,7 +84,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
         else if(action==="CustomerToggle"){
 
             try {
-                alert(`${authToken}`)
+              
                 const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`,{}, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
