@@ -8,11 +8,16 @@ import DisplayCustomer from './pages/DisplayCustomer';
 import RoleCheck from './Utils/RoleCheck';
 import ProtectedRoute from './Utils/ProtectedRoute';
 import AdminDashBoard from './pages/AdminDashBoard';
+import Navbar from './Components/Navbar';
+
 
 function App() {
+  
 
   return (
     <>
+
+      <Navbar/>
       <Routes>
         <Route path='/' element={
           // <ProtectedRoute>
