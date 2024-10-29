@@ -5,9 +5,9 @@ function Customers() {
     return (
         <>
             <Navbar />
-            <div className="mx-5">
+            <div className="mx-sm-5">
                 <div className="options">
-                    <ul className="nav justify-content-end mt-3">
+                    <ul className="nav justify-content-md-end mt-3">
                         <li className="nav-item">
                             <button className="btn btn-primary mx-3" aria-current="page" href="#">Add</button>
                         </li>

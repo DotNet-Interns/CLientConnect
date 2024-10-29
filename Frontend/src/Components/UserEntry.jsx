@@ -5,7 +5,7 @@ function UserEntry(){
             <div className="col m-2">UserName: Name</div>
             <div className="col m-2">CreatedBy: Name</div>
             <div className="col m-2">CreatedAt: 09:00</div>
-            <button className="col-1 m-2">Show</button>
+            <button className="col-md-1 m-2">Show</button>
         </div>
     )
 }
