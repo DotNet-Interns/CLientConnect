@@ -1,25 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../Components/Navbar'
 import NoteSlider from "../Components/NoteSlider"
 import TotalCustomers from '../Components/TotalCustomers'
 import RecentInteractions from '../Components/RecentInteractions'
-import axios from "axios"
-import { getCookie } from '../Utils/cookie';
-import { useUserInfo } from '../Contexts/User';
 import Greeting from '../Components/Greeting'
-import '../styles/AdminDashBoard.css'
-import PendingNotes from '../Components/PendingNotes'
-import CompletedNotesThisMonth from '../Components/CompletedNotesThisMonth'
-import TotalSalesReps from '../Components/TotalSalesReps'
-const server = import.meta.env.VITE_SERVER;
+import CustomersCreatedBySR from "../Components/CustomersCreatedBySR"
+import CompletedNotesThisMonthSR from "../Components/CompletedNotesThisMonthBySR"
+import Navbar from '../Components/Navbar'
+import { useUserInfo } from '../Contexts/User';
 
-function AdminDashBoard() {
+function SRDashBoard() {
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
     const [loading, setLoading] = useState(true);
-    console.log(contextUser);
-
-
-
     return (
         <>
             {
@@ -44,21 +35,19 @@ function AdminDashBoard() {
                                     <RecentInteractions />
                                 </div>
                             </div>
-                            {/* </div>
-                            <div className="row m-5"> */}
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className="p-3 border border-5 border-dark rounded h-100">
-                                    <TotalSalesReps />
+                                    <CustomersCreatedBySR />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className=" p-3 bg-danger text-white rounded h-100">
-                                    <PendingNotes />
+                                    <CustomersCreatedBySR />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className="p-3 bg-dark text-white rounded h-100">
-                                    <CompletedNotesThisMonth />
+                                    <CompletedNotesThisMonthSR />
                                 </div>
                             </div>
                         </div>
@@ -73,4 +62,4 @@ function AdminDashBoard() {
     )
 }
 
-export default AdminDashBoard
+export default SRDashBoard
