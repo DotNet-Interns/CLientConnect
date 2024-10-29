@@ -12,25 +12,8 @@ namespace Backend
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddCors(options =>
-            {
-               
-
-                options.AddPolicy("AnotherPolicy",
-                    policy =>
-                    {
-                        policy.WithOrigins("http://localhost:5173")
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod();
-                    });
-                //options.AddDefaultPolicy(
-                //                  policy =>
-                //                  {
-                //                      policy.WithOrigins("http://localhost:5173/").AllowAnyHeader().AllowAnyMethod();
-                //                  });
-            });
-
-
+            //Added dependency to get http context in controllers to get the jwt payload
+            builder.Services.AddHttpContextAccessor();
             builder.WebHost.ConfigureKestrel(serverop =>
             {
                 serverop.ListenAnyIP(5100);
@@ -41,10 +24,29 @@ namespace Backend
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowSpecificOrigins",
+            //        policy =>
+            //        {
+            //            policy.WithOrigins("http://172.20.68.21:5173")  // Replace with your frontend URL
+            //                  .AllowAnyHeader()
+            //                  .AllowAnyMethod()
+            //                  .AllowCredentials();  // Enable credentials (cookies, authorization headers)
+            //        });
+            //});
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigins",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()  // Replace with your frontend URL
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              ;  // Enable credentials (cookies, authorization headers)
+                    });
+            });
 
-
-            // No need to register middleware as a service
-             //builder.Services.AddScoped<Authenticate>(); // Comment or remove this line
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -64,8 +66,10 @@ namespace Backend
             }
 
             app.UseHttpsRedirection();
-            //app.UseMiddleware<Authenticate>(); 
-            app.UseAuthorization();
+            app.UseCors("AllowSpecificOrigins");
+            app.UseMiddleware<Authenticate>();
+            //app.UseMiddleware<RoleCheck>();
+            //app.UseAuthorization();
             app.MapControllers();
 
             app.Run();

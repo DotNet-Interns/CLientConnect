@@ -6,30 +6,25 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Services;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
-    public class RegisterCustomer 
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Address { get; set; }
-
-        public string Company { get; set; }
-        public int CreatedBy { get; set; }
-        public string Position { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-    }
+  
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly JwtTokenService _jwtTokenService ;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CustomersController(ClientConnectContext context)
+        public CustomersController(ClientConnectContext context , JwtTokenService jwtTokenService,IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/Customers
@@ -41,7 +36,7 @@ namespace Backend.Controllers
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
@@ -50,20 +45,68 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return customer;
+            
+
+            List<Phone> phone = await _context.Phones.Where(p => p.CID == id).ToListAsync();
+            List<Email> email = await _context.Emails.Where(e => e.CID == id).ToListAsync();
+
+            List<PhoneDto> customerPhones = [];
+            List<EmailDto> customerEmails = [];
+            foreach (var item in phone)
+            {
+                PhoneDto currPhone = new PhoneDto();
+                currPhone.phone = item.PhoneNumber;
+                currPhone.pid = item.PID;
+
+                customerPhones.Add(currPhone);
+
+            }
+
+            foreach (var item in email)
+            {
+               EmailDto currEmail = new EmailDto();
+                currEmail.email = item.email;
+                currEmail.eid = item.EID;
+
+                customerEmails.Add(currEmail);
+
+            }
+
+
+
+
+            var customerDto = new CustomerDto
+            {
+                CID = customer.CID,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Company = customer.Company,
+                Position = customer.Position,
+                Status = customer.Status,
+                PhoneNumbers = customerPhones ,
+                Emails = customerEmails,
+                Address = customer.Address
+            };
+
+            return customerDto;
         }
+
 
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
+        [HttpPut()]
+        public async Task<IActionResult> PutCustomer( [FromBody] CustomerUpdateDto customer)
         {
-            if (id != customer.CID)
-            {
-                return BadRequest();
-            }
+           
+            Customer updatedCustomer = await _context.Customers.FindAsync(customer.cid);
 
-            _context.Entry(customer).State = EntityState.Modified;
+            updatedCustomer.FirstName = customer.firstName ?? updatedCustomer.FirstName;
+            updatedCustomer.LastName = customer.lastName ?? updatedCustomer.LastName;
+            updatedCustomer.Address = customer.address ?? updatedCustomer.Address;
+            updatedCustomer.Company = customer.company ?? updatedCustomer.Company;
+            updatedCustomer.Position = customer.position ?? updatedCustomer.Position;
+
+            _context.Entry(updatedCustomer).State = EntityState.Modified;
 
             try
             {
@@ -71,7 +114,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(id))
+                if (!CustomerExists(customer.cid))
                 {
                     return NotFound();
                 }
@@ -87,14 +130,17 @@ namespace Backend.Controllers
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomer registerCustomer)
+        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomerDto registerCustomer)
         {
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+            
             Customer customer = new Customer();
             customer.FirstName = registerCustomer.FirstName;
             customer.LastName = registerCustomer.LastName;
             customer.Address = registerCustomer.Address;
             customer.Company = registerCustomer.Company;
-            customer.CreatedBy = registerCustomer.CreatedBy;
+            customer.CreatedBy = Int32.Parse(userPayload.UserId);
+
             customer.Position = registerCustomer.Position;
 
             Phone phone = new Phone();
@@ -112,19 +158,31 @@ namespace Backend.Controllers
         }
 
         // DELETE: api/Customers/5
-        [HttpDelete("{id}")]
+        [HttpPut("toggleStatus/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            
+            
+            Customer customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
             }
+            if(customer.Status == CustomerStatus.Inactive)
+            {
+                customer.Status = CustomerStatus.Active;
+            }
+            else
+            {
+                customer.Status = CustomerStatus.Inactive;
+            }
+            
+            
 
-            _context.Customers.Remove(customer);
+            _context.Entry(customer).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool CustomerExists(int id)
