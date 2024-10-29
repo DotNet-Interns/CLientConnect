@@ -56,7 +56,7 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("Admin")]
         public async Task<ActionResult<AdminDashboardDto>> AdminDashboard()
         {
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -97,7 +97,7 @@ namespace Backend.Controllers
         }
 
 
-        [HttpGet("sr/{UserId}")]
+        [HttpGet("SR/{UserId}")]
         public async Task<ActionResult<SRDashboardDto>> SRDashboard(int UserId)
         {
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
