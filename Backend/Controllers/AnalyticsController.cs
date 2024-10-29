@@ -92,6 +92,7 @@ namespace Backend.Controllers
                     CreatedAt = note.CreatedAt
                 })
                 .ToListAsync();
+           adto.recentNotes =  adto.recentNotes.GetRange(0, 10);
 
             return adto;
         }
@@ -135,6 +136,8 @@ namespace Backend.Controllers
                    CreatedAt = note.CreatedAt
                })
                .ToListAsync();
+
+            srdto.recentNotes = srdto.recentNotes.GetRange(0, 10);
 
             return srdto;
         }
