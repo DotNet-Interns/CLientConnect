@@ -22,6 +22,7 @@ namespace Backend.Middlewares
             
             var requestPath = context.Request.Path.ToString();
             Console.WriteLine(requestPath);
+            Console.Write("role");
 
             if (_notAllowedRoutes.Contains(requestPath))
             {

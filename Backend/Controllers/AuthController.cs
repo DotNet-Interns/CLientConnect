@@ -35,6 +35,7 @@ namespace Backend.Controllers
 
             if(user.Status== UserStatus.Inactive)
             {
+                Console.Write("inactive");
                 return Unauthorized();
             }
 

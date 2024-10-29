@@ -94,15 +94,19 @@ namespace Backend.Controllers
 
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
+        [HttpPut()]
+        public async Task<IActionResult> PutCustomer( [FromBody] CustomerUpdateDto customer)
         {
-            if (id != customer.CID)
-            {
-                return BadRequest();
-            }
+           
+            Customer updatedCustomer = await _context.Customers.FindAsync(customer.cid);
 
-            _context.Entry(customer).State = EntityState.Modified;
+            updatedCustomer.FirstName = customer.firstName ?? updatedCustomer.FirstName;
+            updatedCustomer.LastName = customer.lastName ?? updatedCustomer.LastName;
+            updatedCustomer.Address = customer.address ?? updatedCustomer.Address;
+            updatedCustomer.Company = customer.company ?? updatedCustomer.Company;
+            updatedCustomer.Position = customer.position ?? updatedCustomer.Position;
+
+            _context.Entry(updatedCustomer).State = EntityState.Modified;
 
             try
             {
@@ -110,7 +114,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(id))
+                if (!CustomerExists(customer.cid))
                 {
                     return NotFound();
                 }
@@ -157,7 +161,8 @@ namespace Backend.Controllers
         [HttpPut("toggleStatus/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            Console.Write(id);
+            
+            
             Customer customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {

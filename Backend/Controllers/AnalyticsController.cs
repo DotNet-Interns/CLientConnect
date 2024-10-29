@@ -35,7 +35,7 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("Admin")]
         public async Task<ActionResult<AdminDashboardDto>> AdminDashboard()
         {
             AdminDashboardDto adto = new AdminDashboardDto();
