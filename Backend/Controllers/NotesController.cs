@@ -44,6 +44,7 @@ namespace Backend.Controllers
         // PUT: api/Notes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ProducesResponseType(statusCode:StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutNote(int id, Note note)
         {
             if (id != note.NoteID)
