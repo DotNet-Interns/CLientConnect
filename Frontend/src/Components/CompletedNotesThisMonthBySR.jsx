@@ -1,12 +1,12 @@
 import React from 'react'
 
-function CompletedNotesThisMonthSR() {
+function CompletedNotesThisMonthSR({CompletedNotesThisMonthSR}) {
   return (
     <div>
         <h2>
             Completed Notes This Month
         </h2>
-        <h1>50</h1>
+        <h1>{CompletedNotesThisMonthSR}</h1>
     </div>
   )
 }

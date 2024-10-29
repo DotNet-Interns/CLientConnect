@@ -13,8 +13,9 @@ function NoteSlider({notes}) {
                     let DateAndTime  = ConvertDate(item.createdAt)
                     return <NoteCard Title={item.title} Content={item.summary} CreatedDate={DateAndTime}  key={index} />
                 })
+                
             }
-            
+            {(notes.length === 0) && <p>There are no recent notes to show!</p>}
             
         </div>
     )
