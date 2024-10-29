@@ -21,7 +21,7 @@ namespace Backend.Controllers
             _context = context;
             _jwtTokenService = jwtTokenService;
         }
-        [EnableCors("AnotherPolicy")]
+        //[EnableCors("AnotherPolicy")]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
@@ -49,7 +49,7 @@ namespace Backend.Controllers
             var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
 
 
-            return Ok(new {token});
+            return Ok(new {token,user});
         }
 
         private bool VerifyPassword(string enteredPassword, string storedHash)

@@ -2,7 +2,7 @@
 
 namespace Backend.Dtos
 {
-    public class NoteDto
+    public class GetNoteDto
     {
         public int noteID { get; set; }
 
@@ -14,12 +14,13 @@ namespace Backend.Dtos
 
         public DateTime expectedCompletion { get; set; }
 
-        public int  createdBy { get; set; }
+        public string createdBy { get; set; }
 
-        public int updatedBy { get; set; }
-
-        public int createdFor { get; set; }
+        public string updatedBy { get; set; }
 
         public DateTime createdAt { get; set; }
+
+        
+
     }
 }
