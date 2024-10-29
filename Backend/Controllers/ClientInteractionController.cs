@@ -72,7 +72,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("create/")]
-        public async Task<ActionResult<ClientInteraction>> CreateClientInteractionDto([FromBody] CreateClientInteractionDto interaction)
+        public async Task<ActionResult<ClientInteraction>> CreateInteraction([FromBody] CreateClientInteractionDto interaction)
         {
             if (!NoteExists(interaction.NoteId) || !UserExists(interaction.UserId))
             {
