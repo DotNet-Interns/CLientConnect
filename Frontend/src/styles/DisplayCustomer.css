@@ -19,7 +19,7 @@
 
 .notes {
 
-    height: 30vh;
+    min-height: 25vh;
     overflow: hidden;
     min-width: 20vw;
 
@@ -83,4 +83,22 @@
 .btn-add:hover{
     box-shadow: 2px 2px 2px #9fc1ff73 ;
     scale: 105%;
+}
+.loaderContainer{
+    height: 90vh;
+    
+}
+.img{
+    height: 5vh;
+    width: 5vw;
+}
+.lottie{
+    height: 10px;
+    width: 90px;
+}
+.customer-address {
+    max-width: 100%;
+    white-space: normal; 
+    word-wrap: break-word; /* Breaks long words if needed */
+    overflow-wrap: break-word;
 }
