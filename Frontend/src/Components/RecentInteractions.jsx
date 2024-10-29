@@ -1,12 +1,12 @@
 import React from 'react'
 
-function RecentInteractions() {
+function RecentInteractions({recentInteractions}) {
   return (
     <div>
         <h2>
             Recent Interactions
         </h2>
-        <h1>50</h1>
+        <h1>{recentInteractions}</h1>
     </div>
   )
 }

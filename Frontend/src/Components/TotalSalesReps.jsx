@@ -1,12 +1,12 @@
 import React from 'react'
 
-function TotalSalesReps() {
+function TotalSalesReps({totalSR}) {
   return (
     <div>
         <h2>
             Total Sales Representatives
         </h2>
-        <h1>50</h1>
+        <h1>{totalSR}</h1>
     </div>
   )
 }
