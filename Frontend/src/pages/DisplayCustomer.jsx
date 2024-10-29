@@ -10,6 +10,7 @@ import notfound from '../assets/notfound.svg';
 import Modal from '../components/Modal';
 import Lottie from 'lottie-react';
 import active from '../../public/active.json';
+import CustomerUpdateModal from '../components/CustomerUpdateModal';
 
 function NoteCard() {
     return (
@@ -29,12 +30,14 @@ function DisplayCustomer() {
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [modalProps, setModalProps] = useState({});
     const [customers, setCustomers] = useState(null);
     const [loading, setLoading] = useState(false);
     const [activeMenuIndex, setActiveMenuIndex] = useState(null);  // for edit , update , delete options menu 
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
-    const [refresh,setRefresh]=useState(false);
+    const [refresh, setRefresh] = useState(false);
+
 
     const copyToClipboard = (text, index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -54,14 +57,23 @@ function DisplayCustomer() {
         setIsModalOpen(true);
     };
 
+    const openUpdateModal = () => {
+        setIsUpdateModalOpen(true);
+    }
     const closeModal = () => {
         setIsModalOpen(false);
         setModalProps({});
-        setRefresh((prev)=>{
+        setRefresh((prev) => {
             return !prev;
         })
-
     };
+
+    const closeUpdateModal = () => {
+        setIsUpdateModalOpen(false);
+        setRefresh((prev) => {
+            return !prev;
+        })
+    }
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -73,6 +85,7 @@ function DisplayCustomer() {
                 console.log(response.data)
                 setCustomers(response.data);
 
+
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching customer data:", error);
@@ -83,10 +96,11 @@ function DisplayCustomer() {
     }, [refresh]);
 
 
-    const inActivateUser = (Id) => {
-        setModalProps({ field: 'Customers', action: 'CustomerActivate', Id });
+    const toggleUser = (Id) => {
+        setModalProps({ field: 'Customers', action: 'CustomerToggle', Id });
         setIsModalOpen(true)
     }
+
     const handleOptionsClick = (index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
     };
@@ -111,29 +125,29 @@ function DisplayCustomer() {
 
     return (
         <div className='d-flex align-items-center justify-center mt-3'>
-            
+
             <div className='d-flex flex-column justify-content-start  gap-3 p-3 align-items-center main-container rounded-4 shadow-lg'>
                 <div className='ms-auto'>
-                  
-                    { !Boolean(customers.status) &&
-                    <div className='lottie'> {/* You can adjust the size */}
-                        <Lottie className=' p-0 flex-row-reverse gap-1 d-flex justify-content-center align-items-center ' animationData={active} loop={true} ><button className='bg-danger-subtle border-0 p-1 rounded-2  ' onClick={() => inActivateUser(customers.cid)} > Delete </button></Lottie>
-                    </div>}
+
+                    {!Boolean(customers.status) &&
+                        <div className='lottie'> {/* You can adjust the size */}
+                            <Lottie className=' p-0 flex-row-reverse gap-1 d-flex justify-content-center align-items-center ' animationData={active} loop={true} ><button className='bg-danger-subtle border-0 p-1 rounded-2  ' onClick={() => toggleUser(customers.cid)} > Delete </button></Lottie>
+                        </div>}
                     {
-                        Boolean(customers.status) && <button className='bg-success-subtle border-0 p-2 rounded-2  ' onClick={() => inActivateUser(customers.cid)} > Restore </button>
+                        Boolean(customers.status) && <button className='bg-success-subtle border-0 p-2 rounded-2  ' onClick={() => toggleUser(customers.cid)} > Restore </button>
                     }
-                
+
 
                 </div>
                 <div className='w-50 p-1 d-flex align-items-center justify-content-center rounded-2 customerContainer'>
                     <h2 className='text-white'>Customer: {customers.firstName} {customers.lastName}</h2>
                 </div>
 
-                <div className='d-flex justify-content-between align-items-start w-100 p-5 gap-3 flex-wrap '>
-                    <div className='shadow-lg p-3 d-flex flex-column align-items-start justify-content-start gap-3 rounded-3'>
+                <div className='d-flex justify-content-between align-items-start w-100 p-5 gap-3  '>
+                    <div className='shadow-lg w-50 p-3 d-flex flex-column align-items-start justify-content-start gap-3 rounded-3'>
                         <div className='note-container d-flex w-100 rounded-3 justify-content-between align-items-center p-2'>
                             <h4 className='text-light mx-3 mb-0'>Customer Details</h4>
-                            <FaEdit className='text-light' onClick={() => alert("Edit customer details")} />
+                            <FaEdit className='text-light' onClick={() => openUpdateModal()} />
                         </div>
 
                         <div className='d-flex flex-column align-items-start justify-content-start'>
@@ -146,9 +160,9 @@ function DisplayCustomer() {
                             <p className='fst-italic'>{customers.position}</p>
                         </div>
 
-                        <div className='d-flex flex-column align-items-start justify-content-start'>
+                        <div className='d-flex flex-column align-items-start justify-content-start w-50'>
                             <h4>Address</h4>
-                            <p className='fst-italic'>{customers.address}</p>
+                            <p className='fst-italic customer-address'>{customers.address}</p>
                         </div>
 
                         <div className="container">
@@ -245,6 +259,14 @@ function DisplayCustomer() {
                 action={modalProps.action}
                 Id={modalProps.Id}
                 currentValue={modalProps.currentValue}
+            />
+
+            <CustomerUpdateModal
+                isOpen={isUpdateModalOpen}
+                onClose={closeUpdateModal}
+                customerId={customers.cid}
+                currentDetails={customers}
+
             />
         </div>
     );
