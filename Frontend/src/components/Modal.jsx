@@ -80,6 +80,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
             console.log(`Deleting ${field} for customer ${Id}`);
         }
 
+
         else if(action==="CustomerToggle"){
 
             try {

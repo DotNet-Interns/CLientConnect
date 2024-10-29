@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 // import Cookies from 'js-cookie;'
 import '../styles/Login.css'; // Import the CSS file
-import * as helpers from "../Utils/validation";
-import * as cookie from "../Utils/cookie";
+import { loginValidation } from '../Utils/validation';
 import axios from "axios"
+const server = import.meta.env.VITE_SERVER;
+import { Navigate } from "react-router-dom";
+import { useUserInfo } from '../Contexts/User';
+import { setCookie } from '../Utils/cookie';
+
 
 
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({ email: '', password: '' });
+    const {loggedIn , setLoggedIn} = useUserInfo();
 
     const handleChange = (event) => {
         setFormData((prevValue) => {
@@ -30,19 +35,19 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        helpers.loginValidation(formData,setErrors);
-        
-
-        try {
-            const response = await axios.post("http://172.20.68.11:5100/api/Auth",{
-                Password : formData.password,
-                Email : formData.email
-            });
-            console.log(response)
-           cookie.setCookie("Auth_Token",response.data.token,1)
-        } catch (error) {
-            console.log(error);
-            
+        if(loginValidation(formData , setErrors)){
+            try {
+                const response = await axios.post(`${server}/api/Auth`,{
+                    Password : formData.password,
+                    Email : formData.email
+                });
+                console.log(response.data);
+                setLoggedIn(true);
+                setCookie("Auth_Token",response.data.token,1);
+            } catch (error) {
+                console.log(error);
+                
+            }
         }
     };
 
@@ -81,6 +86,9 @@ const Login = () => {
                     <button type='submit' onClick={handleSubmit} className="btn btn-primary w-100">Login</button>
                 </form>
             </div>
+            {
+                (loggedIn) && <Navigate to="/" replace={true} />
+            }
         </div>
     );
 };
