@@ -1,14 +1,14 @@
 import React from 'react'
 
-function RecentInteractions() {
+function TotalSalesReps() {
   return (
     <div>
         <h2>
-            Recent Interactions
+            Total Sales Representatives
         </h2>
         <h1>50</h1>
     </div>
   )
 }
 
-export default RecentInteractions
+export default TotalSalesReps

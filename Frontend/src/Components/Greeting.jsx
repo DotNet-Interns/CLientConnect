@@ -1,10 +1,11 @@
 import React from 'react'
+import { FaAlignCenter } from 'react-icons/fa'
 
 function Greeting() {
   return (
-    <div>
-        Hello Nasa
-    </div>
+    <h2 className=''>
+        Hello Nasa,
+    </h2>
   )
 }
 

@@ -6,6 +6,7 @@ function TotalCustomers() {
         <h2>
             Total Customers
         </h2>
+        <h1>50</h1>
     </div>
   )
 }
