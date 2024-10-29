@@ -1,24 +1,11 @@
-﻿using Backend.Models;
+﻿using Backend.Dtos;
+using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 
 namespace Backend.Controllers
 {
-    public class ClientInteractionDto
-    {
-        public int CIID { get; set; }
-        public int NoteId { get; set; }
-        public int UserId { get; set; }
-        public DateTime InteractionTime { get; set; }
-    }
-
-    public class CreateClientInteractionDto
-    {
-        public int NoteId { get; set; }
-        public int UserId { get; set; }
-    }
-
     [Route("api/[controller]")]
     [ApiController]
     public class ClientInteractionController : ControllerBase
