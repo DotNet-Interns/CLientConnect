@@ -9,9 +9,9 @@
     transition: transform 0.2s;
 }
 
-.note-card-container:hover {
+/* .note-card-container:hover {
     transform: translateY(-5px);
-}
+} */
 
 .popup-content{
 
@@ -93,3 +93,8 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
 }
+
+/* .scrollmenu{
+    position: fixed;
+    bottom: 0;
+} */
