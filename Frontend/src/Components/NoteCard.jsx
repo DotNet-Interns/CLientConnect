@@ -5,7 +5,7 @@ function NoteCard({ Title, Content, IDate ,id }) {
     const [noteCard, setNoteCard] = useState(false);
     const noteCardRef = useRef(null);
 
-    console.log(id);
+    // console.log(id);
     
     const handleNoteCardClick = () => {
         setNoteCard(true);
