@@ -7,7 +7,7 @@ function NoteSlider({notes}) {
     
     
     return (
-        <div className="scrollmenu">
+        <div className="scrollmenu d-flex">
             {
                 notes?.map((item,index)=>{
                     let DateAndTime  = ConvertDate(item.createdAt)
