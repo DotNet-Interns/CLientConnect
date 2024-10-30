@@ -29,10 +29,30 @@ namespace Backend.Controllers
 
         // GET: api/Customers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<CustomerListDto>>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
-        }
+            var customerList = await _context.Customers.ToListAsync();
+            List < CustomerListDto > result = [];
+            foreach (var item in customerList)
+            {
+                CustomerListDto current = new CustomerListDto
+                {
+                    CID = item.CID,
+                    FirstName = item.FirstName,
+                    LastName=item.LastName,
+                    Company=item.Company,
+                    Position=item.Position,
+                    Address=item.Address,
+                    Status=item.Status,
+                    createdBy = _context.Users
+                          .Where(u => u.UserID == item.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                    createdAt=item.CreatedAt
+                };
+                result.Add(current);
+                
+            }
+            return result;
+        } 
 
         // GET: api/Customers/5
         [HttpGet("{id}")]

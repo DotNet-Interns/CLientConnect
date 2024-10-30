@@ -137,6 +137,7 @@ namespace Backend.Controllers
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             if (userPayload.Role == "SalesRepresentative")
             {
+
                 return false;
             }
             return true;
