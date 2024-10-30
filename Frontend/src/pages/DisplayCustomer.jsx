@@ -371,6 +371,7 @@ function DisplayCustomer() {
                                 });
 
                                 return (
+                                    <div className="">
                                     <NoteCard
                                         key={note.noteID}
                                         Title={note.title}
@@ -387,6 +388,7 @@ function DisplayCustomer() {
                                             })
                                             }}
                                     />
+                                    </div>
                                 );
                             })}
                         </div>
