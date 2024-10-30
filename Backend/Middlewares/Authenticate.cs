@@ -24,7 +24,7 @@ namespace Backend.Middlewares
             _allowedRoutes = new HashSet<string>
             {
                 "/api/Auth",
-                "/api/Users"
+               
 
             };
         }

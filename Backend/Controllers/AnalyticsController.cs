@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticsController : ControllerBase
@@ -55,7 +56,7 @@ namespace Backend.Controllers
                     CreatedAt = note.CreatedAt
                 })
                 .ToListAsync();
-           adto.recentNotes =  adto.recentNotes.GetRange(0, 10);
+           adto.recentNotes =  adto.recentNotes.GetRange(0, adto.recentNotes.Count() > 10 ? 10 : adto.recentNotes.Count());
 
             return adto;
         }
@@ -100,7 +101,8 @@ namespace Backend.Controllers
                })
                .ToListAsync();
 
-            srdto.recentNotes = srdto.recentNotes.GetRange(0, 10);
+            
+            srdto.recentNotes = srdto.recentNotes.GetRange(0, srdto.recentNotes.Count() > 10 ? 10 : srdto.recentNotes.Count());
 
             return srdto;
         }
