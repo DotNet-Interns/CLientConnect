@@ -1,0 +1,12 @@
+.search{
+    width: 30px;
+    font-size: x-large;
+    cursor: pointer;
+}
+.search:hover{
+    scale: 105%;
+}
+nav{
+    background-image: linear-gradient(90deg, #01386e, hsl(228, 85%, 8%));
+}
+

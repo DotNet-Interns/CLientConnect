@@ -4,6 +4,8 @@ using Backend.Services;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
+using NuGet.Protocol;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -19,9 +21,9 @@ namespace Backend.Controllers
             _context = context;
             _jwtTokenService = jwtTokenService;
         }
-        [EnableCors("AnotherPolicy")]
+        //[EnableCors("AnotherPolicy")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
         
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
@@ -32,15 +34,22 @@ namespace Backend.Controllers
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
+            if(user.Status== UserStatus.Inactive)
+            {
+                Console.Write("inactive");
+                return Unauthorized();
+            }
+
        
             if (user == null || !VerifyPassword(request.Password, user.Password))
             {
                 return Unauthorized("Invalid email or password.");
             }
 
-            var token = _jwtTokenService.GenerateJwtToken(user.Email, user.Role.ToString());
+            var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
 
-            return Ok(new { Token = token });
+
+            return Ok(new {token,user});
         }
 
         private bool VerifyPassword(string enteredPassword, string storedHash)
@@ -49,9 +58,5 @@ namespace Backend.Controllers
         }
     }
 
-    public class LoginRequest
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    
 }

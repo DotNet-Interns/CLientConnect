@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -29,29 +30,36 @@ namespace Backend.Controllers
 
         // GET: api/Emails/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Email>> GetEmail(int id)
+        public async Task<ActionResult<EmailDto>> GetEmail(int id)
         {
             var email = await _context.Emails.FindAsync(id);
+            
 
             if (email == null)
             {
                 return NotFound();
             }
+            EmailDto emailData = new EmailDto { eid = email.EID, email = email.email };
 
-            return email;
+            return emailData;
         }
 
         // PUT: api/Emails/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmail(int id, Email email)
+        [HttpPut()]
+        public async Task<IActionResult> PutEmail( [FromBody] EmailDto email)
         {
-            if (id != email.EID)
-            {
-                return BadRequest();
-            }
+            //if (id != email.eid)
+            //{
+            //    return BadRequest();
+            //}
 
-            _context.Entry(email).State = EntityState.Modified;
+            Email newEmail =  _context.Emails.Find(email.eid);
+            
+
+            newEmail.email = email.email;
+
+            _context.Entry(newEmail).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +67,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmailExists(id))
+                if (!EmailExists(email.eid))
                 {
                     return NotFound();
                 }
@@ -75,12 +83,17 @@ namespace Backend.Controllers
         // POST: api/Emails
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Email>> PostEmail(Email email)
+        public async Task<ActionResult<Email>> PostEmail([FromBody] AddEmailDto email)
         {
-            _context.Emails.Add(email);
+            Console.WriteLine("Email Data");
+            Console.WriteLine(email.email);
+            Email currEmail = new Email();
+            currEmail.email = email.email;
+            currEmail.CID = email.CID;
+            _context.Emails.Add(currEmail);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEmail", new { id = email.EID }, email);
+            return CreatedAtAction("GetEmail", new { id = currEmail.EID }, currEmail);
         }
 
         // DELETE: api/Emails/5
@@ -88,10 +101,19 @@ namespace Backend.Controllers
         public async Task<IActionResult> DeleteEmail(int id)
         {
             var email = await _context.Emails.FindAsync(id);
+
+
+            List<Email> emails = await _context.Emails.Where(e => e.CID == email.CID).ToListAsync();
+
+            if (emails.Count == 1)
+            {
+                return NoContent();
+            }
             if (email == null)
             {
                 return NotFound();
             }
+
 
             _context.Emails.Remove(email);
             await _context.SaveChangesAsync();

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using BCrypt.Net;
+using System.IdentityModel.Tokens.Jwt;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
@@ -23,24 +25,32 @@ namespace Backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly JwtTokenService _jwtTokenService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsersController(ClientConnectContext context)
+        public UsersController(ClientConnectContext context, JwtTokenService jwtTokenService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        // GET: api/Users
+        //GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        // GET: /get
+        [HttpGet("/get")]
+        public async Task<ActionResult<User>> GetUser()
         {
-            var user = await _context.Users.FindAsync(id);
+
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+
+
+            var user = await _context.Users.FindAsync(Int32.Parse(userPayload.UserId));
 
             if (user == null)
             {
@@ -55,6 +65,10 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+            if (CheckUserRole())
+            {
+                return Unauthorized(new { message = "Invalid role" });
+            }
             if (id != user.UserID)
             {
                 return BadRequest();
@@ -86,6 +100,11 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult> PostUser([FromBody] UserRequest request)
         {
+            if (CheckUserRole())
+            {
+               return Unauthorized(new { message = "Invalid role" });
+
+            }
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User();
             user.FirstName = request.FirstName;
@@ -102,6 +121,10 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            if (CheckUserRole())
+            {
+                return Unauthorized(new { message = "Invalid role" });
+            }
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
@@ -114,6 +137,15 @@ namespace Backend.Controllers
             return NoContent();
         }
 
+        private bool CheckUserRole()
+        {
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+            if (userPayload.Role == "SalesRepresentative")
+            {
+                return false;
+            }
+            return true;
+        }
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.UserID == id);

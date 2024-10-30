@@ -2,10 +2,24 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Azure.Core;
+using Backend.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
+using NuGet.Protocol;
 
 namespace Backend.Services
 {
+    public class Payload
+    {
+        public Payload(string uid,string role)
+        {
+            UserId = uid;
+            Role = role;
+        }
+        public string UserId;
+        public string Role;
+    }
     public class JwtTokenService
     {
         private readonly string _secretKey;
@@ -16,12 +30,12 @@ namespace Backend.Services
             _secretKey = configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JWT Secret key is missing.");
         }
 
-        public string GenerateJwtToken(string username, string role)
+        public string GenerateJwtToken(int userId,string role)
         {
             // Define the token's claims (user-related data)
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(ClaimTypes.UserData, userId.ToString()),
             new Claim(ClaimTypes.Role, role),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // unique identifier for the token
         };
@@ -44,6 +58,44 @@ namespace Backend.Services
 
             // Return the token string
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+        public string GetJwtToken(HttpContext context)
+        {
+            // Check for the token in the Authorization header
+            string token = context.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
+            {
+                // Extract the token after "Bearer "
+                return token.Substring("Bearer ".Length).Trim();
+            }
+
+           
+
+            // Return null if token is not found in both locations
+            return null;
+        }
+
+
+
+        public Payload GetJwtPayload(HttpContext context)
+        {
+
+            var token = GetJwtToken(context);
+            
+
+            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken payload = (JwtSecurityToken)handler.ReadToken(token);
+
+            string UserId = payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata").Value;
+            string Role = payload.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
+
+
+
+            return new Payload(UserId,Role);
+
         }
 
         // Method to verify JWT token
