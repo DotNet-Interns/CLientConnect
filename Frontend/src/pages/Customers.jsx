@@ -5,6 +5,7 @@ import { useUserInfo } from '../Contexts/User';
 import axios from 'axios';
 import { getCookie } from '../Utils/cookie';
 import ConvertDate from '../Utils/ConvertDate';
+import { Link } from 'react-router-dom';
 const server = import.meta.env.VITE_SERVER;
 
 function Customers() {
@@ -35,7 +36,7 @@ function Customers() {
                 <div className="options">
                     <ul className="nav justify-content-md-end mt-3">
                         <li className="nav-item">
-                            <button className="btn btn-primary mx-3" aria-current="page" href="#">Add</button>
+                            <Link to={"/addCustomer"}><button className="btn btn-primary mx-3" aria-current="page" >Add</button></Link>
                         </li>
                         <li className="nav-item">
                             <button className="btn btn-primary mx-3" href="#">A-Z</button>
@@ -52,7 +53,7 @@ function Customers() {
                 {
                     customerList?.map ((item,index)=>{
                         const Date = ConvertDate(item.createdAt);
-                        return <CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} />
+                        return (item.status===0)?<CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} />:null
                     })
                 }
             </div>

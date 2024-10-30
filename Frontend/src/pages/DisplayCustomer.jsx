@@ -14,6 +14,8 @@ import CustomerUpdateModal from "../Components/Modals/CustomerUpdateModal";
 import NoteCard from "../Components/NoteCard";
 import NoteModal from "../Components/Modals/NoteModal";
 import { useParams } from "react-router-dom";
+import Navbar from "../Components/Navbar";
+import { useUserInfo } from "../Contexts/User";
 
 function DisplayCustomer() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +34,8 @@ function DisplayCustomer() {
     const [refresh, setRefresh] = useState(false);
 
     let { cid } = useParams();
+
+    const {loggedIn , setContextUser , setLoggedIn , contextUser} = useUserInfo();
 
     const copyToClipboard = (text, index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -145,6 +149,8 @@ function DisplayCustomer() {
     }
 
     return (
+        <>
+        <Navbar ifAdmin={(contextUser?.role===0)?true:false} />
         <div className="d-flex align-items-center justify-center mt-3">
             <div className="d-flex flex-column justify-content-start  gap-3 p-3 align-items-center main-container rounded-4 shadow-lg">
                 <div className="ms-auto">
@@ -424,6 +430,7 @@ function DisplayCustomer() {
                 customerId={customers.cid}
             />
         </div>
+        </>
     );
 }
 
