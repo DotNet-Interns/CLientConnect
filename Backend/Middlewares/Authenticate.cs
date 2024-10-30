@@ -24,8 +24,6 @@ namespace Backend.Middlewares
             _allowedRoutes = new HashSet<string>
             {
                 "/api/Auth",
-               
-
             };
         }
 
@@ -68,6 +66,7 @@ namespace Backend.Middlewares
                 return;
             }
 
+            Console.Write("auth verify");
             await _next(context); 
         }
     }

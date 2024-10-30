@@ -33,6 +33,15 @@ namespace Backend.Controllers
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+            {
+                return BadRequest("Email do not exist");
+            }
+            if (user == null || !VerifyPassword(request.Password, user.Password))
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+            
 
             if(user.Status== UserStatus.Inactive)
             {
@@ -41,10 +50,7 @@ namespace Backend.Controllers
             }
 
        
-            if (user == null || !VerifyPassword(request.Password, user.Password))
-            {
-                return Unauthorized("Invalid email or password.");
-            }
+            
 
             var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
 

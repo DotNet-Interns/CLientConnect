@@ -137,10 +137,10 @@ namespace Backend.Controllers
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             if (userPayload.Role == "SalesRepresentative")
             {
-
-                return false;
+                Console.WriteLine("here");
+                return true;
             }
-            return true;
+            return false;
         }
         private bool UserExists(int id)
         {
