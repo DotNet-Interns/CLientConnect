@@ -13,9 +13,9 @@
     transition: transform 0.2s;
 }
 
-.note-card-container:hover {
+/* .note-card-container:hover {
     transform: translateY(-5px);
-}
+} */
 
 .note-card-title {
     font-size: 1.25rem;
@@ -105,7 +105,6 @@
     z-index: 1000;
 }
 
-
 /* edit */
 
 .edit-input-title {
@@ -121,3 +120,4 @@
     width: 98%;
     padding: 5px;
 }
+

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -20,46 +21,75 @@ namespace Backend.Controllers
             _context = context;
         }
 
+        
+
         // GET: api/Notes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
+        [HttpGet("userNotes/{id}")]
+        public async Task<ActionResult<IEnumerable<GetNoteDto>>> GetNotes(int id, ClientConnectContext _context)
         {
-            return await _context.Notes.ToListAsync();
+            return await _context.Notes
+                  .Where(n => n.CreatedFor == id)
+                  .Select( note => new GetNoteDto
+                  {
+                      noteID = note.NoteID,
+                      title = note.Title,
+                      summary = note.Summary,
+                      status = note.Status,
+                      expectedCompletion = note.ExpectedCompletion,
+                      createdBy = _context.Users
+                          .Where(u => u.UserID == note.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                      updatedBy = _context.Users
+                          .Where(u => u.UserID == note.UpdatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                      
+
+
+                      createdAt = note.CreatedAt
+                  })
+                .ToListAsync();
         }
 
-        // GET: api/Notes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Note>> GetNote(int id)
+        [HttpPut("UpdateNoteStatus/{id}")]
+        public async Task<IActionResult> UpdateNoteStatus(int id , [FromBody] UpdateNoteStatusDto upnsdto)
         {
-            var note = await _context.Notes.FindAsync(id);
+            Note n = _context.Notes.Find(id);
 
-            if (note == null)
-            {
-                return NotFound();
-            }
-
-            return note;
+            n.Status = upnsdto.Status; 
+            return Ok();
         }
 
         // PUT: api/Notes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutNote(int id, Note note)
+        [HttpPut()]
+        [ProducesResponseType(statusCode:StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutNote( NoteDto note)
         {
-            if (id != note.NoteID)
-            {
-                return BadRequest();
-            }
+            Note upNote = _context.Notes.Find(note.noteID);
+            upNote.Summary = note.summary ?? upNote.Summary;
+            upNote.Title = note.title ?? upNote.Title;
+            upNote.ExpectedCompletion = note.expectedCompletion;
+            
 
-            _context.Entry(note).State = EntityState.Modified;
+            _context.Entry(upNote).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
+
+                User u = _context.Users.Find(note.createdBy);
+
+                var interaction = new ClientInteraction
+                {
+                    Note = upNote,
+                    User = u,
+                    InteractionTime = DateTime.Now
+                };
+
+                _context.clientInteractions.Add(interaction);
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!NoteExists(id))
+                if (!NoteExists(note.noteID))
                 {
                     return NotFound();
                 }
@@ -75,28 +105,36 @@ namespace Backend.Controllers
         // POST: api/Notes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Note>> PostNote(Note note)
+        public async Task<ActionResult<Note>> PostNote([FromBody]NoteDto note)
         {
-            _context.Notes.Add(note);
+           
+
+            Note n = new Note();
+            n.Title = note.title;
+            n.CreatedBy = note.createdBy;
+            n.Summary = note.summary;
+
+            n.ExpectedCompletion = note.expectedCompletion;
+            n.CreatedFor = note.createdFor;
+            
+            _context.Notes.Add(n);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNote", new { id = note.NoteID }, note);
-        }
 
-        // DELETE: api/Notes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNote(int id)
-        {
-            var note = await _context.Notes.FindAsync(id);
-            if (note == null)
+            User u = _context.Users.Find(note.createdBy);
+
+            var interaction = new ClientInteraction
             {
-                return NotFound();
-            }
+                Note = n,
+                User = u,
+                InteractionTime = DateTime.Now
+            };
 
-            _context.Notes.Remove(note);
+           _context.clientInteractions.Add(interaction);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+         
+            return Ok();
         }
 
         private bool NoteExists(int id)

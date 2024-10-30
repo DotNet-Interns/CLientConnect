@@ -8,7 +8,9 @@ import { BiUndo } from "react-icons/bi"; // Add an icon for the Restore button
 import axios from "axios";
 import * as cookie from "../Utils/cookie";
 
+
 function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, createdBy="",updatedBy="", initialStatus = 0, onStatusChange }) {
+
     const [noteCard, setNoteCard] = useState(false);
     const [status, setStatus] = useState(initialStatus);
     const [isEditing, setIsEditing] = useState(false); // Track if in edit mode
@@ -66,10 +68,10 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
     };
 
     const handleStatusChange = () => {
-        const newStatus = status === 0 ? 1 : 0; // Toggle status
+        const newStatus = status === 0 ? 1 : 0; 
         setStatus(newStatus);
         if (onStatusChange) {
-            onStatusChange(id, newStatus); // Call the status change function passed down as prop
+            onStatusChange(id, newStatus); 
         }
     };
 
@@ -97,6 +99,7 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                 <h3 className='note-card-title'>{Title}</h3>
                 <p className="note-card-content">{Content}</p>
                 <p className="note-card-date">Expected: {editedDateTime}</p> {/* Display combined date and time */}
+
             </div>
 
             {noteCard && (
@@ -179,6 +182,7 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                                 Save   
                             </button>
                         }
+
                     </div>
                 </div>
             )}
