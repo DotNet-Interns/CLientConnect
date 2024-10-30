@@ -14,10 +14,9 @@ import { getCookie } from './Utils/cookie';
 import axios from 'axios';
 import Customers from './pages/Customers';
 import Users from './pages/Users';
-
 import Loader from './Components/Loader';
-
 import DisplayUsers from './pages/DisplayUsers';
+
 
 const server = import.meta.env.VITE_SERVER;
 // import AdminDashBoard from './pages/AdminDashBoard';
@@ -76,7 +75,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path='/addSR' element={<ProtectedRoute><AddSR /></ProtectedRoute>} />
             <Route path='/addCustomer' element={<ProtectedRoute><AddCustomer /></ProtectedRoute>} />
-             <Route path='/view/user/:uid' element={<ProtectedRoute><i/></ProtectedRoute>} />
+             <Route path='/view/user/:uid' element={<ProtectedRoute><DisplayUsers /></ProtectedRoute>} />
             <Route path='/view/customer/:cid' element={<ProtectedRoute><DisplayCustomer /></ProtectedRoute>} />
             <Route path='/customers' element={
               <ProtectedRoute>

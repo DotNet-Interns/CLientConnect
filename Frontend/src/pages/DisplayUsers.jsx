@@ -2,25 +2,26 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import * as cookie from "../Utils/cookie";
 import axios from "axios";
-
+const server = import.meta.env.VITE_SERVER;
 
 
 function DisplayUsers() {
     const [authToken, setAuthToken] = useState(null);
+    let {uid} = useParams();
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                
                 const response = await axios.get(
-                    `http://172.20.68.11:5100/api/Customers/${cid}`,
+                    `${server}/api/Customers/${uid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
                     },
                 );
                 const notesResponse = await axios.get(
 
-                    `http://172.20.68.11:5100/api/Notes/userNotes/${cid}`,
+                    `${server}/api/Notes/userNotes/${uid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
                     },
@@ -36,20 +37,17 @@ function DisplayUsers() {
                 setLoading(false);
             }
         };
-        fetchCustomers();
-    }, [refresh]);
-
-
-    let { uid } = useParams();
+        fetchUsers();
+    }, []);
 
 
     return (
         <div className='main-container'>
-            {/* Sr name */}
+            
             <div className='Srname'>
                 Test
             </div>
-            {/* section 2 */}
+            
             <div className='inner-container'>
                 <div className='details'>
                     <div className=''></div>

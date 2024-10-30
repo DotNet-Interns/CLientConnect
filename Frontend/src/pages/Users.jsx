@@ -49,7 +49,7 @@ function Users() {
                     userList?.map ((item,index)=>{
                     
                         const date = ConvertDate(item.createdAt)
-                        return (item.role===1)?<UserEntry key={index} name={`${item.firstName} ${item.lastName}`} CreatedBy={"Admin"} CreatedAt={date} />:null 
+                        return (item.role===1)?<UserEntry key={index} name={`${item.firstName} ${item.lastName}`} CreatedBy={"Admin"} CreatedAt={date} uid={item.userID} />:null 
                     })
                 }
             </div>
