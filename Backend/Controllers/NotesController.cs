@@ -83,6 +83,7 @@ namespace Backend.Controllers
             upNote.Summary = note.summary ?? upNote.Summary;
             upNote.Title = note.title ?? upNote.Title;
             upNote.ExpectedCompletion = note.expectedCompletion;
+            upNote.UpdatedBy = note.updatedBy;
 
             Console.WriteLine("update note");
             _context.Entry(upNote).State = EntityState.Modified;
@@ -115,7 +116,7 @@ namespace Backend.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Notes

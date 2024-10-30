@@ -9,16 +9,11 @@ using Backend.Models;
 using BCrypt.Net;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
-    public class UserRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    
 
     [Route("api/[controller]")]
     [ApiController]
@@ -98,7 +93,7 @@ namespace Backend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostUser([FromBody] UserRequest request)
+        public async Task<ActionResult> PostUser([FromBody] UserRequestDto request)
         {
             if (CheckUserRole())
             {

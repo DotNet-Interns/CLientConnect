@@ -21,7 +21,7 @@ namespace Backend.Controllers
             _context = context;
             _jwtTokenService = jwtTokenService;
         }
-        //[EnableCors("AnotherPolicy")]
+        
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
