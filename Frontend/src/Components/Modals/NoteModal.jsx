@@ -15,7 +15,7 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3
             setTitle(noteData.title || "");
             setSummary(noteData.summary || "");
             setStatus(noteData.status || "Pending");
-            setExpectedCompletion(noteData.expectedCompletion || "");
+            setExpectedCompletion(noteData.expectedCompletion || null);
         }
     }, [noteData]);
 

@@ -63,7 +63,6 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
             noteID: id,
         };
 
-        alert(updatedNote.updatedBy)
 
         try {
             const response = await axios.put(`${server}/api/Notes`, updatedNote, {
@@ -155,6 +154,7 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
 
             {noteCard && (
                 <div id="Note-Pop-up" ref={noteCardRef} className="note-card-popup">
+                    {isEditing && <span className="me-auto my-2 fst-italic text-secondary">Update Details</span>}
                     <h3 className="note-card-title h3 text-light text-capitalize">
                         {isEditing ? (
                             <>
