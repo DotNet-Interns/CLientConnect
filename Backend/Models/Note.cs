@@ -8,7 +8,6 @@ namespace Backend.Models
     {
         Pending,
         Completed,
-        InProgress,
         Cancelled
     }
 

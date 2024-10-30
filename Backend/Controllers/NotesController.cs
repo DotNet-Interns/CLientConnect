@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backend.Controllers
 {
@@ -51,9 +52,24 @@ namespace Backend.Controllers
         [HttpPut("UpdateNoteStatus/{id}")]
         public async Task<IActionResult> UpdateNoteStatus(int id , [FromBody] UpdateNoteStatusDto upnsdto)
         {
-            Note n = _context.Notes.Find(id);
+            Note n =  _context.Notes.Find(id);
+            Console.WriteLine("current status");
+            Console.Write(upnsdto.Status);
+            //if(upnsdto.Status)
+            if(n == null)
+            {
+                return BadRequest();
+            }
+            n.Status = upnsdto.Status;
 
-            n.Status = upnsdto.Status; 
+            Console.WriteLine("current status");
+            Console.Write(n.Status);
+
+            _context.Entry(n).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+
             return Ok();
         }
 
@@ -61,21 +77,21 @@ namespace Backend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut()]
         [ProducesResponseType(statusCode:StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutNote( NoteDto note)
+        public async Task<IActionResult> PutNote([FromBody] UpdateNoteDto note)
         {
             Note upNote = _context.Notes.Find(note.noteID);
             upNote.Summary = note.summary ?? upNote.Summary;
             upNote.Title = note.title ?? upNote.Title;
             upNote.ExpectedCompletion = note.expectedCompletion;
-            
 
+            Console.WriteLine("update note");
             _context.Entry(upNote).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
 
-                User u = _context.Users.Find(note.createdBy);
+                User u = _context.Users.Find(note.updatedBy);
 
                 var interaction = new ClientInteraction
                 {
