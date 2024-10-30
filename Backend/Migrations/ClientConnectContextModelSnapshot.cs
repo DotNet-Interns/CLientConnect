@@ -110,14 +110,11 @@ namespace Backend.Migrations
 
                     b.Property<string>("email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EID");
 
                     b.HasIndex("CID");
-
-                    b.HasIndex("email")
-                        .IsUnique();
 
                     b.ToTable("Emails");
                 });
@@ -139,7 +136,7 @@ namespace Backend.Migrations
                     b.Property<int>("CreatedFor")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ExpectedCompletion")
+                    b.Property<DateTime?>("ExpectedCompletion")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -226,9 +223,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("UserID");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });

@@ -19,15 +19,7 @@ namespace Backend.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();  // This ensures the Email column is unique
-
-            modelBuilder.Entity<Email>()
-                .HasIndex(e => e.email)
-                .IsUnique();
-
-            base.OnModelCreating(modelBuilder);
+            
         }
     }
 }
