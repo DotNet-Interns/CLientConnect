@@ -378,8 +378,14 @@ function DisplayCustomer() {
                                         ITime={formattedTime}
                                         IDate={formattedDate}  
                                         id={note.noteID} 
+                                        initialStatus={note.status}
                                         createdBy={note.createdBy} 
                                         updatedBy={note.updatedBy} 
+                                        onChangingAnything={()=>{
+                                            setRefresh((prev)=>{
+                                                return !prev
+                                            })
+                                            }}
                                     />
                                 );
                             })}
