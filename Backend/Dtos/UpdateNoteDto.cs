@@ -12,6 +12,6 @@ namespace Backend.Dtos
 
         public int updatedBy { get; set; }
 
-        public DateTime expectedCompletion { get; set; }
+        public DateTime? expectedCompletion { get; set; } = null;
     }
 }

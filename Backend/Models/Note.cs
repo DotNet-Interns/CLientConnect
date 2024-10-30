@@ -32,7 +32,7 @@ namespace Backend.Models
         [Required]
         public NoteStatus Status { get; set; }
 
-        public DateTime ExpectedCompletion { get; set; }
+        public DateTime? ExpectedCompletion { get; set; } = null;
 
         public int CreatedBy { get; set; } // Foreign key for the user who created the note
 

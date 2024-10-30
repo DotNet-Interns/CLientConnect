@@ -12,7 +12,7 @@ namespace Backend.Dtos
 
         public NoteStatus status { get; set; }
 
-        public DateTime expectedCompletion { get; set; }
+        public DateTime? expectedCompletion { get; set; }
 
 
         public string createdBy { get; set; }

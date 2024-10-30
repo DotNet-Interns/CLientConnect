@@ -99,6 +99,12 @@ namespace Backend.Controllers
             {
                return Unauthorized(new { message = "Invalid role" });
 
+
+            }
+
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return Conflict(new { message = "Email already exists." });
             }
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User();
@@ -107,8 +113,16 @@ namespace Backend.Controllers
             user.Email = request.Email;
             user.Password = request.Password;
             _context.Add(user);
-            await _context.SaveChangesAsync();
-            return Created();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred while saving the user. {ex}" });
+
+            }
+            return Ok(user);
            
         }
 

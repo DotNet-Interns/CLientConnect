@@ -54,9 +54,7 @@ namespace Backend.Middlewares
                     await context.Response.WriteAsync("Unauthorized Token");
                     return;
                 }
-                var claims = JwtTokenService.GetClaimsFromToken(token);
-                var uid = claims.FindFirst(ClaimTypes.PrimarySid);
-                Console.Write(uid);
+                
             }
             else
             {

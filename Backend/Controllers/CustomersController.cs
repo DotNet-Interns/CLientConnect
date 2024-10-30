@@ -45,7 +45,7 @@ namespace Backend.Controllers
                     Address=item.Address,
                     Status=item.Status,
                     createdBy = _context.Users
-                          .Where(u => u.UserID == item.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                          .Where(u => u.UserID == item.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null Data",
                     createdAt=item.CreatedAt
                 };
                 result.Add(current);
@@ -118,7 +118,12 @@ namespace Backend.Controllers
         public async Task<IActionResult> PutCustomer( [FromBody] CustomerUpdateDto customer)
         {
            
-            Customer updatedCustomer = await _context.Customers.FindAsync(customer.cid);
+            Customer? updatedCustomer = await _context.Customers.FindAsync(customer.cid);
+
+            if(updatedCustomer == null)
+            {
+                return BadRequest("Null customer");
+            }
 
             updatedCustomer.FirstName = customer.firstName ?? updatedCustomer.FirstName;
             updatedCustomer.LastName = customer.lastName ?? updatedCustomer.LastName;
@@ -183,7 +188,7 @@ namespace Backend.Controllers
         {
             
             
-            Customer customer = await _context.Customers.FindAsync(id);
+            Customer? customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();

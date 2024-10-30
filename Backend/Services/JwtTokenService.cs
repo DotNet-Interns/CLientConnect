@@ -61,10 +61,10 @@ namespace Backend.Services
         }
 
 
-        public string GetJwtToken(HttpContext context)
+        public string? GetJwtToken(HttpContext context)
         {
             // Check for the token in the Authorization header
-            string token = context.Request.Headers["Authorization"].FirstOrDefault();
+            string? token = context.Request.Headers["Authorization"].FirstOrDefault();
 
             if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
             {
@@ -130,7 +130,7 @@ namespace Backend.Services
             }
         }
 
-        public static ClaimsPrincipal GetClaimsFromToken(string token)
+        public static ClaimsPrincipal? GetClaimsFromToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
 
