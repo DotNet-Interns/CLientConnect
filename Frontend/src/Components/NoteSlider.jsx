@@ -1,24 +1,40 @@
 import React from 'react'
 import "../styles/NoteSlider.css"
 import NoteCard from './NoteCard'
+import ConvertDate from '../Utils/ConvertDate';
 
-function NoteSlider() {
+function NoteSlider({ notes }) {
+
+
     return (
-        <div className="scrollmenu">
-            <NoteCard id={1} />
-            <NoteCard id={2} />
-            <NoteCard id={3} />
-            <NoteCard id={4} />
-            <NoteCard id={5} />
-            <NoteCard id={6} />
-            <NoteCard id={7} />
-            <NoteCard id={8} />
-            <NoteCard id={9} />
-            <NoteCard id={10} />
-            <NoteCard id={11} />
-            <NoteCard id={12} />
-            <NoteCard id={13} />
-            <NoteCard id={14} />
+        <div className="scrollmenu d-flex">
+            {
+                notes?.map((item, index) => {
+
+                    const expectedCompletionDate = new Date(item.expectedCompletion);
+                    const formattedDate = expectedCompletionDate.toLocaleDateString();
+                    const formattedTime = expectedCompletionDate.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                   
+                    return <NoteCard
+                        Title={item.title}
+                        Content={item.summary}
+                        // CreatedDate={DateAndTime}
+                        key={index}
+                        id={item.noteID}
+                        ITime={formattedTime}
+                        IDate={formattedDate}
+                        createdBy={item.createdBy}
+                        updatedBy={item.updatedBy}
+
+                    />
+                })
+
+            }
+            {(notes?.length === 0) && <p>There are no recent notes to show!</p>}
+
         </div>
     )
 }
