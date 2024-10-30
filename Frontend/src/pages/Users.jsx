@@ -29,8 +29,9 @@ function Users() {
         <>
             <Navbar ifAdmin={(contextUser?.role===0)?true:false} />
             <div className="mx-sm-5">
-                <div className="options">
-                    <ul className="nav justify-content-md-end mt-3">
+                <div className="options d-flex">
+                <h3 className='mt-3'>Sales Representative List</h3>
+                    <ul className="nav justify-content-md-end ms-auto mt-3">
                         <li className="nav-item">
                             <Link to={"/addSR"}><button className="btn btn-primary mx-3" aria-current="page" >Add</button></Link>
                         </li>
@@ -44,9 +45,9 @@ function Users() {
                     </ul>
                 </div>
 
-                <h3>User List</h3>
                 {
                     userList?.map ((item,index)=>{
+                    
                         const date = ConvertDate(item.createdAt)
                         return (item.role===1)?<UserEntry key={index} name={`${item.firstName} ${item.lastName}`} CreatedBy={"Admin"} CreatedAt={date} />:null 
                     })

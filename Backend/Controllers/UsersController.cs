@@ -9,16 +9,11 @@ using Backend.Models;
 using BCrypt.Net;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
-    public class UserRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    
 
     [Route("api/[controller]")]
     [ApiController]
@@ -98,12 +93,18 @@ namespace Backend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostUser([FromBody] UserRequest request)
+        public async Task<ActionResult> PostUser([FromBody] UserRequestDto request)
         {
             if (CheckUserRole())
             {
                return Unauthorized(new { message = "Invalid role" });
 
+
+            }
+
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return Conflict(new { message = "Email already exists." });
             }
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User();
@@ -112,8 +113,16 @@ namespace Backend.Controllers
             user.Email = request.Email;
             user.Password = request.Password;
             _context.Add(user);
-            await _context.SaveChangesAsync();
-            return Created();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred while saving the user. {ex}" });
+
+            }
+            return Ok(user);
            
         }
 
@@ -142,9 +151,10 @@ namespace Backend.Controllers
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             if (userPayload.Role == "SalesRepresentative")
             {
-                return false;
+                Console.WriteLine("here");
+                return true;
             }
-            return true;
+            return false;
         }
         private bool UserExists(int id)
         {

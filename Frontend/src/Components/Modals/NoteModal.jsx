@@ -3,8 +3,7 @@ import "../../styles/CustomModal.css";
 import axios from 'axios';
 import * as cookie from "../../Utils/cookie";
 
-function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", srId = "3",
-    customerId }) {
+function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3, customerId }) {
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
     const [title, setTitle] = useState(noteData.title || "");
     const [summary, setSummary] = useState(noteData.summary || "");
@@ -16,37 +15,35 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", srId = "3",
             setTitle(noteData.title || "");
             setSummary(noteData.summary || "");
             setStatus(noteData.status || "Pending");
-            setExpectedCompletion(noteData.expectedCompletion || "");
+            setExpectedCompletion(noteData.expectedCompletion || null);
         }
     }, [noteData]);
 
     const handleSave = async () => {
-        const addData = { title, summary, expectedCompletion, createdBy: srId, createdFor: customerId };
+        const addData = { title, summary, expectedCompletion, createdBy, createdFor: customerId };
         const updateData = { title, summary, status, expectedCompletion };
-      
+
         try {
+            const config = { headers: { Authorization: `Bearer ${authToken}` } };
             const response = mode === "add"
-                ? await axios.post(`http://172.20.68.11:5100/api/Notes`, addData,
-                     {  headers: { Authorization: `Bearer ${authToken}`}
-                })
-                : await axios.put(`http://your.api/notes/${noteData.noteID}`, updateData);
+                ? await axios.post(`http://172.20.68.11:5100/api/Notes`, addData, config)
+                : await axios.put(`http://172.20.68.11:5100/api/Notes/${noteData.noteID}`, updateData, config);
 
             console.log(`Note ${mode === "add" ? "created" : "updated"} successfully`, response.data);
-
         } catch (error) {
-            console.log(`Unable to ${mode} note:`, error);
-            alert(`Unable to ${mode} note.`);
+            console.log(`Unable to ${mode} note:`, error.response ? error.response.data : error.message);
+            alert(`Unable to ${mode} note. ${error}`);
         }
         onClose();
     };
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://172.20.68.11:5100/api/Notes${noteData.noteID}`);
+            const config = { headers: { Authorization: `Bearer ${authToken}` } };
+            await axios.delete(`http://172.20.68.11:5100/api/Notes/${noteData.noteID}`, config);
             console.log("Note deleted successfully");
-            onActionComplete();
         } catch (error) {
-            console.log("Unable to delete note:", error);
+            console.log("Unable to delete note:", error.response ? error.response.data : error.message);
         }
         onClose();
     };
@@ -74,10 +71,9 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", srId = "3",
                         className="input-field"
                         rows="3"
                     />
-                    {
-                        !mode === "add" && <>
+                    {mode !== "add" && (
+                        <>
                             <label className="input-label">Status</label>
-
                             <select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
@@ -89,9 +85,8 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", srId = "3",
                                 <option value="Cancelled">Cancelled</option>
                             </select>
                         </>
-                    }
+                    )}
                     <label className="input-label">Expected Completion</label>
-
                     <input
                         type="datetime-local"
                         value={expectedCompletion}

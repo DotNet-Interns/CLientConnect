@@ -101,6 +101,7 @@ function DisplayCustomer() {
                     },
                 );
                 const notesResponse = await axios.get(
+
                     `http://172.20.68.11:5100/api/Notes/userNotes/${cid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
@@ -371,15 +372,36 @@ function DisplayCustomer() {
                             </button>
                         </div>
                         <div className="d-flex gap-3 justify-content-evenly align-items-center flex-wrap my-3">
-                            {notes.map((note, index) => (
-                                <NoteCard
-                                    key={note.noteID}  // Use noteID as the key for each NoteCard
-                                    Title={note.title}
-                                    Content={note.summary}
-                                    IDate={new Date(note.expectedCompletion).toLocaleDateString()}  // Format the date for display
-                                    id={note.noteID}  // Pass the note ID if needed for further actions
-                                />
-                            ))}
+                            {notes.map((note, index) => {
+                                const expectedCompletionDate = new Date(note.expectedCompletion);
+                                const formattedDate = expectedCompletionDate.toLocaleDateString();
+                                const formattedTime = expectedCompletionDate.toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+
+                                return (
+                                    <div className="">
+                                    <NoteCard
+                                        key={note.noteID}
+                                        Title={note.title}
+                                        Content={note.summary}
+                                        ITime={formattedTime}
+                                        IDate={formattedDate}  
+                                        id={note.noteID} 
+                                        initialStatus={note.status}
+                                        createdBy={note.createdBy} 
+                                        updatedBy={note.updatedBy} 
+                                        allowEdit={true}
+                                        onChangingAnything={()=>{
+                                            setRefresh((prev)=>{
+                                                return !prev
+                                            })
+                                            }}
+                                    />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -405,7 +427,7 @@ function DisplayCustomer() {
                 onClose={closeNoteModal}
                 noteData={selectedNote}
                 mode={modalMode}
-                srId="3" // need to be changed
+                createdBy="3" // need to be changed
                 customerId={customers.cid}
             />
         </div>

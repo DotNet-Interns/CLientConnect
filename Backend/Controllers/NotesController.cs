@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backend.Controllers
 {
@@ -37,9 +38,9 @@ namespace Backend.Controllers
                       status = note.Status,
                       expectedCompletion = note.ExpectedCompletion,
                       createdBy = _context.Users
-                          .Where(u => u.UserID == note.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                          .Where(u => u.UserID == note.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null data",
                       updatedBy = _context.Users
-                          .Where(u => u.UserID == note.UpdatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault(),
+                          .Where(u => u.UserID == note.UpdatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null data",
                       
 
 
@@ -51,9 +52,24 @@ namespace Backend.Controllers
         [HttpPut("UpdateNoteStatus/{id}")]
         public async Task<IActionResult> UpdateNoteStatus(int id , [FromBody] UpdateNoteStatusDto upnsdto)
         {
-            Note n = _context.Notes.Find(id);
+            Note? n =  _context.Notes.Find(id);
+            Console.WriteLine("current status");
+            Console.Write(upnsdto.Status);
+            //if(upnsdto.Status)
+            if(n == null)
+            {
+                return BadRequest();
+            }
+            n.Status = upnsdto.Status;
 
-            n.Status = upnsdto.Status; 
+            Console.WriteLine("current status");
+            Console.Write(n.Status);
+
+            _context.Entry(n).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+
             return Ok();
         }
 
@@ -61,26 +77,39 @@ namespace Backend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut()]
         [ProducesResponseType(statusCode:StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutNote( NoteDto note)
+        public async Task<IActionResult> PutNote([FromBody] UpdateNoteDto note)
         {
-            Note upNote = _context.Notes.Find(note.noteID);
+            Note? upNote = _context.Notes.Find(note.noteID);
+            if (upNote == null) {
+                return BadRequest("No Note found");
+            }
             upNote.Summary = note.summary ?? upNote.Summary;
             upNote.Title = note.title ?? upNote.Title;
-            upNote.ExpectedCompletion = note.expectedCompletion;
+            if(note.expectedCompletion != null)
+            {
+                upNote.ExpectedCompletion = (DateTime)note.expectedCompletion;
+            }
             
+            upNote.UpdatedBy = note.updatedBy;
 
+            Console.WriteLine("update note");
             _context.Entry(upNote).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
 
-                User u = _context.Users.Find(note.createdBy);
+                User? u = _context.Users.Find(note.updatedBy);
+
+                if(u == null)
+                {
+                    BadRequest("No user found");
+                }
 
                 var interaction = new ClientInteraction
                 {
                     Note = upNote,
-                    User = u,
+                    User = u!,
                     InteractionTime = DateTime.Now
                 };
 
@@ -99,7 +128,7 @@ namespace Backend.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Notes
@@ -109,19 +138,34 @@ namespace Backend.Controllers
         {
            
 
+
             Note n = new Note();
             n.Title = note.title;
             n.CreatedBy = note.createdBy;
             n.Summary = note.summary;
 
-            n.ExpectedCompletion = note.expectedCompletion;
+            if (note.expectedCompletion != null)
+            {
+
+                n.ExpectedCompletion = (DateTime)note.expectedCompletion;
+            }
             n.CreatedFor = note.createdFor;
             
             _context.Notes.Add(n);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }catch(Exception ex)
+            {
+                return BadRequest($"Error {ex}");
+            }
 
 
-            User u = _context.Users.Find(note.createdBy);
+            User? u = _context.Users.Find(note.createdBy);
+            if(u == null)
+            {
+               return BadRequest();
+            }
 
             var interaction = new ClientInteraction
             {
