@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
-    
-
 
     [Route("api/[controller]")]
     [ApiController]
