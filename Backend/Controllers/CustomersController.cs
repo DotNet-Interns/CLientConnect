@@ -29,10 +29,30 @@ namespace Backend.Controllers
 
         // GET: api/Customers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<CustomerListDto>>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
-        }
+            var customerList = await _context.Customers.ToListAsync();
+            List < CustomerListDto > result = [];
+            foreach (var item in customerList)
+            {
+                CustomerListDto current = new CustomerListDto
+                {
+                    CID = item.CID,
+                    FirstName = item.FirstName,
+                    LastName=item.LastName,
+                    Company=item.Company,
+                    Position=item.Position,
+                    Address=item.Address,
+                    Status=item.Status,
+                    createdBy = _context.Users
+                          .Where(u => u.UserID == item.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null Data",
+                    createdAt=item.CreatedAt
+                };
+                result.Add(current);
+                
+            }
+            return result;
+        } 
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
@@ -98,7 +118,12 @@ namespace Backend.Controllers
         public async Task<IActionResult> PutCustomer( [FromBody] CustomerUpdateDto customer)
         {
            
-            Customer updatedCustomer = await _context.Customers.FindAsync(customer.cid);
+            Customer? updatedCustomer = await _context.Customers.FindAsync(customer.cid);
+
+            if(updatedCustomer == null)
+            {
+                return BadRequest("Null customer");
+            }
 
             updatedCustomer.FirstName = customer.firstName ?? updatedCustomer.FirstName;
             updatedCustomer.LastName = customer.lastName ?? updatedCustomer.LastName;
@@ -163,7 +188,7 @@ namespace Backend.Controllers
         {
             
             
-            Customer customer = await _context.Customers.FindAsync(id);
+            Customer? customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
