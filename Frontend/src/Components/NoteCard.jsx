@@ -6,10 +6,16 @@ import { MdCancelPresentation } from "react-icons/md";
 import { BiUndo } from "react-icons/bi";
 import axios from "axios";
 import * as cookie from "../Utils/cookie";
+import { useUserInfo } from "../Contexts/User";
 
 const server = import.meta.env.VITE_SERVER;
 
-function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything }) {
+function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
+
+    console.log(`updatedby ${updatedBy}`)
+    const { contextUser } = useUserInfo();
+
+
     const [noteCard, setNoteCard] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(Title);
@@ -27,10 +33,10 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
 
     const validateFields = () => {
         const newErrors = {};
-    
+
         if (!editedTitle.trim()) newErrors.title = "Title cannot be empty.";
         if (!editedContent.trim()) newErrors.content = "Content cannot be empty.";
-        
+
         // Explicitly check for an empty date string
         if (!updatedTime || updatedTime.trim() === "") {
             newErrors.date = "Date and time cannot be empty.";
@@ -41,11 +47,11 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                 newErrors.date = "Expected completion date must be in the future.";
             }
         }
-    
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    
+
     const saveChanges = async () => {
         if (!validateFields()) return;
 
@@ -53,9 +59,11 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
             title: editedTitle,
             summary: editedContent,
             expectedCompletion: updatedTime,
-            updatedBy: 3,
+            updatedBy: contextUser?.userID,
             noteID: id,
         };
+
+        alert(updatedNote.updatedBy)
 
         try {
             const response = await axios.put(`${server}/api/Notes`, updatedNote, {
@@ -139,7 +147,7 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                     className={`badge rounded-pill mx-auto ${initialStatus === 0 ? 'text-secondary bg-warning' :
                         initialStatus === 1 ? 'bg-success-subtle text-success' :
                             'bg-danger-subtle text-danger'
-                    }`}
+                        }`}
                 >
                     {statusEnum[initialStatus]}
                 </span>
@@ -192,45 +200,52 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                                 {errors.date && <p className="error-text">{errors.date}</p>}
                             </>
                         ) : (
+
                             <div className="text-danger">{editedDateTime}</div>
                         )}
                     </p>
                     <p className="popup-date m-0 d-flex">
                         Created by: {createdBy}
                     </p>
-                    <p className="popup-date mt-1 d-flex">
-                        Updated by: {updatedBy}
-                    </p>
-                    <div className="popup-actions d-flex justify-content-center align-items-center gap-2">
-                        {isEditing ? (
-                            <button onClick={handleRestore} className="restore-button bg-warning border-0 shadow-lg h4 rounded-3 d-flex justify-content-center align-items-center p-1">
-                                <BiUndo />
-                            </button>
-                        ) : (
-                            <button onClick={handleEdit} className="edit-button bg-primary-subtle shadow-lg h5 border-0 rounded-3 d-flex justify-content-center align-items-center p-2 gap-1">
-                                <CiEdit />
-                                Edit
-                            </button>
-                        )}
-                        {!isEditing && initialStatus === 0 && (
-                            <div className="d-flex gap-1">
-                                <button onClick={handleComplete} className="status-button border-0 d-flex shadow-lg h5 rounded-3 justify-content-center align-items-center p-2 gap-1 bg-success-subtle">
-                                    <IoCheckmarkDone />
-                                    Complete
-                                </button>
-                                <button onClick={handleCancel} className="status-button border-0 d-flex shadow-lg h5 rounded-3 justify-content-center align-items-center p-2 gap-1 bg-danger-subtle">
-                                    <MdCancelPresentation />
-                                    Cancel
-                                </button>
-                            </div>
-                        )}
-                        {isEditing && (
-                            <button className="status-button border-0 bg-primary-subtle d-flex justify-content-center align-content-center shadow-lg h4 rounded-1 p-1" onClick={() => saveChanges()}>
-                                Save
-                            </button>
-                        )}
+                    {updatedBy != null && updatedBy !== "Null data" && (
+                        <p className="popup-date mt-1 d-flex">
+                            Updated by: {updatedBy}
+                        </p>
+                    )}
+                    {
 
-                    </div>
+                        allowEdit &&
+                        <div className="popup-actions d-flex justify-content-start align-items-center gap-2 mt-2">
+                            {isEditing ? (
+                                <button onClick={handleRestore} className="restore-button bg-warning border-0 shadow-lg h4 rounded-3 d-flex justify-content-center align-items-center p-1">
+                                    <BiUndo />
+                                </button>
+                            ) : (
+                                <button onClick={handleEdit} className="edit-button bg-primary-subtle shadow-lg h5 border-0 rounded-3 d-flex justify-content-center align-items-center p-2 gap-1">
+                                    <CiEdit />
+                                    Edit
+                                </button>
+                            )}
+                            {!isEditing && initialStatus === 0 && (
+                                <div className="d-flex gap-1">
+                                    <button onClick={handleComplete} className="status-button border-0 d-flex shadow-lg h5 rounded-3 justify-content-center align-items-center p-2 gap-1 bg-success-subtle">
+                                        <IoCheckmarkDone />
+                                        Complete
+                                    </button>
+                                    <button onClick={handleCancel} className="status-button border-0 d-flex shadow-lg h5 rounded-3 justify-content-center align-items-center p-2 gap-1 bg-danger-subtle">
+                                        <MdCancelPresentation />
+                                        Cancel
+                                    </button>
+                                </div>
+                            )}
+                            {isEditing && (
+                                <button className="status-button border-0 bg-primary-subtle d-flex justify-content-center align-content-center shadow-lg h4 rounded-1 p-1" onClick={() => saveChanges()}>
+                                    Save
+                                </button>
+                            )}
+
+                        </div>
+                    }
                 </div>
             )}
 

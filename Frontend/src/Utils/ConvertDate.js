@@ -7,7 +7,7 @@ const ConvertDate = (InputDate) => {
         String(date.getMinutes()).padStart(2, '0') + ":" +
         String(date.getSeconds()).padStart(2, '0');
 
-    // console.log(formattedDate);
+   
     return formattedDate;
 }
 

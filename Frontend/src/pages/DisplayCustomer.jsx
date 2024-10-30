@@ -392,6 +392,7 @@ function DisplayCustomer() {
                                         initialStatus={note.status}
                                         createdBy={note.createdBy} 
                                         updatedBy={note.updatedBy} 
+                                        allowEdit={true}
                                         onChangingAnything={()=>{
                                             setRefresh((prev)=>{
                                                 return !prev
