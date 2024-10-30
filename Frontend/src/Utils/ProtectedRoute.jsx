@@ -4,6 +4,7 @@ import { useUserInfo } from '../Contexts/User';
 
 const ProtectedRoute = ({ children }) => {
     let location = useLocation();
+    
     const { loggedIn } = useUserInfo();
     console.log(loggedIn);
     

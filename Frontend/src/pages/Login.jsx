@@ -4,7 +4,7 @@ import '../styles/Login.css'; // Import the CSS file
 import { loginValidation } from '../Utils/validation';
 import axios from "axios"
 const server = import.meta.env.VITE_SERVER;
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useUserInfo } from '../Contexts/User';
 import { setCookie } from '../Utils/cookie';
 
@@ -15,6 +15,8 @@ const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({ email: '', password: '' });
     const {loggedIn , setContextUser , setLoggedIn , contextUser} = useUserInfo();
+    const location = useLocation();
+    const redirectPath = location.state?.from || '/'; 
 
     const handleChange = (event) => {
         setFormData((prevValue) => {
@@ -88,7 +90,7 @@ const Login = () => {
                 </form>
             </div>
             {
-                (loggedIn) && <Navigate to="/" replace={true} />
+                (loggedIn) && <Navigate to={`${redirectPath}`} replace={true} />
             }
         </div>
     );
