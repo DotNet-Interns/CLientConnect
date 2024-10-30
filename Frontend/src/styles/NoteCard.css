@@ -104,6 +104,11 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
 }
+.error-text {
+    color: rgb(251, 120, 120);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
 
 /* edit */
 

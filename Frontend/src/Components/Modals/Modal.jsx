@@ -29,7 +29,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
                 data["phoneNumber"] = inputValue;
             }
             try {
-                const response = await axios.post(`/api/${field}`, data, {
+                const response = await axios.post(`http://172.20.68.11:5100/api/${field}`, data, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
 
