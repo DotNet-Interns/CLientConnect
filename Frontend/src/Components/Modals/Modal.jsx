@@ -27,7 +27,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
             }
             else if (field == "Phones") {
                 data["phoneNumber"] = inputValue;
-            }http://172.20.68.11:5100
+            }
             try {
                 const response = await axios.post(`/api/${field}`, data, {
                     headers: { Authorization: `Bearer ${authToken}` }
