@@ -13,6 +13,7 @@ import active from "../../public/active.json";
 import CustomerUpdateModal from "../Components/Modals/CustomerUpdateModal";
 import NoteCard from "../Components/NoteCard";
 import NoteModal from "../Components/Modals/NoteModal";
+import { useParams } from "react-router-dom";
 
 function DisplayCustomer() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +30,8 @@ function DisplayCustomer() {
     const [activeMenuIndex, setActiveMenuIndex] = useState(null); // for edit , update , delete options menu
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
     const [refresh, setRefresh] = useState(false);
+
+    let { cid } = useParams();
 
     const copyToClipboard = (text, index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -88,13 +91,14 @@ function DisplayCustomer() {
             try {
                 setLoading(true);
                 const response = await axios.get(
-                    "http://172.20.68.11:5100/api/Customers/1",
+                    `http://172.20.68.11:5100/api/Customers/${cid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
                     },
                 );
                 const notesResponse = await axios.get(
-                    "http://172.20.68.11:5100/api/Notes/userNotes/1",
+
+                    `http://172.20.68.11:5100/api/Notes/userNotes/${cid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
                     },

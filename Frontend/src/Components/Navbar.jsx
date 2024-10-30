@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import "../styles/Navbar.css";
+import { Link } from "react-router-dom";
 
-function Navbar() {
+function Navbar({ifAdmin}) {
     const [searchField, setSearchField] = useState("");
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark  ">
             <div className="container-fluid">
-                <a className="navbar-brand " href="#">Client Connect</a>
+                <Link className='navbar-brand' to='/'>Client Connect</Link>
                 
                 {/* Hamburger Menu for Mobile */}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,11 +35,15 @@ function Navbar() {
 
                         {/* Nav Links */}
                         <li className="nav-item">
-                            <a className="nav-link" href="/view/Customer">Customers</a>
+                            {/* <a className="nav-link" href="/view/Customer">Customers</a> */}
+                            <Link className='nav-link' to='/customers'>Customers</Link>
                         </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/view/SR">Sales-Representative</a>
-                        </li>
+                        {
+                            ifAdmin && (<li className="nav-item">
+                                {/* <a className="nav-link" href="/view/SR"></a> */}
+                                <Link className='nav-link' to='/srList'>Sales-Representatives</Link>
+                            </li>)
+                        }
                     </ul>
                 </div>
             </div>

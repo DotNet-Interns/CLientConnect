@@ -58,9 +58,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path='/addSR' element={<AddSR />} />
         <Route path='/addCustomer' element={<AddCustomer />} />
-        <Route path='/view/customer' element={<DisplayCustomer />} />
-        <Route path='/customers' element={<Customers />} />
-        <Route path='/users' element={<Users />} />
+        <Route path='/view/customer/:cid' element={<ProtectedRoute><DisplayCustomer /></ProtectedRoute>} />
+        <Route path='/customers' element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+        <Route path='/srList' element={<ProtectedRoute><Users /></ProtectedRoute>} />
       </Routes>
 
 
