@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import "../styles/Navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { setCookie } from '../Utils/cookie';
+import { useUserInfo } from '../Contexts/User';
 
-function Navbar({ifAdmin}) {
+function Navbar({ifAdmin }) {
     const [searchField, setSearchField] = useState("");
+    const {loggedIn , setContextUser , setLoggedIn , contextUser} = useUserInfo();
+    const navigate = useNavigate();
+
+    const handleLogOut = ()=>{
+        setCookie("Auth_Token",null);
+        setLoggedIn(null);
+        navigate('/login')
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark  ">
@@ -36,6 +46,10 @@ function Navbar({ifAdmin}) {
                         {/* Nav Links */}
                         <li className="nav-item">
                             {/* <a className="nav-link" href="/view/Customer">Customers</a> */}
+                            <Link className='nav-link' to='/'>Dashboard</Link>
+                        </li>
+                        <li className="nav-item">
+                            {/* <a className="nav-link" href="/view/Customer">Customers</a> */}
                             <Link className='nav-link' to='/customers'>Customers</Link>
                         </li>
                         {
@@ -44,6 +58,10 @@ function Navbar({ifAdmin}) {
                                 <Link className='nav-link' to='/srList'>Sales-Representatives</Link>
                             </li>)
                         }
+                        <li className="nav-item">
+                            {/* <a className="nav-link" href="/view/Customer">Customers</a> */}
+                            <button onClick={handleLogOut} className='nav-link'>Log Out</button>
+                        </li>
                     </ul>
                 </div>
             </div>

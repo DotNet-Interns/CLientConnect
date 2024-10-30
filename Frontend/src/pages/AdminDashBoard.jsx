@@ -45,7 +45,7 @@ function AdminDashBoard() {
                 (contextUser) ?
                     <>
 
-                        <Navbar ifAdmin={true} />
+                        <Navbar ifAdmin={true} setContextUser={setContextUser} />
 
                         <div className='row m-5 mt-3'>
                             <div className="col-md-4 mt-sm-5 col-sm-6 stats">
