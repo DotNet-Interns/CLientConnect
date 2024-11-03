@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ClientConnectContext))]
-    [Migration("20241030110056_newDb2")]
-    partial class newDb2
+    [Migration("20241103062647_newDb")]
+    partial class newDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,7 +48,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("clientInteractions");
+                    b.ToTable("ClientInteractions");
                 });
 
             modelBuilder.Entity("Backend.Models.Customer", b =>
@@ -111,9 +111,10 @@ namespace Backend.Migrations
                     b.Property<int>("CID")
                         .HasColumnType("int");
 
-                    b.Property<string>("email")
+                    b.Property<string>("EmailAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("EID");
 
@@ -228,6 +229,19 @@ namespace Backend.Migrations
                     b.HasKey("UserID");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserID = 1,
+                            CreatedAt = new DateTime(2024, 11, 3, 11, 56, 46, 645, DateTimeKind.Local).AddTicks(8321),
+                            Email = "Admin@gmail.com",
+                            FirstName = "Admin",
+                            LastName = "Admin",
+                            Password = "$2a$11$RbjXKNeloLiLw/Lr1PDrGeJSskgCabgGkUQ68ivNTkQ0yM0m2glpG",
+                            Role = 0,
+                            Status = 0
+                        });
                 });
 
             modelBuilder.Entity("Backend.Models.ClientInteraction", b =>
@@ -251,13 +265,13 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Customer", b =>
                 {
-                    b.HasOne("Backend.Models.User", "userId")
+                    b.HasOne("Backend.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("userId");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Backend.Models.Email", b =>

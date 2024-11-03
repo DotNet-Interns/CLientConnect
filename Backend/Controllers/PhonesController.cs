@@ -21,43 +21,55 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Phones
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Phone>>> GetPhones()
-        {
-            return await _context.Phones.ToListAsync();
-        }
+
 
         // GET: api/Phones/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Phone>> GetPhone(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PhoneDto>> GetPhone(int id)
         {
             var phone = await _context.Phones.FindAsync(id);
 
             if (phone == null)
             {
-                return NotFound();
+                return NotFound(new { Message = "Phone not found." });
             }
 
-            return phone;
+            
+
+            var phoneDto = new PhoneDto
+            {
+                pid = phone.PID,
+                phone = phone.PhoneNumber
+            };
+
+            return Ok(phoneDto);
         }
+
 
         // PUT: api/Phones/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut()]
-        public async Task<IActionResult> PutPhone([FromBody]PhoneDto phone)
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutPhone([FromBody] PhoneDto phone)
         {
+            if (phone == null || phone.pid <= 0)
+            {
+                return BadRequest(new { Message = "Invalid phone data." });
+            }
 
-            //if (id != phone.pid)
-            //{
-            //    return BadRequest();
-            //}
-            Console.WriteLine(phone.phone);
-            Phone newPhone = _context.Phones.Find(phone.pid);
-            newPhone.PhoneNumber = phone.phone;
-            
+            var existingPhone = await _context.Phones.FindAsync(phone.pid);
+            if (existingPhone == null)
+            {
+                return NotFound(new { Message = "Phone not found." });
+            }
 
-            _context.Entry(newPhone).State = EntityState.Modified;
+            existingPhone.PhoneNumber = phone.phone;
+
+            _context.Entry(existingPhone).State = EntityState.Modified;
 
             try
             {
@@ -67,60 +79,88 @@ namespace Backend.Controllers
             {
                 if (!PhoneExists(phone.pid))
                 {
-                    return NotFound();
+                    return NotFound(new { Message = "Phone not found during update." });
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
         }
+
 
         // POST: api/Phones
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Phone>> PostPhone([FromBody]AddPhoneDto phone)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Phone>> PostPhone([FromBody] AddPhoneDto phone)
         {
+            if (phone == null || string.IsNullOrWhiteSpace(phone.PhoneNumber) || phone.CID <= 0)
+            {
+                return BadRequest(new { Message = "Invalid phone data." });
+            }
 
-            Phone currPhone = new Phone();
-            currPhone.PhoneNumber = phone.PhoneNumber;
-            currPhone.CID = phone.CID;
+            if(!_context.Customers.Any(p => p.CID == phone.CID)){
+                return BadRequest("Customer Does not exist");
+            }
+
+            var currPhone = new Phone
+            {
+                PhoneNumber = phone.PhoneNumber,
+                CID = phone.CID
+            };
+
             _context.Phones.Add(currPhone);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPhone", new { id = currPhone.PID }, currPhone);
-            
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // You can log the exception here if needed
+                return BadRequest(new { Message = $"Error creating phone: {ex.Message}" });
+            }
+
+            return CreatedAtAction(nameof(GetPhone), new { id = currPhone.PID }, currPhone);
         }
+
 
         // DELETE: api/Phones/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeletePhone(int id)
         {
-
-            
-
-
             var phone = await _context.Phones.FindAsync(id);
 
-            List<Phone> phones = await _context.Phones.Where(p => p.CID == phone.CID).ToListAsync();
-            
-            if(phones.Count == 1)
+            if (phone == null)
+            {
+                return NotFound(new { Message = "Phone not found." });
+            }
+
+            // Check if this is the only phone associated with the customer
+            var phoneCount = await _context.Phones.CountAsync(p => p.CID == phone.CID);
+            if (phoneCount == 1)
             {
                 return NoContent();
             }
-            
-            if (phone == null)
-            {
-                return NotFound();
-            }
 
             _context.Phones.Remove(phone);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(new { Message = $"Error deleting phone: {ex.Message}" });
+            }
 
             return NoContent();
         }
+
 
         private bool PhoneExists(int id)
         {

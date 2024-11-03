@@ -21,41 +21,43 @@ namespace Backend.Controllers
             _context = context;
             _jwtTokenService = jwtTokenService;
         }
-        
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-        
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
                 return BadRequest("Email and password are required.");
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null)
+            try
             {
-                return BadRequest("Email do not exist");
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+                if (user == null)
+                {
+                    return BadRequest("Email does not exist.");
+                }
+
+                if (user.Status == UserStatus.Inactive)
+                {
+                    return Unauthorized("User account is inactive.");
+                }
+
+                if (!VerifyPassword(request.Password, user.Password))
+                {
+                    return Unauthorized("Invalid email or password.");
+                }
+
+                var token = _jwtTokenService.GenerateJwtToken(user.UserID, user.Role.ToString());
+
+                return Ok(new { token, user });
             }
-            if (user == null || !VerifyPassword(request.Password, user.Password))
+            catch (Exception ex)
             {
-                return Unauthorized("Invalid email or password.");
+               // _logger.LogError(ex, "An error occurred during the login process for email: {Email}", request.Email);
+                return StatusCode(500, "An internal server error occurred.");
             }
-            
-
-            if(user.Status== UserStatus.Inactive)
-            {
-                Console.Write("inactive");
-                return Unauthorized();
-            }
-
-       
-            
-
-            var token = _jwtTokenService.GenerateJwtToken(user.UserID,user.Role.ToString());
-
-
-            return Ok(new {token,user});
         }
 
         private bool VerifyPassword(string enteredPassword, string storedHash)

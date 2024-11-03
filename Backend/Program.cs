@@ -24,26 +24,15 @@ namespace Backend
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowSpecificOrigins",
-            //        policy =>
-            //        {
-            //            policy.WithOrigins("http://172.20.68.21:5173")  // Replace with your frontend URL
-            //                  .AllowAnyHeader()
-            //                  .AllowAnyMethod()
-            //                  .AllowCredentials();  // Enable credentials (cookies, authorization headers)
-            //        });
-            //});
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigins",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()  // Replace with your frontend URL
+                        policy.AllowAnyOrigin()  
                               .AllowAnyHeader()
                               .AllowAnyMethod()
-                              ;  // Enable credentials (cookies, authorization headers)
+                              ;  
                     });
             });
 

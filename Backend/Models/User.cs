@@ -24,38 +24,37 @@ namespace Backend.Models
             CreatedAt = DateTime.Now;
             Status = UserStatus.Active;
             Role = UserRole.SalesRepresentative;
-            //Notes = new List<Note>(); // Initialize the collection
         }
 
         [Key]
         public int UserID { get; set; }
 
-        [Required]
-        [StringLength(10)]
+        [Required(ErrorMessage = "First name is required.")]
+        [StringLength(10, ErrorMessage = "First name cannot exceed 10 characters.")]
         public string FirstName { get; set; }
 
-
-
-        [Required]
-        [StringLength(10)]
+        [Required(ErrorMessage = "Last name is required.")]
+        [StringLength(10, ErrorMessage = "Last name cannot exceed 10 characters.")]
         public string LastName { get; set; }
 
-        [Required,MaxLength(50)]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [StringLength(50, ErrorMessage = "Email cannot exceed 50 characters.")]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(256)]
+        [Required(ErrorMessage = "Password is required.")]
+        [StringLength(256, ErrorMessage = "Password cannot exceed 256 characters.")]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Role is required.")]
         public UserRole Role { get; set; }
 
+        [Required]
         public DateTime CreatedAt { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Status is required.")]
         public UserStatus Status { get; set; }
 
-        //public ICollection<Note> Notes { get; set; } // Navigation property
     }
+
 }

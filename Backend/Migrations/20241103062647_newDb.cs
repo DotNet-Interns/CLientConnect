@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class newDb2 : Migration
+    public partial class newDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,7 +62,7 @@ namespace Backend.Migrations
                 {
                     EID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmailAddress = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -123,7 +123,7 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "clientInteractions",
+                name: "ClientInteractions",
                 columns: table => new
                 {
                     CIID = table.Column<int>(type: "int", nullable: false)
@@ -134,29 +134,34 @@ namespace Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_clientInteractions", x => x.CIID);
+                    table.PrimaryKey("PK_ClientInteractions", x => x.CIID);
                     table.ForeignKey(
-                        name: "FK_clientInteractions_Notes_NoteId",
+                        name: "FK_ClientInteractions_Notes_NoteId",
                         column: x => x.NoteId,
                         principalTable: "Notes",
                         principalColumn: "NoteID",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_clientInteractions_Users_UserId",
+                        name: "FK_ClientInteractions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.NoAction);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserID", "CreatedAt", "Email", "FirstName", "LastName", "Password", "Role", "Status" },
+                values: new object[] { 1, new DateTime(2024, 11, 3, 11, 56, 46, 645, DateTimeKind.Local).AddTicks(8321), "Admin@gmail.com", "Admin", "Admin", "$2a$11$RbjXKNeloLiLw/Lr1PDrGeJSskgCabgGkUQ68ivNTkQ0yM0m2glpG", 0, 0 });
+
             migrationBuilder.CreateIndex(
-                name: "IX_clientInteractions_NoteId",
-                table: "clientInteractions",
+                name: "IX_ClientInteractions_NoteId",
+                table: "ClientInteractions",
                 column: "NoteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_clientInteractions_UserId",
-                table: "clientInteractions",
+                name: "IX_ClientInteractions_UserId",
+                table: "ClientInteractions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -184,7 +189,7 @@ namespace Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "clientInteractions");
+                name: "ClientInteractions");
 
             migrationBuilder.DropTable(
                 name: "Emails");

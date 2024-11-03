@@ -9,12 +9,16 @@ namespace Backend.Models
         [Key]
         public int EID { get; set; }
 
-        [Required]
-        [EmailAddress]
-        public string email { get; set; }
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
+        public string EmailAddress { get; set; }
 
-        public int CID { get; set; } // Assuming this is a foreign key to CID in Customer
+        [Required(ErrorMessage = "Customer ID is required.")]
+        public int CID { get; set; } // Foreign key to Customer
+
         [ForeignKey("CID")]
         public Customer Customer { get; set; }
     }
+
 }
