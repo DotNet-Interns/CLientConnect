@@ -23,11 +23,11 @@ function DisplayCustomer() {
     const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
     const [selectedNote, setSelectedNote] = useState({});
     const [modalMode, setModalMode] = useState("add");
-    const [notes, setNotes] = useState(null);
+    const [notes, setNotes] = useState([]);
 
     const [modalProps, setModalProps] = useState({});
 
-    const [customers, setCustomers] = useState(null);
+    const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeMenuIndex, setActiveMenuIndex] = useState(null); // for edit , update , delete options menu
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
@@ -220,7 +220,7 @@ function DisplayCustomer() {
 
                                 <h5 className="text-secondary my-2">Phone Numbers</h5>
                                 <ul className="list-group w-100">
-                                    {customers.phoneNumbers.map((phoneNumber, index) => (
+                                    {customers.phoneNumbers?.map((phoneNumber, index) => (
                                         <li
                                             key={index}
                                             className="list-group-item d-flex justify-content-between align-items-center phone-number"
@@ -372,7 +372,7 @@ function DisplayCustomer() {
                             </button>
                         </div>
                         <div className="d-flex gap-3 justify-content-evenly align-items-center flex-wrap my-3">
-                            {notes.map((note, index) => {
+                            {notes?.map((note, index) => {
                                 const expectedCompletionDate = new Date(note.expectedCompletion);
                                 const formattedDate = expectedCompletionDate.toLocaleDateString();
                                 const formattedTime = expectedCompletionDate.toLocaleTimeString([], {
