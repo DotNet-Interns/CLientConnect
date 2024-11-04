@@ -11,7 +11,9 @@ const server = import.meta.env.VITE_SERVER;
 function Customers() {
     const { contextUser } = useUserInfo();
     const [customerList, setCustomerList] = useState(null);
-    console.log(customerList);
+    const [filterList, setFilterList] = useState(customerList);
+    console.log(filterList);
+    
 
 
     useEffect(() => {
@@ -25,35 +27,62 @@ function Customers() {
 
             console.log(response);
             setCustomerList(response.data)
-
+            setFilterList(() => {
+                return response.data?.filter((item, index) => {
+                    return item.status === 0
+                })
+            })
         }
         getCustomerData();
     }, [])
 
 
-    const handleFilterClick = (event)=>{
+    const handleFilterClick = (event) => {
         const id = event.target.id;
+        console.log(`Clicked ${id}`);
 
-        if(id === "active"){
-            setCustomerList((prevValue)=>{
-                return prevValue.filter((item,index)=>{
+
+        if (id === "active") {
+            setFilterList(() => {
+                return customerList.filter((item, index) => {
                     return item.status === 0
                 })
             })
-        }else if(id === "inactive"){
-            setCustomerList((prevValue)=>{
-                return prevValue.filter((item,index)=>{
+        } else if (id === "inactive") {
+            setFilterList(() => {
+                return customerList.filter((item, index) => {
                     return item.status === 1
                 })
             })
-        }else if(id === "all"){
-            setCustomerList((prevValue)=>{
-                return prevValue.filter((item,index)=>{
+        } else if (id === "all") {
+            setFilterList(() => {
+                return customerList.filter((item, index) => {
                     return item.status === 1 || item.status === 0
                 })
             })
         }
     }
+
+    const sortFunction = (event) => {
+        const sortByFullName = (array) => {
+            return  [...array].sort((a, b) => {
+                const fullNameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+                const fullNameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+
+                if (fullNameA < fullNameB) return -1;
+                if (fullNameA > fullNameB) return 1;
+                return 0;
+            });
+            //setFilterList(sortedArray);
+            
+        };
+        
+        setFilterList(sortByFullName(filterList));
+        console.log(filterList);
+    }
+
+
+
     return (
         <>
             <Navbar ifAdmin={(contextUser?.role === 0) ? true : false} />
@@ -65,18 +94,18 @@ function Customers() {
                             <Link to={"/addCustomer"}><button className="btn btn-primary mx-3" aria-current="page" >Add</button></Link>
                         </li>
                         <li className="nav-item">
-                            <button className="btn btn-primary mx-3" href="#">A-Z</button>
+                            <button className="btn btn-primary mx-3" id='true'  onClick={sortFunction}>A-Z</button>
                         </li>
                         <li className="nav-item">
                             <div className="dropdown">
                                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Dropdown button
+                                    active
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li onClick={handleFilterClick} id='active' className="dropdown-item">Active</li>
                                     <li onClick={handleFilterClick} id='inactive' className="dropdown-item">Inactive</li>
-                                    <li onClick={handleFilterClick} id='all' 
-                                    className="dropdown-item">All</li>
+                                    <li onClick={handleFilterClick} id='all'
+                                        className="dropdown-item">All</li>
                                 </ul>
                             </div>
                         </li>
@@ -85,10 +114,14 @@ function Customers() {
                 </div>
 
                 {
-                    customerList?.map((item, index) => {
+                    filterList?.map((item, index) => {
                         const Date = ConvertDate(item.createdAt);
-                        return (item.status === 0) ? <CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} /> : null
+                        return <CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} />
                     })
+                }
+
+                {
+                    (filterList?.length === 0) && <p>No record found!</p>
                 }
             </div>
         </>
