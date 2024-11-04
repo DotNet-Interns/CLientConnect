@@ -12,7 +12,7 @@ const server = import.meta.env.VITE_SERVER;
 
 function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
 
-    console.log(`updatedby ${updatedBy}`)
+    // console.log(`updatedby ${updatedBy}`)
     const { contextUser } = useUserInfo();
 
 
