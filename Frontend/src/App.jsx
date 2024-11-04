@@ -23,7 +23,7 @@ const server = import.meta.env.VITE_SERVER;
 
 function App() {
   const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
-  console.log(contextUser);
+  // console.log(contextUser);
 
   const [loading, setLoading] = useState(true)
 
@@ -51,7 +51,7 @@ function App() {
         setLoading(false)
 
       } catch (error) {
-        console.log(error);
+        // console.log(error);
 
       }finally{
         setLoading(false)

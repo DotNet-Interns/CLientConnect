@@ -43,13 +43,14 @@ const Login = () => {
                     Password : formData.password,
                     Email : formData.email
                 });
-                console.log(response.data);
+                // console.log(response.data);
                 setLoggedIn(true);
                 setCookie("Auth_Token",response.data.token,1);
                 setContextUser(response.data.user)
             } catch (error) {
-                console.log(error);
-                
+                // console.log(error);
+                alert(error.response.data)
+                setFormData({ email: '', password: '' })
             }
         }
     };
