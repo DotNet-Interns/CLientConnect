@@ -92,17 +92,17 @@ function Customers() {
             <Navbar ifAdmin={(contextUser?.role === 0) ? true : false} />
             <div className="mx-sm-5">
                 <div className="options d-flex">
-                    <h3 className='mt-3'>Customer List</h3>
-                    <ul className="nav ms-auto justify-content-md-end mt-3">
-                        <li className="nav-item">
-                            <Link to={"/addCustomer"}><button className="btn btn-primary mx-3" aria-current="page" >Add</button></Link>
+                    <h3 className='mt-3 ms-2 ms-md-0'>Customer List</h3>
+                    <ul className="nav ms-auto justify-content-md-end mt-3 row">
+                        <li className="nav-item col-sm-4 col-6 ms-auto">
+                            <Link to={"/addCustomer"}><button className="btn btn-primary mx-md-3" aria-current="page" >Add</button></Link>
                         </li>
-                        <li className="nav-item">
-                            <button className="btn btn-primary mx-3" id='true'  onClick={sortFunction}>A-Z</button>
+                        <li className="nav-item col-sm-4 col-6">
+                            <button className="btn btn-primary" id='true'  onClick={sortFunction}>A-Z</button>
                         </li>
-                        <li className="nav-item">
-                            <div className="dropdown">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <li className="nav-item col-sm-4 col ms-auto mt-2 mt-sm-0">
+                            <div className="dropdown ms-auto">
+                                <button className="btn btn-secondary dropdown-toggle ms-auto" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     {dropdownValue}
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">

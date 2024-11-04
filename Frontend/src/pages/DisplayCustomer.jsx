@@ -16,6 +16,7 @@ import NoteModal from "../Components/Modals/NoteModal";
 import { useParams } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import { useUserInfo } from "../Contexts/User";
+const server = import.meta.env.VITE_SERVER;
 
 function DisplayCustomer() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,7 +96,7 @@ function DisplayCustomer() {
             try {
                 setLoading(true);
                 const customerResponse = await axios.get(
-                    `http://172.20.68.11:5100/api/Customers/${cid}`,
+                    `${server}/api/Customers/${cid}`,
                     {
                         headers: { Authorization: `Bearer ${authToken}` },
                     },
@@ -106,7 +107,7 @@ function DisplayCustomer() {
 
                 try {
                     const notesResponse = await axios.get(
-                        `http://172.20.68.11:5100/api/Notes/userNotes/${cid}`,
+                        `${server}/api/Notes/userNotes/${cid}`,
                         {
                             headers: { Authorization: `Bearer ${authToken}` },
                         },
