@@ -36,7 +36,7 @@ namespace Backend.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest("Email does not exist.");
+                    return BadRequest("Invalid email or password.");
                 }
 
                 if (user.Status == UserStatus.Inactive)

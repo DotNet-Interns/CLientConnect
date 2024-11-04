@@ -25,6 +25,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<AdminDashboardDto>> AdminDashboard()
         {
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var dayBefore = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1);
             var adto = new AdminDashboardDto();
 
             try
@@ -36,6 +37,8 @@ namespace Backend.Controllers
                 adto.totalSalesReps = await _context.Users.CountAsync(u => u.Role == UserRole.SalesRepresentative && u.Status == UserStatus.Active);
                 adto.pendingNotes = await _context.Notes.CountAsync(n => n.Status == NoteStatus.Pending);
                 adto.CompletedNotesThisMonth = await _context.Notes.CountAsync(n => n.Status == NoteStatus.Completed && n.CreatedAt >= startOfMonth && n.CreatedAt <= DateTime.Now);
+
+                adto.recentInteraction = await _context.ClientInteractions.CountAsync(i => i.InteractionTime >= dayBefore);
 
                 adto.recentNotes = await _context.Notes
                     .OrderByDescending(n => n.CreatedAt)
@@ -49,15 +52,15 @@ namespace Backend.Controllers
                         CreatedBy = _context.Users
                             .Where(u => u.UserID == note.CreatedBy)
                             .Select(u => u.FirstName + " " + u.LastName)
-                            .FirstOrDefault(),
+                            .FirstOrDefault() ?? "Unknown",
                         UpdatedBy = _context.Users
                             .Where(u => u.UserID == note.UpdatedBy)
                             .Select(u => u.FirstName + " " + u.LastName)
-                            .FirstOrDefault(),
+                            .FirstOrDefault() ?? "Unknown",
                         CreatedFor = _context.Users
                             .Where(u => u.UserID == note.CreatedFor)
                             .Select(u => u.FirstName + " " + u.LastName)
-                            .FirstOrDefault(),
+                            .FirstOrDefault() ?? "Unknown",
                         CreatedAt = note.CreatedAt
                     })
                     .ToListAsync();
@@ -80,6 +83,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<SRDashboardDto>> SRDashboard(int UserId)
         {
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var dayBefore = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1);
             var srdto = new SRDashboardDto();
             if (!_context.Users.Any(u => u.UserID == UserId)) {
 
@@ -94,6 +98,7 @@ namespace Backend.Controllers
                 srdto.totalCustomer = srdto.activeCustomers + srdto.inactiveCustomers;
 
                 srdto.customersCreatedByYou = await _context.Customers.CountAsync(c => c.CreatedBy == UserId);
+               srdto.recentInteraction =   await _context.ClientInteractions.CountAsync(i => i.InteractionTime >= dayBefore && i.UserId == UserId);
 
                 srdto.CompletedNotesThisMonth = await _context.Notes.CountAsync(n =>
                     n.Status == NoteStatus.Completed &&
