@@ -219,7 +219,7 @@ namespace Backend.Controllers
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { Message = "Customer is created" });
+                return Created();
             }
             catch (DbUpdateException ex)
             {
