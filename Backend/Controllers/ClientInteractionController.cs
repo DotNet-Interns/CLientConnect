@@ -106,12 +106,16 @@ namespace Backend.Controllers
                     return NotFound(new { Message = "No interactions found for this note." });
                 }
 
-                
+
                 var interactionDtos = interactions.Select(interaction => new ClientInteractionDto
                 {
                     CIID = interaction.CIID,
                     NoteId = interaction.NoteId,
                     UserId = interaction.UserId,
+                    UserName = _context.Users
+                            .Where(u => u.UserID == interaction.UserId)
+                            .Select(u => u.FirstName + " " + u.LastName)
+                            .FirstOrDefault() ?? "Unknown",
                     InteractionTime = interaction.InteractionTime
                 }).ToList();
 

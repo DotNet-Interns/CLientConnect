@@ -10,6 +10,7 @@ using BCrypt.Net;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
 using Backend.Dtos;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Backend.Controllers
 {
@@ -55,6 +56,31 @@ namespace Backend.Controllers
 
             return Ok(user);
         }
+
+
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetAllUsesr()
+        {
+            //Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+
+            //if (userPayload == null || string.IsNullOrEmpty(userPayload.UserId))
+            //{
+            //    return BadRequest(new { Message = "User ID not found in token." });
+            //}
+
+            //var userId = Int32.Parse(userPayload.UserId);
+            //var user = await _context.Users.FindAsync(userId);
+
+            //if (user == null)
+            //{
+            //    return NotFound(new { Message = "User not found." });
+            //}
+
+            return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+        }
+
 
 
         // PUT: api/Users/5
@@ -128,7 +154,7 @@ namespace Backend.Controllers
                 Status = UserStatus.Active // Set a default status if needed
             };
 
-            _context.Add(user);
+            _context.Users.Add(user);
 
             try
             {
