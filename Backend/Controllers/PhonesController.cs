@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Backend.Controllers
 {
@@ -122,7 +123,7 @@ namespace Backend.Controllers
                 return BadRequest(new { Message = $"Error creating phone: {ex.Message}" });
             }
 
-            return CreatedAtAction(nameof(GetPhone), new { id = currPhone.PID }, currPhone);
+            return Ok(new  {Message = "Phone added" });
         }
 
 
