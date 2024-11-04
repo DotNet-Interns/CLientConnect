@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import "../../styles/CustomModal.css";
 import axios from 'axios';
 import * as cookie from "../../Utils/cookie";
+const server = import.meta.env.VITE_SERVER;
 
-function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3, customerId }) {
+
+function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy, customerId }) {
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
     const [title, setTitle] = useState(noteData.title || "");
     const [summary, setSummary] = useState(noteData.summary || "");
@@ -15,7 +17,7 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3
             setTitle(noteData.title || "");
             setSummary(noteData.summary || "");
             setStatus(noteData.status || "Pending");
-            setExpectedCompletion(noteData.expectedCompletion || "");
+            setExpectedCompletion(noteData.expectedCompletion || null);
         }
     }, [noteData]);
 
@@ -26,8 +28,8 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3
         try {
             const config = { headers: { Authorization: `Bearer ${authToken}` } };
             const response = mode === "add"
-                ? await axios.post(`http://172.20.68.11:5100/api/Notes`, addData, config)
-                : await axios.put(`http://172.20.68.11:5100/api/Notes/${noteData.noteID}`, updateData, config);
+                ? await axios.post(`${server}/api/Notes`, addData, config)
+                : await axios.put(`${server}/api/Notes/${noteData.noteID}`, updateData, config);
 
             console.log(`Note ${mode === "add" ? "created" : "updated"} successfully`, response.data);
         } catch (error) {
@@ -40,7 +42,7 @@ function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3
     const handleDelete = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${authToken}` } };
-            await axios.delete(`http://172.20.68.11:5100/api/Notes/${noteData.noteID}`, config);
+            await axios.delete(`${server}/api/Notes/${noteData.noteID}`, config);
             console.log("Note deleted successfully");
         } catch (error) {
             console.log("Unable to delete note:", error.response ? error.response.data : error.message);

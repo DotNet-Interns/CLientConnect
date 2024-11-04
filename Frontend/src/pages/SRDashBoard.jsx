@@ -42,7 +42,7 @@ function SRDashBoard() {
                 (contextUser) ?
                     <>
 
-                        <Navbar />
+                        <Navbar setContextUser={setContextUser} />
                         <div className='row m-5 mt-3'>
                             <div className="col-md-4 mt-sm-5 col-sm-6 stats">
                                 <div className="greeting rounded bg-primary text-white p-3 h-100">

@@ -9,16 +9,16 @@ namespace Backend.Models
         [Key]
         public int PID { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        [Required(ErrorMessage = "Phone number is required.")]
+        [StringLength(10, ErrorMessage = "Phone number cannot exceed 15 characters.")]
+        [RegularExpression(@"^\+?[0-9]*$", ErrorMessage = "Phone number must be numeric and can optionally start with a '+' sign.")]
         public string PhoneNumber { get; set; }
 
-        [Required]
-        public int CID { get; set; } // Assuming this is a foreign key to CID in Customer
+        [Required(ErrorMessage = "Customer ID is required.")]
+        public int CID { get; set; } // Foreign key to Customer
 
         [ForeignKey("CID")]
-        public Customer Customer  { get; set; }
-
-
+        public Customer Customer { get; set; }
     }
+
 }

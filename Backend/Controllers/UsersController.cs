@@ -9,16 +9,12 @@ using Backend.Models;
 using BCrypt.Net;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
+using Backend.Dtos;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Backend.Controllers
 {
-    public class UserRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    
 
     [Route("api/[controller]")]
     [ApiController]
@@ -35,43 +31,75 @@ namespace Backend.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        //GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
+
 
         // GET: /get
         [HttpGet("/get")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetUser()
         {
-
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
 
+            if (userPayload == null || string.IsNullOrEmpty(userPayload.UserId))
+            {
+                return BadRequest(new { Message = "User ID not found in token." });
+            }
 
-            var user = await _context.Users.FindAsync(Int32.Parse(userPayload.UserId));
+            var userId = Int32.Parse(userPayload.UserId);
+            var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound(new { Message = "User not found." });
             }
 
-            return user;
+            return Ok(user);
         }
+
+
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetAllUsesr()
+        {
+            //Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+
+            //if (userPayload == null || string.IsNullOrEmpty(userPayload.UserId))
+            //{
+            //    return BadRequest(new { Message = "User ID not found in token." });
+            //}
+
+            //var userId = Int32.Parse(userPayload.UserId);
+            //var user = await _context.Users.FindAsync(userId);
+
+            //if (user == null)
+            //{
+            //    return NotFound(new { Message = "User not found." });
+            //}
+
+            return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+        }
+
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (CheckUserRole())
             {
                 return Unauthorized(new { message = "Invalid role" });
             }
+
             if (id != user.UserID)
             {
-                return BadRequest();
+                return BadRequest(new { message = "User ID in the URL does not match the user object." });
             }
 
             _context.Entry(user).State = EntityState.Modified;
@@ -84,67 +112,106 @@ namespace Backend.Controllers
             {
                 if (!UserExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new { message = "User not found." });
                 }
                 else
                 {
-                    throw;
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the user." });
                 }
             }
 
             return NoContent();
         }
 
+
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostUser([FromBody] UserRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> PostUser([FromBody] UserRequestDto request)
         {
             if (CheckUserRole())
             {
-               return Unauthorized(new { message = "Invalid role" });
-
+                return Unauthorized(new { message = "Invalid role" });
             }
+
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
+
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
-            User user = new User();
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.Email = request.Email;
-            user.Password = request.Password;
-            _context.Add(user);
-            await _context.SaveChangesAsync();
-            return Created();
-           
+            User user = new User
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Password = request.Password,
+                Role = UserRole.SalesRepresentative, // Set a default role if needed
+                Status = UserStatus.Active // Set a default status if needed
+            };
+
+            _context.Users.Add(user);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"An error occurred while saving the user: {ex.Message}" });
+            }
+
+            return Ok(user);
         }
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (CheckUserRole())
             {
                 return Unauthorized(new { message = "Invalid role" });
             }
+
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound(new { message = "User not found." });
             }
 
             _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
 
-            return NoContent();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Optionally handle any exceptions that might occur during deletion
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"An error occurred while deleting the user: {ex.Message}" });
+            }
+
+            return NoContent(); // Success response with no content
         }
+
 
         private bool CheckUserRole()
         {
             Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
             if (userPayload.Role == "SalesRepresentative")
             {
-                return false;
+                Console.WriteLine("here");
+                return true;
             }
-            return true;
+            return false;
         }
         private bool UserExists(int id)
         {

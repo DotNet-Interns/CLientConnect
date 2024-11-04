@@ -1,6 +1,11 @@
+import axios from 'axios';
 import React, { useState } from 'react'
+import { getCookie } from '../Utils/cookie';
+import { useNavigate } from 'react-router-dom';
+const server = import.meta.env.VITE_SERVER;
 
 function AddSR() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -19,24 +24,49 @@ function AddSR() {
 
     const handleChange = (event) => {
         const name = event.target.name;
-        const value = event.target.value; 
-        setFormData((prevValue)=>{
+        const value = event.target.value;
+        setFormData((prevValue) => {
             return ({
                 ...prevValue,
-                [name] : value
+                [name]: value
             })
         })
 
-        setErrors((prevValue)=>{
+        setErrors((prevValue) => {
             return ({
                 ...prevValue,
-                [name] : ""
+                [name]: ""
             })
         })
     }
 
-    const handleSubmit = (event)=>{
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+            setErrors((prevValue) => {
+                return {
+                    ...prevValue,
+                    confirmPassword: "Password and confirm password does not match"
+                }
+            })
+        }
+        else {
+            try {
+                const Auth_Token = getCookie("Auth_Token")
+                const response = await axios.post(`${server}/api/Users`, {
+                    "firstName": formData.firstName,
+                    "lastName": formData.lastName,
+                    "email": formData.email,
+                    "password": formData.password
+                },{headers:{Authorization: `Bearer ${Auth_Token}`}})
+                console.log(response);
+                (response.data) ? navigate("/srList") : console.log(response);
+                
+            } catch (error) {
+                console.log(error);
+                
+            }
+        }
     }
 
     return (

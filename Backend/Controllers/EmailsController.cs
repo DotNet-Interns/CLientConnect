@@ -22,104 +22,155 @@ namespace Backend.Controllers
         }
 
         // GET: api/Emails
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Email>>> GetEmails()
-        {
-            return await _context.Emails.ToListAsync();
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Email>>> GetEmails()
+        //{
+        //    return await _context.Emails.ToListAsync();
+        //}
 
         // GET: api/Emails/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<EmailDto>> GetEmail(int id)
         {
-            var email = await _context.Emails.FindAsync(id);
-            
-
-            if (email == null)
+            try
             {
-                return NotFound();
-            }
-            EmailDto emailData = new EmailDto { eid = email.EID, email = email.email };
+                var email = await _context.Emails.FindAsync(id);
 
-            return emailData;
+                if (email == null)
+                {
+                    return NotFound(new { Message = "Email not found." });
+                }
+
+                var emailData = new EmailDto
+                {
+                    eid = email.EID,
+                    email = email.EmailAddress
+                };
+
+                return Ok(emailData); // Return 200 OK with email data
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while retrieving the email.");
+            }
         }
+
 
         // PUT: api/Emails/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut()]
-        public async Task<IActionResult> PutEmail( [FromBody] EmailDto email)
+        // PUT: api/Emails
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PutEmail([FromBody] EmailDto email)
         {
-            //if (id != email.eid)
-            //{
-            //    return BadRequest();
-            //}
+            if (email == null || email.eid <= 0)
+            {
+                return BadRequest("Invalid email data.");
+            }
 
-            Email newEmail =  _context.Emails.Find(email.eid);
-            
+            var existingEmail = await _context.Emails.FindAsync(email.eid);
+            if (existingEmail == null)
+            {
+                return NotFound(new { Message = "Email not found." });
+            }
 
-            newEmail.email = email.email;
+            existingEmail.EmailAddress = email.email;
 
-            _context.Entry(newEmail).State = EntityState.Modified;
+            _context.Entry(existingEmail).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
-                if (!EmailExists(email.eid))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while updating the email.");
             }
 
-            return NoContent();
+            return NoContent(); // Return 204 No Content on successful update
         }
 
         // POST: api/Emails
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/Emails
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Email>> PostEmail([FromBody] AddEmailDto email)
         {
-            Console.WriteLine("Email Data");
-            Console.WriteLine(email.email);
-            Email currEmail = new Email();
-            currEmail.email = email.email;
-            currEmail.CID = email.CID;
-            _context.Emails.Add(currEmail);
-            await _context.SaveChangesAsync();
+            if (email == null || string.IsNullOrWhiteSpace(email.email) || email.CID <= 0)
+            {
+                return BadRequest("Invalid email data.");
+            }
 
-            return CreatedAtAction("GetEmail", new { id = currEmail.EID }, currEmail);
+            if(!_context.Customers.Any(c => c.CID == email.CID))
+            {
+                return BadRequest("Customer does not exits");
+            }
+
+            var currEmail = new Email
+            {
+                EmailAddress = email.email,
+                CID = email.CID
+            };
+
+            try
+            {
+                _context.Emails.Add(currEmail);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while saving the email.");
+            }
+
+            return CreatedAtAction(nameof(GetEmail), new { id = currEmail.EID }, currEmail); // Use nameof for better refactoring support
         }
+
 
         // DELETE: api/Emails/5
+        // DELETE: api/Emails/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEmail(int id)
         {
-            var email = await _context.Emails.FindAsync(id);
-
-
-            List<Email> emails = await _context.Emails.Where(e => e.CID == email.CID).ToListAsync();
-
-            if (emails.Count == 1)
+            try
             {
-                return NoContent();
+                var email = await _context.Emails.FindAsync(id);
+
+                if (email == null)
+                {
+                    return NotFound(new { Message = "Email not found." });
+                }
+
+                // Check if this is the only email for the customer
+                var emails = await _context.Emails.Where(e => e.CID == email.CID).ToListAsync();
+
+                if (emails.Count == 1) // Only one email exists
+                {
+                    return NoContent(); // Return 204 No Content if the only email can't be deleted
+                }
+
+                _context.Emails.Remove(email);
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // Return 204 No Content on successful deletion
             }
-            if (email == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                 return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while deleting the email.");
             }
-
-
-            _context.Emails.Remove(email);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
+
 
         private bool EmailExists(int id)
         {

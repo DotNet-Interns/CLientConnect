@@ -24,8 +24,6 @@ namespace Backend.Middlewares
             _allowedRoutes = new HashSet<string>
             {
                 "/api/Auth",
-               
-
             };
         }
 
@@ -56,9 +54,7 @@ namespace Backend.Middlewares
                     await context.Response.WriteAsync("Unauthorized Token");
                     return;
                 }
-                var claims = JwtTokenService.GetClaimsFromToken(token);
-                var uid = claims.FindFirst(ClaimTypes.PrimarySid);
-                Console.Write(uid);
+                
             }
             else
             {
@@ -68,6 +64,7 @@ namespace Backend.Middlewares
                 return;
             }
 
+            Console.Write("auth verify");
             await _next(context); 
         }
     }

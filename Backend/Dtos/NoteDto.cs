@@ -1,4 +1,5 @@
 ﻿using Backend.Models;
+using NuGet.DependencyResolver;
 
 namespace Backend.Dtos
 {
@@ -12,7 +13,7 @@ namespace Backend.Dtos
 
         public NoteStatus status { get; set; }
 
-        public DateTime expectedCompletion { get; set; }
+        public DateTime? expectedCompletion { get; set; } = null;
 
         public int  createdBy { get; set; }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Login from './pages/Login';
 import AddSR from './pages/AddSR';
 import AddCustomer from './pages/AddCustomer';
@@ -14,14 +14,26 @@ import { getCookie } from './Utils/cookie';
 import axios from 'axios';
 import Customers from './pages/Customers';
 import Users from './pages/Users';
+import Loader from './Components/Loader';
+import DisplayUsers from './pages/DisplayUsers';
+
+
 const server = import.meta.env.VITE_SERVER;
 // import AdminDashBoard from './pages/AdminDashBoard';
 
 function App() {
   const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
-  console.log(contextUser);
-  
+  // console.log(contextUser);
+
   const [loading, setLoading] = useState(true)
+
+  const location = useLocation();
+
+  // useEffect(() => {
+  //   localStorage.setItem("lastRoute", location.pathname);
+  // }, [location]);
+
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -39,8 +51,10 @@ function App() {
         setLoading(false)
 
       } catch (error) {
-        console.log(error);
+        // console.log(error);
 
+      }finally{
+        setLoading(false)
       }
     }
     getUser();
@@ -48,22 +62,30 @@ function App() {
 
   return (
     <>
-      <Routes>
-        <Route path='/' element={
-          <ProtectedRoute>
-            <RoleCheck />
-          </ProtectedRoute>
-
-        } />
-        <Route path="/login" element={<Login />} />
-        <Route path='/addSR' element={<AddSR />} />
-        <Route path='/addCustomer' element={<AddCustomer />} />
-        <Route path='/view/customer' element={<DisplayCustomer />} />
-        <Route path='/customers' element={<Customers />} />
-        <Route path='/users' element={<Users />} />
-      </Routes>
-
-
+      {
+        (loading) ?
+          <Loader size="60px" color="#ff5733" message="Please wait..." />
+          :
+          <Routes>
+            <Route path='/' element={
+              <ProtectedRoute>
+                <RoleCheck />
+              </ProtectedRoute>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path='/addSR' element={<ProtectedRoute><AddSR /></ProtectedRoute>} />
+            <Route path='/addCustomer' element={<ProtectedRoute><AddCustomer /></ProtectedRoute>} />
+             <Route path='/view/user/:uid' element={<ProtectedRoute><DisplayUsers /></ProtectedRoute>} />
+            <Route path='/view/customer/:cid' element={<ProtectedRoute><DisplayCustomer /></ProtectedRoute>} />
+            <Route path='/customers' element={
+              <ProtectedRoute>
+                <Customers />
+              </ProtectedRoute>
+            }
+            />
+            <Route path='/srList' element={<ProtectedRoute><Users /></ProtectedRoute>} />
+          </Routes>
+      }
     </>
   )
 }

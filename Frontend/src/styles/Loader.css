@@ -1,0 +1,24 @@
+/* Loader.css */
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .loader {
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  .loader-message {
+    margin-top: 10px;
+    color: #555;
+    font-size: 14px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

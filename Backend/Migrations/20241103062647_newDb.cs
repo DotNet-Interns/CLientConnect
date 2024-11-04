@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class newDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,8 @@ namespace Backend.Migrations
                 {
                     UserID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
@@ -36,10 +36,10 @@ namespace Backend.Migrations
                 {
                     CID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Company = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Company = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Position = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -62,7 +62,7 @@ namespace Backend.Migrations
                 {
                     EID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmailAddress = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -85,7 +85,7 @@ namespace Backend.Migrations
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Summary = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ExpectedCompletion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpectedCompletion = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     UpdatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedFor = table.Column<int>(type: "int", nullable: false),
@@ -108,7 +108,7 @@ namespace Backend.Migrations
                 {
                     PID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     CID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -123,7 +123,7 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "clientInteractions",
+                name: "ClientInteractions",
                 columns: table => new
                 {
                     CIID = table.Column<int>(type: "int", nullable: false)
@@ -134,29 +134,34 @@ namespace Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_clientInteractions", x => x.CIID);
+                    table.PrimaryKey("PK_ClientInteractions", x => x.CIID);
                     table.ForeignKey(
-                        name: "FK_clientInteractions_Notes_NoteId",
+                        name: "FK_ClientInteractions_Notes_NoteId",
                         column: x => x.NoteId,
                         principalTable: "Notes",
                         principalColumn: "NoteID",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_clientInteractions_Users_UserId",
+                        name: "FK_ClientInteractions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.NoAction);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserID", "CreatedAt", "Email", "FirstName", "LastName", "Password", "Role", "Status" },
+                values: new object[] { 1, new DateTime(2024, 11, 3, 11, 56, 46, 645, DateTimeKind.Local).AddTicks(8321), "Admin@gmail.com", "Admin", "Admin", "$2a$11$RbjXKNeloLiLw/Lr1PDrGeJSskgCabgGkUQ68ivNTkQ0yM0m2glpG", 0, 0 });
+
             migrationBuilder.CreateIndex(
-                name: "IX_clientInteractions_NoteId",
-                table: "clientInteractions",
+                name: "IX_ClientInteractions_NoteId",
+                table: "ClientInteractions",
                 column: "NoteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_clientInteractions_UserId",
-                table: "clientInteractions",
+                name: "IX_ClientInteractions_UserId",
+                table: "ClientInteractions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -178,19 +183,13 @@ namespace Backend.Migrations
                 name: "IX_Phones_CID",
                 table: "Phones",
                 column: "CID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
-                column: "Email",
-                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "clientInteractions");
+                name: "ClientInteractions");
 
             migrationBuilder.DropTable(
                 name: "Emails");

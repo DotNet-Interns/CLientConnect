@@ -2,10 +2,15 @@ import React, { useState } from 'react'
 // import * as helpers from '../Utils/validation.js';
 import validateCustomerData from '../Utils/validation.js';
 import axios from 'axios';
+import { getCookie } from '../Utils/cookie.js';
+import { useUserInfo } from '../Contexts/User.jsx';
+import { Navigate } from 'react-router-dom';
 const server = import.meta.env.VITE_SERVER;
 
 function AddCustomer() {
-    console.log("AddCustomer")
+    console.log("AddCustomer");
+    const {contextUser} = useUserInfo();
+    const [status , setStatus] = useState(false)
     const [customerData, setCustomerData] = useState({
         firstName: "",
         lastName: "",
@@ -44,24 +49,29 @@ function AddCustomer() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // helpers.validateCustomerData(customerData , setValidationErrors);
-        // validateCustomerData(customerData , setValidationErrors);
 
         if (validateCustomerData(customerData, setValidationErrors)) {
             try {
+                const Auth_Token = getCookie("Auth_Token")
                 const response = await axios.post(`${server}/api/Customers`,
                     {
                         firstName: customerData.firstName,
                         lastName: customerData.lastName,
                         address: customerData.Address,
                         company: customerData.Company_name,
-                        createdBy: "Kelvin",
+                        createdBy: contextUser.userId,
                         position: customerData.Position,
                         phoneNumber: customerData.phone,
                         email: customerData.email
+                    },
+                    {
+                        headers : {
+                            Authorization : `Bearer ${Auth_Token}`
+                        }
                     }
                 )
                 console.log(response);
+                setStatus(true);
                 
             } catch (error) {
                 console.log(error);
@@ -119,6 +129,9 @@ function AddCustomer() {
 
                 <button onClick={handleSubmit} className="btn btn-primary">Submit</button>
             </form>
+            {
+                (status) && <Navigate to={"/customers"} />
+             }
         </div>
     )
 }
