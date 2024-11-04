@@ -27,102 +27,123 @@ namespace Backend.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        
+
         // GET: api/Customers
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<CustomerListDto>>> GetCustomers()
         {
-            var customerList = await _context.Customers.ToListAsync();
-            List < CustomerListDto > result = [];
-            foreach (var item in customerList)
+            try
             {
-                CustomerListDto current = new CustomerListDto
+                var customerList = await _context.Customers.ToListAsync();
+
+                if (customerList == null || !customerList.Any())
+                {
+                    return NoContent(); // No customers found
+                }
+
+                var result = customerList.Select(item => new CustomerListDto
                 {
                     CID = item.CID,
                     FirstName = item.FirstName,
-                    LastName=item.LastName,
-                    Company=item.Company,
-                    Position=item.Position,
-                    Address=item.Address,
-                    Status=item.Status,
+                    LastName = item.LastName,
+                    Company = item.Company,
+                    Position = item.Position,
+                    Address = item.Address,
+                    Status = item.Status,
                     createdBy = _context.Users
-                          .Where(u => u.UserID == item.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null Data",
-                    createdAt=item.CreatedAt
-                };
-                result.Add(current);
-                
+                        .Where(u => u.UserID == item.CreatedBy)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "Null Data",
+                    createdAt = item.CreatedAt
+                }).ToList();
+
+                return Ok(result); // Return the list of customers
             }
-            return result;
-        } 
+            catch (Exception ex)
+            {
+               // _logger.LogError(ex, "An error occurred while retrieving customers.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
+            }
+        }
+
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-
-            if (customer == null)
+            try
             {
-                return NotFound();
+                var customer = await _context.Customers.FindAsync(id);
+
+                if (customer == null)
+                {
+                    return NotFound(new { Message = "Customer not found." });
+                }
+
+                var phones = await _context.Phones.Where(p => p.CID == id).ToListAsync();
+                var emails = await _context.Emails.Where(e => e.CID == id).ToListAsync();
+
+                var customerPhones = phones.Select(item => new PhoneDto
+                {
+                    phone = item.PhoneNumber,
+                    pid = item.PID
+                }).ToList();
+
+                var customerEmails = emails.Select(item => new EmailDto
+                {
+                    email = item.EmailAddress,
+                    eid = item.EID
+                }).ToList();
+
+                var customerDto = new CustomerDto
+                {
+                    CID = customer.CID,
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    Company = customer.Company,
+                    Position = customer.Position,
+                    Status = customer.Status,
+                    PhoneNumbers = customerPhones,
+                    Emails = customerEmails,
+                    Address = customer.Address
+                };
+
+                return Ok(customerDto); // Return the customer DTO
             }
-
-            
-
-            List<Phone> phone = await _context.Phones.Where(p => p.CID == id).ToListAsync();
-            List<Email> email = await _context.Emails.Where(e => e.CID == id).ToListAsync();
-
-            List<PhoneDto> customerPhones = [];
-            List<EmailDto> customerEmails = [];
-            foreach (var item in phone)
+            catch (Exception ex)
             {
-                PhoneDto currPhone = new PhoneDto();
-                currPhone.phone = item.PhoneNumber;
-                currPhone.pid = item.PID;
-
-                customerPhones.Add(currPhone);
-
+               // _logger.LogError(ex, "An error occurred while retrieving customer with ID: {Id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
             }
-
-            foreach (var item in email)
-            {
-               EmailDto currEmail = new EmailDto();
-                currEmail.email = item.email;
-                currEmail.eid = item.EID;
-
-                customerEmails.Add(currEmail);
-
-            }
-
-
-
-
-            var customerDto = new CustomerDto
-            {
-                CID = customer.CID,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                Company = customer.Company,
-                Position = customer.Position,
-                Status = customer.Status,
-                PhoneNumbers = customerPhones ,
-                Emails = customerEmails,
-                Address = customer.Address
-            };
-
-            return customerDto;
         }
 
 
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut()]
-        public async Task<IActionResult> PutCustomer( [FromBody] CustomerUpdateDto customer)
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PutCustomer(int id, [FromBody] CustomerUpdateDto customer)
         {
-           
-            Customer? updatedCustomer = await _context.Customers.FindAsync(customer.cid);
-
-            if(updatedCustomer == null)
+            if (customer == null)
             {
-                return BadRequest("Null customer");
+                return BadRequest("Customer data is required.");
+            }
+
+            var updatedCustomer = await _context.Customers.FindAsync(id);
+
+            if (updatedCustomer == null)
+            {
+                return NotFound(new { Message = "Customer not found." });
             }
 
             updatedCustomer.FirstName = customer.firstName ?? updatedCustomer.FirstName;
@@ -137,78 +158,104 @@ namespace Backend.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
-                if (!CustomerExists(customer.cid))
+                if (!CustomerExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new { Message = "Customer not found during update." });
                 }
                 else
                 {
-                    throw;
+                    //_logger.LogError(ex, "Concurrency error occurred while updating customer with ID: {Id}", id);
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
                 }
             }
 
-            return NoContent();
+            return NoContent(); // Successfully updated
         }
 
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/Customers
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomerDto registerCustomer)
         {
-            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
-            
-            Customer customer = new Customer();
-            customer.FirstName = registerCustomer.FirstName;
-            customer.LastName = registerCustomer.LastName;
-            customer.Address = registerCustomer.Address;
-            customer.Company = registerCustomer.Company;
-            customer.CreatedBy = Int32.Parse(userPayload.UserId);
+            if (registerCustomer == null)
+            {
+                return BadRequest("Customer registration data is required.");
+            }
 
-            customer.Position = registerCustomer.Position;
+            try
+            {
+                Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
 
-            Phone phone = new Phone();
-            phone.PhoneNumber = registerCustomer.PhoneNumber;
-            customer.PhoneNumbers.Add(phone);
+                // Create new customer instance
+                var customer = new Customer
+                {
+                    FirstName = registerCustomer.FirstName,
+                    LastName = registerCustomer.LastName,
+                    Address = registerCustomer.Address,
+                    Company = registerCustomer.Company,
+                    CreatedBy = Int32.Parse(userPayload.UserId),
+                    Position = registerCustomer.Position,
+                    PhoneNumbers = new List<Phone>(), // Initialize PhoneNumbers collection
+                    Emails = new List<Email>() // Initialize Emails collection
+                };
 
-            Email email = new Email();
-            email.email = registerCustomer.Email;
-            customer.Emails.Add(email);
+                // Add phone and email
+                if (!string.IsNullOrEmpty(registerCustomer.PhoneNumber))
+                {
+                    customer.PhoneNumbers.Add(new Phone { PhoneNumber = registerCustomer.PhoneNumber });
+                }
 
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+                if (!string.IsNullOrEmpty(registerCustomer.Email))
+                {
+                    customer.Emails.Add(new Email { EmailAddress = registerCustomer.Email });
+                }
 
-            return Created();      
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Customer is created" });
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while saving the customer.");
+            }
         }
 
-        // DELETE: api/Customers/5
+        // PUT: api/Customers/toggleStatus/5
         [HttpPut("toggleStatus/{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ToggleCustomerStatus(int id)
         {
-            
-            
-            Customer? customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
+            try
             {
-                return NotFound();
-            }
-            if(customer.Status == CustomerStatus.Inactive)
-            {
-                customer.Status = CustomerStatus.Active;
-            }
-            else
-            {
-                customer.Status = CustomerStatus.Inactive;
-            }
-            
-            
+                var customer = await _context.Customers.FindAsync(id);
+                if (customer == null)
+                {
+                    return NotFound(new { Message = "Customer not found." });
+                }
 
-            _context.Entry(customer).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+                // Toggle the status
+                customer.Status = customer.Status == CustomerStatus.Inactive ? CustomerStatus.Active : CustomerStatus.Inactive;
 
-            return Ok();
+                _context.Entry(customer).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Customer status updated successfully.", Status = customer.Status });
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while updating the customer status.");
+            }
         }
+
 
         private bool CustomerExists(int id)
         {

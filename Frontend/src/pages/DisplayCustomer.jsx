@@ -365,7 +365,6 @@ function DisplayCustomer() {
                                 </div>
                             </div>
                         </div>
-
                         <div className="w-75 shadow-lg p-3 d-flex flex-column align-items-center justify-content-center rounded-3 bg-white">
                             <div className="text-light note-container w-100 p-2 rounded-3 shadow-sm d-flex justify-content-between align-items-center">
                                 <h3 className="mb-0">Notes</h3>

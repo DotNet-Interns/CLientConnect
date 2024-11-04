@@ -22,164 +22,216 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        
 
-        // GET: api/Notes
+
+        // GET: api/Notes/userNotes/{id}
         [HttpGet("userNotes/{id}")]
-        public async Task<ActionResult<IEnumerable<GetNoteDto>>> GetNotes(int id, ClientConnectContext _context)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<GetNoteDto>>> GetNoteById(int id)
         {
-            return await _context.Notes
-                  .Where(n => n.CreatedFor == id)
-                  .Select( note => new GetNoteDto
-                  {
-                      noteID = note.NoteID,
-                      title = note.Title,
-                      summary = note.Summary,
-                      status = note.Status,
-                      expectedCompletion = note.ExpectedCompletion,
-                      createdBy = _context.Users
-                          .Where(u => u.UserID == note.CreatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null data",
-                      updatedBy = _context.Users
-                          .Where(u => u.UserID == note.UpdatedBy).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? "Null data",
-                      
-
-
-                      createdAt = note.CreatedAt
-                  })
-                .ToListAsync();
-        }
-
-        [HttpPut("UpdateNoteStatus/{id}")]
-        public async Task<IActionResult> UpdateNoteStatus(int id , [FromBody] UpdateNoteStatusDto upnsdto)
-        {
-            Note? n =  _context.Notes.Find(id);
-            Console.WriteLine("current status");
-            Console.Write(upnsdto.Status);
-            //if(upnsdto.Status)
-            if(n == null)
+            try
             {
-                return BadRequest();
+                var notes = await _context.Notes
+                    .Where(n => n.CreatedFor == id)
+                    .Select(note => new GetNoteDto
+                    {
+                        noteID = note.NoteID,
+                        title = note.Title,
+                        summary = note.Summary,
+                        status = note.Status,
+                        expectedCompletion = note.ExpectedCompletion,
+                        createdBy = _context.Users
+                            .Where(u => u.UserID == note.CreatedBy)
+                            .Select(u => u.FirstName + " " + u.LastName)
+                            .FirstOrDefault() ?? "Null data",
+                        updatedBy = _context.Users
+                            .Where(u => u.UserID == note.UpdatedBy)
+                            .Select(u => u.FirstName + " " + u.LastName)
+                            .FirstOrDefault() ?? "Null data",
+                        createdAt = note.CreatedAt
+                    })
+                    .ToListAsync();
+
+                if (notes == null || !notes.Any())
+                {
+                    return NoContent();
+                }
+
+                return Ok(notes);
             }
-            n.Status = upnsdto.Status;
-
-            Console.WriteLine("current status");
-            Console.Write(n.Status);
-
-            _context.Entry(n).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while retrieving notes.");
+            }
         }
+
+
+        // PUT: api/Notes/UpdateNoteStatus/{id}
+        [HttpPut("UpdateNoteStatus/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateNoteStatus(int id, [FromBody] UpdateNoteStatusDto upnsdto)
+        {
+            if (upnsdto == null || !Enum.IsDefined(typeof(NoteStatus), upnsdto.Status))
+            {
+                return BadRequest(new { Message = "Invalid status value." });
+            }
+
+            try
+            {
+                var note = await _context.Notes.FindAsync(id);
+                if (note == null)
+                {
+                    return NotFound(new { Message = "Note not found." });
+                }
+
+                note.Status = upnsdto.Status;
+
+                _context.Entry(note).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Note status updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred while updating the note status.");
+            }
+        }
+
 
         // PUT: api/Notes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut()]
-        [ProducesResponseType(statusCode:StatusCodes.Status404NotFound)]
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutNote([FromBody] UpdateNoteDto note)
         {
-            Note? upNote = _context.Notes.Find(note.noteID);
-            if (upNote == null) {
-                return BadRequest("No Note found");
+            if (note == null)
+            {
+                return BadRequest(new { Message = "Invalid note data." });
             }
+
+            var upNote = await _context.Notes.FindAsync(note.noteID);
+            if (upNote == null)
+            {
+                return NotFound(new { Message = "No note found." });
+            }
+
+            // Update note properties
             upNote.Summary = note.summary ?? upNote.Summary;
             upNote.Title = note.title ?? upNote.Title;
-            if(note.expectedCompletion != null)
+
+            if (note.expectedCompletion.HasValue)
             {
-                upNote.ExpectedCompletion = (DateTime)note.expectedCompletion;
+                upNote.ExpectedCompletion = note.expectedCompletion.Value;
             }
-            
+
             upNote.UpdatedBy = note.updatedBy;
 
-            Console.WriteLine("update note");
             _context.Entry(upNote).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
 
-                User? u = _context.Users.Find(note.updatedBy);
-
-                if(u == null)
+                var user = await _context.Users.FindAsync(note.updatedBy);
+                if (user == null)
                 {
-                    BadRequest("No user found");
+                    return BadRequest(new { Message = "No user found." });
                 }
 
                 var interaction = new ClientInteraction
                 {
                     Note = upNote,
-                    User = u!,
+                    User = user,
                     InteractionTime = DateTime.Now
                 };
 
-                _context.clientInteractions.Add(interaction);
+                _context.ClientInteractions.Add(interaction);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!NoteExists(note.noteID))
                 {
-                    return NotFound();
+                    return NotFound(new { Message = "Note no longer exists." });
                 }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the note.");
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
             }
 
-            return Ok();
+            return Ok(new { Message = "Note updated successfully." });
         }
+
 
         // POST: api/Notes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Note>> PostNote([FromBody]NoteDto note)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Note>> PostNote([FromBody] NoteDto note)
         {
-           
-
-
-            Note n = new Note();
-            n.Title = note.title;
-            n.CreatedBy = note.createdBy;
-            n.Summary = note.summary;
-
-            if (note.expectedCompletion != null)
+            if (note == null)
             {
-
-                n.ExpectedCompletion = (DateTime)note.expectedCompletion;
+                return BadRequest(new { Message = "Invalid note data." });
             }
-            n.CreatedFor = note.createdFor;
-            
+
+            var n = new Note
+            {
+                Title = note.title,
+                CreatedBy = note.createdBy,
+                Summary = note.summary,
+                ExpectedCompletion = note.expectedCompletion,
+                CreatedFor = note.createdFor
+            };
+
             _context.Notes.Add(n);
             try
             {
                 await _context.SaveChangesAsync();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                return BadRequest($"Error {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"An error occurred while saving the note: {ex.Message}" });
             }
 
-
-            User? u = _context.Users.Find(note.createdBy);
-            if(u == null)
+            var user = await _context.Users.FindAsync(note.createdBy);
+            if (user == null)
             {
-               return BadRequest();
+                return BadRequest(new { Message = "User not found." });
             }
 
             var interaction = new ClientInteraction
             {
                 Note = n,
-                User = u,
+                User = user,
                 InteractionTime = DateTime.Now
             };
 
-           _context.clientInteractions.Add(interaction);
-            await _context.SaveChangesAsync();
+            _context.ClientInteractions.Add(interaction);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"An error occurred while saving the interaction: {ex.Message}" });
+            }
 
-         
-            return Ok();
+            return Ok(new {Message  = "Note Created" });
         }
+
 
         private bool NoteExists(int id)
         {
