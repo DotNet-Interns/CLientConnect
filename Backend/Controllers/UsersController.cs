@@ -57,45 +57,45 @@ namespace Backend.Controllers
         }
 
 
-        //// PUT: api/Users/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[ProducesResponseType(StatusCodes.Status204NoContent)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<IActionResult> PutUser(int id, User user)
-        //{
-        //    if (CheckUserRole())
-        //    {
-        //        return Unauthorized(new { message = "Invalid role" });
-        //    }
+        // PUT: api/Users/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutUser(int id, User user)
+        {
+            if (CheckUserRole())
+            {
+                return Unauthorized(new { message = "Invalid role" });
+            }
 
-        //    if (id != user.UserID)
-        //    {
-        //        return BadRequest(new { message = "User ID in the URL does not match the user object." });
-        //    }
+            if (id != user.UserID)
+            {
+                return BadRequest(new { message = "User ID in the URL does not match the user object." });
+            }
 
-        //    _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!UserExists(id))
-        //        {
-        //            return NotFound(new { message = "User not found." });
-        //        }
-        //        else
-        //        {
-        //            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the user." });
-        //        }
-        //    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound(new { message = "User not found." });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the user." });
+                }
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
 
         // POST: api/Users
@@ -143,38 +143,38 @@ namespace Backend.Controllers
         }
 
 
-        //// DELETE: api/Users/5
-        //[HttpDelete("{id}")]
-        //[ProducesResponseType(StatusCodes.Status204NoContent)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<IActionResult> DeleteUser(int id)
-        //{
-        //    if (CheckUserRole())
-        //    {
-        //        return Unauthorized(new { message = "Invalid role" });
-        //    }
+        // DELETE: api/Users/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            if (CheckUserRole())
+            {
+                return Unauthorized(new { message = "Invalid role" });
+            }
 
-        //    var user = await _context.Users.FindAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound(new { message = "User not found." });
-        //    }
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
 
-        //    _context.Users.Remove(user);
+            _context.Users.Remove(user);
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Optionally handle any exceptions that might occur during deletion
-        //        return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"An error occurred while deleting the user: {ex.Message}" });
-        //    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Optionally handle any exceptions that might occur during deletion
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"An error occurred while deleting the user: {ex.Message}" });
+            }
 
-        //    return NoContent(); // Success response with no content
-        //}
+            return NoContent(); // Success response with no content
+        }
 
 
         private bool CheckUserRole()

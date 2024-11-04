@@ -56,7 +56,7 @@ namespace Backend.Controllers
 
                 if (notes == null || !notes.Any())
                 {
-                    return NotFound(new { Message = "No notes found for the specified user." });
+                    return NoContent();
                 }
 
                 return Ok(notes);
