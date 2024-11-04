@@ -12,7 +12,8 @@ function Customers() {
     const { contextUser } = useUserInfo();
     const [customerList, setCustomerList] = useState(null);
     const [filterList, setFilterList] = useState(customerList);
-    console.log(filterList);
+    const [dropdownValue , setDropDownValue] = useState("Active")
+    // console.log(filterList);
     
 
 
@@ -25,7 +26,7 @@ function Customers() {
                 }
             })
 
-            console.log(response);
+            // console.log(response);
             setCustomerList(response.data)
             setFilterList(() => {
                 return response.data?.filter((item, index) => {
@@ -39,22 +40,25 @@ function Customers() {
 
     const handleFilterClick = (event) => {
         const id = event.target.id;
-        console.log(`Clicked ${id}`);
+        // console.log(`Clicked ${id}`);
 
 
         if (id === "active") {
+            setDropDownValue("Active");
             setFilterList(() => {
                 return customerList.filter((item, index) => {
                     return item.status === 0
                 })
             })
         } else if (id === "inactive") {
+            setDropDownValue("Inactive");
             setFilterList(() => {
                 return customerList.filter((item, index) => {
                     return item.status === 1
                 })
             })
         } else if (id === "all") {
+            setDropDownValue("All");
             setFilterList(() => {
                 return customerList.filter((item, index) => {
                     return item.status === 1 || item.status === 0
@@ -78,7 +82,7 @@ function Customers() {
         };
         
         setFilterList(sortByFullName(filterList));
-        console.log(filterList);
+        // console.log(filterList);
     }
 
 
@@ -99,7 +103,7 @@ function Customers() {
                         <li className="nav-item">
                             <div className="dropdown">
                                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                    active
+                                    {dropdownValue}
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li onClick={handleFilterClick} id='active' className="dropdown-item">Active</li>
