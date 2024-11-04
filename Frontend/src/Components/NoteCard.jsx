@@ -10,7 +10,7 @@ import { useUserInfo } from "../Contexts/User";
 
 const server = import.meta.env.VITE_SERVER;
 
-function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
+function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
 
     console.log(`updatedby ${updatedBy}`)
     const { contextUser } = useUserInfo();
@@ -187,23 +187,25 @@ function NoteCard({ Title = "", Content = "", IDate = "", ITime = "", id, create
                             editedContent
                         )}
                     </p>
-                    <p className="popup-date text-start p-1 text-dark rounded-1 d-flex gap-2">
-                        Due:{" "}
-                        {isEditing ? (
-                            <>
-                                <input
-                                    type="datetime-local"
-                                    value={updatedTime}
-                                    onChange={(e) => setUpdatedTime(e.target.value)}
-                                    className="edit-input"
-                                />
-                                {errors.date && <p className="error-text">{errors.date}</p>}
-                            </>
-                        ) : (
+                    {
+                        IDate && ITime &&
+                        <p className="popup-date text-start p-1 text-dark rounded-1 d-flex gap-2">
+                            Due:{" "}
+                            {isEditing ? (
+                                <>
+                                    <input
+                                        type="datetime-local"
+                                        value={updatedTime}
+                                        onChange={(e) => setUpdatedTime(e.target.value)}
+                                        className="edit-input"
+                                    />
+                                    {errors.date && <p className="error-text">{errors.date}</p>}
+                                </>
+                            ) : (
 
-                            <div className="text-danger">{editedDateTime}</div>
-                        )}
-                    </p>
+                                <div className="text-danger">{editedDateTime}</div>
+                            )}
+                        </p>}
                     <p className="popup-date m-0 d-flex">
                         Created by: {createdBy}
                     </p>

@@ -3,7 +3,7 @@ import "../../styles/CustomModal.css";
 import axios from 'axios';
 import * as cookie from "../../Utils/cookie";
 
-function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy = 3, customerId }) {
+function NoteModal({ isOpen, onClose, noteData = {}, mode = "add", createdBy, customerId }) {
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
     const [title, setTitle] = useState(noteData.title || "");
     const [summary, setSummary] = useState(noteData.summary || "");
