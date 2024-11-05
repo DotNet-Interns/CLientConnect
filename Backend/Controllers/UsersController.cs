@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
 using Backend.Dtos;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NuGet.Protocol.Core.Types;
 
 namespace Backend.Controllers
 {
@@ -57,19 +58,36 @@ namespace Backend.Controllers
             return Ok(user);
         }
 
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetAllUser()
+        {
+
+            return await _context.Users.ToListAsync();
+        }
+
 
         [HttpGet("{start}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<User>>> GetAllUsesr(int start)
+        public async Task<ActionResult> GetAllUser(int start)
         {
 
             var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
             if(users.Count - start >= 10)
             {
-                return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start, 10);
+                return Ok(new
+                {
+                    list = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start,10),
+                    count = users.Count
+                });
             }
-            return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+            return Ok(new
+            {
+                list = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start, users.Count - start),
+                count = users.Count
+            });
         }
 
 

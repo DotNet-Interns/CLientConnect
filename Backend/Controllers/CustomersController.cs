@@ -11,30 +11,27 @@ using Backend.Dtos;
 
 namespace Backend.Controllers
 {
-  
+
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
     {
         private readonly ClientConnectContext _context;
-        private readonly JwtTokenService _jwtTokenService ;
+        private readonly JwtTokenService _jwtTokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CustomersController(ClientConnectContext context , JwtTokenService jwtTokenService,IHttpContextAccessor httpContextAccessor)
+        public CustomersController(ClientConnectContext context, JwtTokenService jwtTokenService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _jwtTokenService = jwtTokenService;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        
-
-        // GET: api/Customers
-        [HttpGet]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<CustomerListDto>>> GetCustomers()
+        public async Task<ActionResult<List<CustomerListDto>>> GetCustomers()
         {
             try
             {
@@ -61,7 +58,56 @@ namespace Backend.Controllers
                     createdAt = item.CreatedAt
                 }).ToList();
 
-                return Ok(result); // Return the list of customers
+
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, "An error occurred while retrieving customers.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
+            }
+        }
+
+
+        // GET: api/Customers
+        [HttpGet("get/{Start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetCustomers(int Start)
+        {
+            try
+            {
+                var customerList = await _context.Customers.ToListAsync();
+
+                if (customerList == null || !customerList.Any())
+                {
+                    return NoContent(); // No customers found
+                }
+
+                var result = customerList.Select(item => new CustomerListDto
+                {
+                    CID = item.CID,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Company = item.Company,
+                    Position = item.Position,
+                    Address = item.Address,
+                    Status = item.Status,
+                    createdBy = _context.Users
+                        .Where(u => u.UserID == item.CreatedBy)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "Null Data",
+                    createdAt = item.CreatedAt
+                }).ToList();
+
+                if(result.Count - Start >= 10)
+                {
+                    return Ok(new { list = result.GetRange(Start, 10) , count = result.Count});
+                }
+
+                return Ok(new { list = result.GetRange(Start, result.Count - Start), count = result.Count }); // Return the list of customers
             }
             catch (Exception ex)
             {
