@@ -12,9 +12,9 @@ function Customers() {
     const { contextUser } = useUserInfo();
     const [customerList, setCustomerList] = useState(null);
     const [filterList, setFilterList] = useState(customerList);
-    const [dropdownValue , setDropDownValue] = useState("Active")
+    const [dropdownValue, setDropDownValue] = useState("Active")
     // console.log(filterList);
-    
+
 
 
     useEffect(() => {
@@ -28,11 +28,13 @@ function Customers() {
 
             // console.log(response);
             setCustomerList(response.data)
-            setFilterList(() => {
-                return response.data?.filter((item, index) => {
-                    return item.status === 0
+            if (response.status !== 204) {
+                setFilterList(() => {
+                    return response.data?.filter((item, index) => {
+                        return item.status === 0
+                    })
                 })
-            })
+            }
         }
         getCustomerData();
     }, [])
@@ -69,7 +71,7 @@ function Customers() {
 
     const sortFunction = (event) => {
         const sortByFullName = (array) => {
-            return  [...array].sort((a, b) => {
+            return [...array].sort((a, b) => {
                 const fullNameA = `${a.firstName} ${a.lastName}`.toLowerCase();
                 const fullNameB = `${b.firstName} ${b.lastName}`.toLowerCase();
 
@@ -78,9 +80,9 @@ function Customers() {
                 return 0;
             });
             //setFilterList(sortedArray);
-            
+
         };
-        
+
         setFilterList(sortByFullName(filterList));
         // console.log(filterList);
     }
