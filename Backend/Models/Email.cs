@@ -12,6 +12,7 @@ namespace Backend.Models
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address format.")]
         [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address format.")]
         public string EmailAddress { get; set; }
 
         [Required(ErrorMessage = "Customer ID is required.")]

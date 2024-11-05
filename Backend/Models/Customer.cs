@@ -26,10 +26,12 @@ namespace Backend.Models
 
         [Required(ErrorMessage = "First name is required.")]
         [StringLength(10, ErrorMessage = "First name cannot exceed 10 characters.")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name must contain only letters.")]
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Last name is required.")]
         [StringLength(10, ErrorMessage = "Last name cannot exceed 10 characters.")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name must contain only letters.")]
         public string LastName { get; set; }
 
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
