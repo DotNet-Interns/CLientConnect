@@ -12,7 +12,8 @@ namespace Backend.Models
         [Required(ErrorMessage = "Phone number is required.")]
         
         [StringLength(10, ErrorMessage = "Phone number cannot exceed 15 characters.")]
-        [RegularExpression(@"^\+?[0-9]*$", ErrorMessage = "Phone number must be numeric and can optionally start with a '+' sign.")]
+        [MinLength(10, ErrorMessage = "Phone number must be at least 10 characters long.")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be exactly 10 digits.")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Customer ID is required.")]

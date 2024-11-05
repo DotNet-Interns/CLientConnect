@@ -102,9 +102,9 @@ namespace Backend.Controllers
                     createdAt = item.CreatedAt
                 }).ToList();
 
-                if(result.Count - Start >= 10)
+                if(result.Count - Start >= 5)
                 {
-                    return Ok(new { list = result.GetRange(Start, 10) , count = result.Count});
+                    return Ok(new { list = result.GetRange(Start, 5) , count = result.Count});
                 }
 
                 return Ok(new { list = result.GetRange(Start, result.Count - Start), count = result.Count }); // Return the list of customers
@@ -112,6 +112,96 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                // _logger.LogError(ex, "An error occurred while retrieving customers.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
+            }
+        }
+
+        [HttpGet("Active/{Start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetActiveCustomers(int Start)
+        {
+            try
+            {
+                var customerList = await _context.Customers.Where(c => c.Status == CustomerStatus.Active).ToListAsync();
+
+                if (customerList == null || !customerList.Any())
+                {
+                    return NoContent(); // No customers found
+                }
+
+                var result = customerList.Select(item => new CustomerListDto
+                {
+                    CID = item.CID,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Company = item.Company,
+                    Position = item.Position,
+                    Address = item.Address,
+                    Status = item.Status,
+                    createdBy = _context.Users
+                        .Where(u => u.UserID == item.CreatedBy)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "Null Data",
+                    createdAt = item.CreatedAt
+                }).ToList();
+
+                if (result.Count - Start >= 5)
+                {
+                    return Ok(new { list = result.GetRange(Start, 5), count = result.Count });
+                }
+
+                return Ok(new { list = result.GetRange(Start, result.Count - Start), count = result.Count }); // Return the list of customers
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, "An error occurred while retrieving customers.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
+            }
+        }
+
+        [HttpGet("Inactive/{Start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetInactiveCustomers(int Start)
+        {
+            try
+            {
+                var customerList = await _context.Customers.Where(c => c.Status == CustomerStatus.Inactive).ToListAsync();
+
+                if (customerList == null)
+                {
+                    return NoContent(); // No customers found
+                }
+
+                var result = customerList.Select(item => new CustomerListDto
+                {
+                    CID = item.CID,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Company = item.Company,
+                    Position = item.Position,
+                    Address = item.Address,
+                    Status = item.Status,
+                    createdBy = _context.Users
+                        .Where(u => u.UserID == item.CreatedBy)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "Null Data",
+                    createdAt = item.CreatedAt
+                }).ToList();
+
+                if (result.Count - Start >= 5)
+                {
+                    return Ok(new { list = result.GetRange(Start, 5), count = result.Count });
+                }
+
+                return Ok(new { list = result.GetRange(Start, result.Count - Start), count = result.Count }); // Return the list of customers
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, "An error occurred while retrieving customers.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred."); // Handle unexpected errors
             }
         }
