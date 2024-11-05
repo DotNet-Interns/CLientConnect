@@ -41,6 +41,7 @@ function AddNote({ visibility, setAddNote }) {
                     }
                 })
             setDropDownData(response.data)
+            console.log(response)
 
         } catch (error) {
             console.log(error);
@@ -132,7 +133,7 @@ function AddNote({ visibility, setAddNote }) {
                                         <option>Select {note.CreatingFor}</option>
                                         {
                                             dropdownData?.map((item, index) =>
-                                                <option key={index} value={item.userID}>{item.firstName} {item.lastName}</option>
+                                                <option key={index} value={(note.CreatingFor==="User")?item.userID:item.cid}>{item.firstName} {item.lastName}</option>
                                             )
                                         }
                                     </>
