@@ -11,8 +11,45 @@ const server = import.meta.env.VITE_SERVER;
 function Users() {
     const { contextUser } = useUserInfo();
     const [userList, setUserList] = useState(null);
-    const [filterList, setFilterList] = useState(userList);
-    const [dropdownValue , setDropDownValue] = useState("Active")
+    const [filterList, setFilterList] = useState([]);
+    const [dropdownValue, setDropDownValue] = useState("Active");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const usersPerPage = 5;
+
+
+    useEffect(() => {
+        fetchFilteredData(dropdownValue, 0);
+    }, []);
+
+
+    const fetchFilteredData = async (filter, start) => {
+        const Auth_Token = getCookie("Auth_Token");
+        try {
+            let response;
+
+            if (filter === "All") {
+                response = await axios.get(`${server}/api/Users/${start}`, {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`,
+                    },
+                });
+            } else {
+                response = await axios.get(`${server}/api/Users/${filter}/${start}`, {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`,
+                    },
+                });
+            }
+            console.log(response);
+            setUserList(response.data.list);
+            setTotalCount(response.data.count);
+            setFilterList(response.data.list);
+        } catch (error) {
+            console.error("Error fetching customer data", error);
+        }
+    };
+
 
     useEffect(() => {
         const getUsers = async () => {
@@ -22,7 +59,7 @@ function Users() {
                     Authorization: `Bearer ${Auth_Token}`
                 }
             })
-            console.log(response);
+            // console.log(response)
             setUserList(response.data)
             setFilterList(() => {
                 return response.data?.filter((item, index) => {
@@ -39,29 +76,29 @@ function Users() {
 
     const handleFilterClick = (event) => {
         const id = event.target.id;
+        setCurrentPage(1);
+
+        let filter;
         if (id === "active") {
+            filter = "Active";
             setDropDownValue("Active");
-            setFilterList(() => {
-                return userList.filter((item, index) => {
-                    return item.status === 0
-                })
-            })
         } else if (id === "inactive") {
+            filter = "Inactive";
             setDropDownValue("Inactive");
-            setFilterList(() => {
-                return userList.filter((item, index) => {
-                    return item.status === 1
-                })
-            })
         } else if (id === "all") {
+            filter = "All";
             setDropDownValue("All");
-            setFilterList(() => {
-                return userList.filter((item, index) => {
-                    return item.status === 1 || item.status === 0
-                })
-            })
         }
-    }
+
+        fetchFilteredData(filter, 0);
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        const start = (newPage - 1) * usersPerPage;
+        const filter = dropdownValue === "Active" ? "Active" : dropdownValue === "Inactive" ? "Inactive" : "All";
+        fetchFilteredData(filter, start);
+    };
 
     const sortFunction = (event) => {
         const sortByFullName = (array) => {
@@ -80,6 +117,10 @@ function Users() {
         setFilterList(sortByFullName(filterList));
     }
 
+    const getPaginatedUsers = () => {
+        const startIndex = (currentPage - 1) * usersPerPage;
+        return filterList;
+    };
 
     return (
         <>
@@ -92,12 +133,12 @@ function Users() {
                             <Link to={"/addSR"}><button className="btn btn-primary mx-md-3" aria-current="page" >Add</button></Link>
                         </li>
                         <li className="nav-item col-sm-4 col-6">
-                            <button className="btn btn-primary " id='true'  onClick={sortFunction}>A-Z</button>
+                            <button className="btn btn-primary " id='true' onClick={sortFunction}>A-Z</button>
                         </li>
                         <li className="nav-item col-sm-4 col ms-auto mt-2 mt-sm-0">
                             <div className="dropdown ms-auto">
                                 <button className="btn btn-secondary dropdown-toggle ms-auto" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                {dropdownValue}
+                                    {dropdownValue}
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li onClick={handleFilterClick} id='active' className="dropdown-item">Active</li>
@@ -109,17 +150,26 @@ function Users() {
                         </li>
                     </ul>
                 </div>
-                {
-                    filterList?.map((item, index) => {
+                {getPaginatedUsers().map((item, index) => {
+                    const Date = ConvertDate(item.createdAt);
+                    return (
+                        <UserEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={"Admin"} CreatedAt={Date} />
+                    );
+                })}
 
-                        const date = ConvertDate(item.createdAt)
-                        return (item.role === 1) ? <UserEntry key={index} name={`${item.firstName} ${item.lastName}`} CreatedBy={"Admin"} CreatedAt={date} uid={item.userID} /> : null
-                    })
-                }
+                {filterList.length === 0 && <p>No record found!</p>}
+            </div>
 
-                {
-                    (filterList?.length === 0) && <p>No record found!</p>
-                }
+            <div className='d-flex justify-content-center'>
+                <button className="btn border border-2" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage <= 1}>
+                    Previous
+                </button>
+                <span className='my-auto mx-2'>
+                    {currentPage} of {Math.ceil(totalCount / usersPerPage)}
+                </span>
+                <button className="btn border border-2" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= Math.ceil(totalCount / usersPerPage)}>
+                    Next
+                </button>
             </div>
         </>
     );
