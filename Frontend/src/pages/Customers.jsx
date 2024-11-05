@@ -83,6 +83,7 @@ function Customers() {
                 const fullNameB = `${b.firstName} ${b.lastName}`.toLowerCase();
                 return fullNameA < fullNameB ? -1 : fullNameA > fullNameB ? 1 : 0;
             });
+
         };
 
         const sortedList = sortByFullName(filterList);

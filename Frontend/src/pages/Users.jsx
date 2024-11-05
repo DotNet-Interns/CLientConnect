@@ -54,7 +54,7 @@ function Users() {
     useEffect(() => {
         const getUsers = async () => {
             const Auth_Token = getCookie("Auth_Token")
-            const response = await axios.get(`${server}/api/Users`, {
+            const response = await axios.get(`${server}/api/Users/0`, {
                 headers: {
                     Authorization: `Bearer ${Auth_Token}`
                 }

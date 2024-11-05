@@ -28,7 +28,6 @@ function NoteSlider({ notes }) {
                         IDate={formattedDate}
                         createdBy={item.createdBy}
                         updatedBy={item.updatedBy}
-
                     />
                 })
 

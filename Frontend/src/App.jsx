@@ -16,23 +16,13 @@ import Customers from './pages/Customers';
 import Users from './pages/Users';
 import Loader from './Components/Loader';
 import DisplayUsers from './pages/DisplayUsers';
-
-
 const server = import.meta.env.VITE_SERVER;
-// import AdminDashBoard from './pages/AdminDashBoard';
+
 
 function App() {
   const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
-  // console.log(contextUser);
-
   const [loading, setLoading] = useState(true)
-
   const location = useLocation();
-
-  // useEffect(() => {
-  //   localStorage.setItem("lastRoute", location.pathname);
-  // }, [location]);
-
 
   useEffect(() => {
     const getUser = async () => {
@@ -45,14 +35,10 @@ function App() {
             }
           }
         )
-        // console.log(response.data);
         setContextUser(response.data)
         setLoggedIn(true)
         setLoading(false)
-
       } catch (error) {
-        // console.log(error);
-
       }finally{
         setLoading(false)
       }
