@@ -123,7 +123,7 @@ namespace Backend.Controllers
                 return BadRequest(new { Message = $"Error creating phone: {ex.Message}" });
             }
 
-            return Ok(new  {Message = "Phone added" });
+            return CreatedAtAction(nameof(GetPhone), new { id = currPhone.PID }, currPhone); ;
         }
 
 

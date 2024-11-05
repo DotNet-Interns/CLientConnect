@@ -16,6 +16,10 @@ namespace Backend.Models
         public DbSet<Note> Notes { get; set; } = null!; // Plural naming for convention
         public DbSet<ClientInteraction> ClientInteractions { get; set; } = null!;
 
+        public DbSet<TimeLogs> TimeLogs { get; set; } = null!;
+
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Ensure base configurations are applied
