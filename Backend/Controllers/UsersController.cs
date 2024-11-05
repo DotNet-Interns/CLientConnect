@@ -75,17 +75,62 @@ namespace Backend.Controllers
         {
 
             var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
-            if(users.Count - start >= 10)
+            if(users.Count - start >= 5)
             {
                 return Ok(new
                 {
-                    list = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start,10),
+                    list = users.GetRange(start, 5),
                     count = users.Count
                 });
             }
             return Ok(new
             {
-                list = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start, users.Count - start),
+                list = users.GetRange(start, users.Count - start),
+                count = users.Count
+            });
+        }
+
+        [HttpGet("Active/{start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllActiveUser(int start)
+        {
+
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative && u.Status == UserStatus.Active).ToList();
+            if (users.Count - start >= 5)
+            {
+                return Ok(new
+                {
+                    list = users.GetRange(start, 5),
+                    count = users.Count
+                });
+            }
+            return Ok(new
+            {
+                list = users.GetRange(start, users.Count - start),
+                count = users.Count
+            });
+        }
+
+
+        [HttpGet("Inactive/{start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllInactiveUser(int start)
+        {
+
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative && u.Status == UserStatus.Inactive).ToList();
+            if (users.Count - start >= 5)
+            {
+                return Ok(new
+                {
+                    list = users.GetRange(start, 5),
+                    count = users.Count
+                });
+            }
+            return Ok(new
+            {
+                list = users.GetRange(start, users.Count - start),
                 count = users.Count
             });
         }
@@ -142,6 +187,10 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostUser([FromBody] UserRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (CheckUserRole())
             {
                 return Unauthorized(new { message = "Invalid role" });

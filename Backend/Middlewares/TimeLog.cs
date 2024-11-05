@@ -44,9 +44,6 @@ namespace Backend.Middlewares
            await _Dbcontext.SaveChangesAsync();
         }
 
-        //Task IMiddleware.InvokeAsync(HttpContext context, RequestDelegate next)
-        //{
-        //    throw new NotImplementedException();
-        //}
+       
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Backend.Dtos;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,23 @@ namespace Backend.Controllers
     public class AnalyticsController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly JwtTokenService _jwtTokenService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AnalyticsController(ClientConnectContext context)
+        public AnalyticsController(ClientConnectContext context , JwtTokenService jwtTokenService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet("Admin")]
         public async Task<ActionResult<AdminDashboardDto>> AdminDashboard()
         {
+            if (CheckUserRole())
+            {
+                return Unauthorized(new { message = "Invalid role" });
+            }
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             var dayBefore = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1);
             var adto = new AdminDashboardDto();
@@ -38,10 +47,10 @@ namespace Backend.Controllers
                 adto.pendingNotes = await _context.Notes.CountAsync(n => n.Status == NoteStatus.Pending);
                 adto.CompletedNotesThisMonth = await _context.Notes.CountAsync(n => n.Status == NoteStatus.Completed && n.CreatedAt >= startOfMonth && n.CreatedAt <= DateTime.Now);
 
-                adto.recentInteraction = await _context.ClientInteractions.CountAsync(i => i.InteractionTime >= dayBefore);
+                adto.recentInteraction = await _context.ClientInteractions.CountAsync(i => i.InteractionTime >= dayBefore );
 
                 adto.recentNotes = await _context.Notes
-                    .OrderByDescending(n => n.CreatedAt)
+                    .OrderByDescending(n => n.CreatedAt).Where(n => n.isCustomer)
                     .Select(note => new RecentNoteDto
                     {
                         NoteID = note.NoteID,
@@ -50,7 +59,7 @@ namespace Backend.Controllers
                         Status = note.Status,
                         ExpectedCompletion = note.ExpectedCompletion,
                         CreatedBy = _context.Users
-                            .Where(u => u.UserID == note.CreatedBy)
+                            .Where(u => u.UserID == note.CreatedBy )
                             .Select(u => u.FirstName + " " + u.LastName)
                             .FirstOrDefault() ?? "Unknown",
                         UpdatedBy = _context.Users
@@ -107,7 +116,7 @@ namespace Backend.Controllers
                     n.CreatedBy == UserId);
 
                 srdto.recentNotes = await _context.Notes
-                    .Where(n => n.CreatedBy == UserId)
+                    .Where(n => n.CreatedBy == UserId && n.isCustomer)
                     .OrderByDescending(n => n.CreatedAt)
                     .Select(note => new RecentNoteDto
                     {
@@ -143,6 +152,17 @@ namespace Backend.Controllers
             return Ok(srdto); // Return the DTO with a 200 OK status
         }
 
+
+        private bool CheckUserRole()
+        {
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
+            if (userPayload.Role == "SalesRepresentative")
+            {
+                Console.WriteLine("here");
+                return true;
+            }
+            return false;
+        }
 
     }
 }
