@@ -10,6 +10,7 @@ namespace Backend.Models
         public int PID { get; set; }
 
         [Required(ErrorMessage = "Phone number is required.")]
+        
         [StringLength(10, ErrorMessage = "Phone number cannot exceed 15 characters.")]
         [RegularExpression(@"^\+?[0-9]*$", ErrorMessage = "Phone number must be numeric and can optionally start with a '+' sign.")]
         public string PhoneNumber { get; set; }

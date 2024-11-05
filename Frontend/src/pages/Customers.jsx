@@ -10,97 +10,109 @@ const server = import.meta.env.VITE_SERVER;
 
 function Customers() {
     const { contextUser } = useUserInfo();
-    const [customerList, setCustomerList] = useState(null);
-    const [filterList, setFilterList] = useState(customerList);
-    const [dropdownValue, setDropDownValue] = useState("Active")
-    // console.log(filterList);
-
-
+    const [customerList, setCustomerList] = useState([]);
+    const [filterList, setFilterList] = useState([]);
+    const [dropdownValue, setDropDownValue] = useState("Active");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const customersPerPage = 5;
+    
 
     useEffect(() => {
-        const getCustomerData = async () => {
-            const Auth_Token = getCookie("Auth_Token")
-            const response = await axios.get(`${server}/api/Customers`, {
-                headers: {
-                    Authorization: `Bearer ${Auth_Token}`
-                }
-            })
+        fetchFilteredData(dropdownValue, 0);
+    }, []);
 
-            // console.log(response);
-            setCustomerList(response.data)
-            if (response.status !== 204) {
-                setFilterList(() => {
-                    return response.data?.filter((item, index) => {
-                        return item.status === 0
-                    })
-                })
+    const fetchFilteredData = async (filter, start) => {
+        const Auth_Token = getCookie("Auth_Token");
+        try {
+            let response;
+    
+            if (filter === "All") {
+                response = await axios.get(`${server}/api/Customers/get/${start}`, {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`,
+                    },
+                });
+            } else {
+                response = await axios.get(`${server}/api/Customers/${filter}/${start}`, {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`,
+                    },
+                });
             }
+            // console.log(response);
+            setCustomerList(response.data.list);
+            setTotalCount(response.data.count);
+            setFilterList(response.data.list);
+        } catch (error) {
+            console.error("Error fetching customer data", error);
         }
-        getCustomerData();
-    }, [])
-
+    };
+    
 
     const handleFilterClick = (event) => {
         const id = event.target.id;
-        // console.log(`Clicked ${id}`);
+        setCurrentPage(1);
 
-
+        let filter;
         if (id === "active") {
+            filter = "Active";
             setDropDownValue("Active");
-            setFilterList(() => {
-                return customerList.filter((item, index) => {
-                    return item.status === 0
-                })
-            })
         } else if (id === "inactive") {
+            filter = "Inactive";
             setDropDownValue("Inactive");
-            setFilterList(() => {
-                return customerList.filter((item, index) => {
-                    return item.status === 1
-                })
-            })
         } else if (id === "all") {
+            filter = "All";
             setDropDownValue("All");
-            setFilterList(() => {
-                return customerList.filter((item, index) => {
-                    return item.status === 1 || item.status === 0
-                })
-            })
         }
-    }
 
-    const sortFunction = (event) => {
+        fetchFilteredData(filter, 0);
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        const start = (newPage - 1) * customersPerPage;
+        const filter = dropdownValue === "Active" ? "Active" : dropdownValue === "Inactive" ? "Inactive" : "All";
+        fetchFilteredData(filter, start);
+    };
+
+    const sortFunction = () => {
         const sortByFullName = (array) => {
             return [...array].sort((a, b) => {
                 const fullNameA = `${a.firstName} ${a.lastName}`.toLowerCase();
                 const fullNameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-
-                if (fullNameA < fullNameB) return -1;
-                if (fullNameA > fullNameB) return 1;
-                return 0;
+                return fullNameA < fullNameB ? -1 : fullNameA > fullNameB ? 1 : 0;
             });
-            //setFilterList(sortedArray);
 
         };
 
-        setFilterList(sortByFullName(filterList));
-        // console.log(filterList);
-    }
+        const sortedList = sortByFullName(filterList);
+        setFilterList(sortedList);
+    };
 
-
+    const getPaginatedCustomers = () => {
+        const startIndex = (currentPage - 1) * customersPerPage;
+        return filterList;
+    };
 
     return (
         <>
-            <Navbar ifAdmin={(contextUser?.role === 0) ? true : false} />
+            <Navbar ifAdmin={contextUser?.role === 0} />
             <div className="mx-sm-5">
                 <div className="options d-flex">
-                    <h3 className='mt-3 ms-2 ms-md-0'>Customer List</h3>
+                    <h3 className="mt-3 ms-2 ms-md-0">Customer List</h3>
                     <ul className="nav ms-auto justify-content-md-end mt-3 row">
                         <li className="nav-item col-sm-4 col-6 ms-auto">
-                            <Link to={"/addCustomer"}><button className="btn btn-primary mx-md-3" aria-current="page" >Add</button></Link>
+                            <Link to={"/addCustomer"}>
+                                <button className="btn btn-primary mx-md-3" aria-current="page">
+                                    Add
+                                </button>
+                            </Link>
                         </li>
                         <li className="nav-item col-sm-4 col-6">
-                            <button className="btn btn-primary" id='true'  onClick={sortFunction}>A-Z</button>
+                            <button className="btn btn-primary" onClick={sortFunction}>
+                                A-Z
+                            </button>
                         </li>
                         <li className="nav-item col-sm-4 col ms-auto mt-2 mt-sm-0">
                             <div className="dropdown ms-auto">
@@ -108,27 +120,35 @@ function Customers() {
                                     {dropdownValue}
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li onClick={handleFilterClick} id='active' className="dropdown-item">Active</li>
-                                    <li onClick={handleFilterClick} id='inactive' className="dropdown-item">Inactive</li>
-                                    <li onClick={handleFilterClick} id='all'
-                                        className="dropdown-item">All</li>
+                                    <li onClick={handleFilterClick} id="active" className="dropdown-item">Active</li>
+                                    <li onClick={handleFilterClick} id="inactive" className="dropdown-item">Inactive</li>
+                                    <li onClick={handleFilterClick} id="all" className="dropdown-item">All</li>
                                 </ul>
                             </div>
                         </li>
-
                     </ul>
                 </div>
 
-                {
-                    filterList?.map((item, index) => {
-                        const Date = ConvertDate(item.createdAt);
-                        return <CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} />
-                    })
-                }
+                {getPaginatedCustomers().map((item, index) => {
+                    const Date = ConvertDate(item.createdAt);
+                    return (
+                        <CustomerEntry key={index} cid={item.cid} name={`${item.firstName} ${item.lastName}`} CreatedBy={item.createdBy} CreatedAt={Date} />
+                    );
+                })}
 
-                {
-                    (filterList?.length === 0) && <p>No record found!</p>
-                }
+                {filterList.length === 0 && <p>No record found!</p>}
+            </div>
+
+            <div className='d-flex justify-content-center'>
+                <button className="btn border border-2" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage <= 1}>
+                    Previous
+                </button>
+                <span className='my-auto mx-2'>
+                    {currentPage} of {Math.ceil(totalCount / customersPerPage)}
+                </span>
+                <button className="btn border border-2" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= Math.ceil(totalCount / customersPerPage)}>
+                    Next
+                </button>
             </div>
         </>
     );

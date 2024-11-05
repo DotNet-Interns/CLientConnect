@@ -50,8 +50,11 @@ namespace Backend.Models
         [Required(ErrorMessage = "Customer ID is required.")]
         public int CreatedFor { get; set; } // Foreign key to Customer
 
-        [ForeignKey("CreatedFor")]
-        public Customer Customer { get; set; } // Navigation property for customer
+        [Required(ErrorMessage = "Is Customer is required")]
+        public bool isCustomer { get; set; }
+
+        //[ForeignKey("CreatedFor")]
+        //public Customer Customer { get; set; } // Navigation property for customer
 
         [Required]
         public DateTime CreatedAt { get; set; }

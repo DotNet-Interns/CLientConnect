@@ -137,6 +137,9 @@ namespace Backend.Migrations
                     b.Property<int>("CreatedFor")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CustomerCID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ExpectedCompletion")
                         .HasColumnType("datetime2");
 
@@ -156,9 +159,12 @@ namespace Backend.Migrations
                     b.Property<int>("UpdatedBy")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isCustomer")
+                        .HasColumnType("bit");
+
                     b.HasKey("NoteID");
 
-                    b.HasIndex("CreatedFor");
+                    b.HasIndex("CustomerCID");
 
                     b.ToTable("Notes");
                 });
@@ -184,6 +190,32 @@ namespace Backend.Migrations
                     b.HasIndex("CID");
 
                     b.ToTable("Phones");
+                });
+
+            modelBuilder.Entity("Backend.Models.TimeLogs", b =>
+                {
+                    b.Property<int>("LogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogId"));
+
+                    b.Property<int>("CycleTime")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Urls")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LogId");
+
+                    b.ToTable("TimeLogs");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>
@@ -231,7 +263,7 @@ namespace Backend.Migrations
                         new
                         {
                             UserID = 1,
-                            CreatedAt = new DateTime(2024, 11, 3, 11, 56, 46, 645, DateTimeKind.Local).AddTicks(8321),
+                            CreatedAt = new DateTime(2024, 11, 4, 17, 48, 52, 684, DateTimeKind.Local).AddTicks(7441),
                             Email = "Admin@gmail.com",
                             FirstName = "Admin",
                             LastName = "Admin",
@@ -284,13 +316,9 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Note", b =>
                 {
-                    b.HasOne("Backend.Models.Customer", "Customer")
+                    b.HasOne("Backend.Models.Customer", null)
                         .WithMany("Notes")
-                        .HasForeignKey("CreatedFor")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
+                        .HasForeignKey("CustomerCID");
                 });
 
             modelBuilder.Entity("Backend.Models.Phone", b =>

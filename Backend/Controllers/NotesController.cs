@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
@@ -16,10 +17,14 @@ namespace Backend.Controllers
     public class NotesController : ControllerBase
     {
         private readonly ClientConnectContext _context;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly JwtTokenService _jwtTokenService;
 
-        public NotesController(ClientConnectContext context)
+        public NotesController(ClientConnectContext context , IHttpContextAccessor httpContext , JwtTokenService jwtTokenService)
         {
             _context = context;
+            _httpContext = httpContext;
+            _jwtTokenService = jwtTokenService;
         }
 
 
@@ -127,6 +132,10 @@ namespace Backend.Controllers
             upNote.Summary = note.summary ?? upNote.Summary;
             upNote.Title = note.title ?? upNote.Title;
 
+            upNote.isCustomer = note.isCustomer;
+            upNote.CreatedFor = note.CreatedFor ?? upNote.CreatedFor;
+            
+
             if (note.expectedCompletion.HasValue)
             {
                 upNote.ExpectedCompletion = note.expectedCompletion.Value;
@@ -186,14 +195,15 @@ namespace Backend.Controllers
             {
                 return BadRequest(new { Message = "Invalid note data." });
             }
-
+            Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContext.HttpContext!);
             var n = new Note
             {
                 Title = note.title,
                 CreatedBy = note.createdBy,
                 Summary = note.summary,
                 ExpectedCompletion = note.expectedCompletion,
-                CreatedFor = note.createdFor
+                CreatedFor = note.createdFor ?? Int32.Parse(userPayload.UserId),
+                isCustomer = note.isCustomer,
             };
 
             _context.Notes.Add(n);

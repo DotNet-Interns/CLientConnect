@@ -6,11 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class newDb : Migration
+    public partial class dbnew : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "TimeLogs",
+                columns: table => new
+                {
+                    LogId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Urls = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CycleTime = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeLogs", x => x.LogId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -89,17 +105,18 @@ namespace Backend.Migrations
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     UpdatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedFor = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    isCustomer = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CustomerCID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notes", x => x.NoteID);
                     table.ForeignKey(
-                        name: "FK_Notes_Customers_CreatedFor",
-                        column: x => x.CreatedFor,
+                        name: "FK_Notes_Customers_CustomerCID",
+                        column: x => x.CustomerCID,
                         principalTable: "Customers",
-                        principalColumn: "CID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CID");
                 });
 
             migrationBuilder.CreateTable(
@@ -140,19 +157,19 @@ namespace Backend.Migrations
                         column: x => x.NoteId,
                         principalTable: "Notes",
                         principalColumn: "NoteID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ClientInteractions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserID", "CreatedAt", "Email", "FirstName", "LastName", "Password", "Role", "Status" },
-                values: new object[] { 1, new DateTime(2024, 11, 3, 11, 56, 46, 645, DateTimeKind.Local).AddTicks(8321), "Admin@gmail.com", "Admin", "Admin", "$2a$11$RbjXKNeloLiLw/Lr1PDrGeJSskgCabgGkUQ68ivNTkQ0yM0m2glpG", 0, 0 });
+                values: new object[] { 1, new DateTime(2024, 11, 4, 17, 48, 52, 684, DateTimeKind.Local).AddTicks(7441), "Admin@gmail.com", "Admin", "Admin", "$2a$11$RbjXKNeloLiLw/Lr1PDrGeJSskgCabgGkUQ68ivNTkQ0yM0m2glpG", 0, 0 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientInteractions_NoteId",
@@ -175,9 +192,9 @@ namespace Backend.Migrations
                 column: "CID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notes_CreatedFor",
+                name: "IX_Notes_CustomerCID",
                 table: "Notes",
-                column: "CreatedFor");
+                column: "CustomerCID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Phones_CID",
@@ -196,6 +213,9 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Phones");
+
+            migrationBuilder.DropTable(
+                name: "TimeLogs");
 
             migrationBuilder.DropTable(
                 name: "Notes");
