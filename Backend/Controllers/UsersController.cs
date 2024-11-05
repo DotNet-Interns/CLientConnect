@@ -11,10 +11,11 @@ using System.IdentityModel.Tokens.Jwt;
 using Backend.Services;
 using Backend.Dtos;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NuGet.Protocol.Core.Types;
 
 namespace Backend.Controllers
 {
-    
+
 
     [Route("api/[controller]")]
     [ApiController]
@@ -57,28 +58,81 @@ namespace Backend.Controllers
             return Ok(user);
         }
 
-
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<User>>> GetAllUsesr()
+        public async Task<ActionResult<List<User>>> GetAllUser()
         {
-            //Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
 
-            //if (userPayload == null || string.IsNullOrEmpty(userPayload.UserId))
-            //{
-            //    return BadRequest(new { Message = "User ID not found in token." });
-            //}
+            return await _context.Users.ToListAsync();
+        }
 
-            //var userId = Int32.Parse(userPayload.UserId);
-            //var user = await _context.Users.FindAsync(userId);
 
-            //if (user == null)
-            //{
-            //    return NotFound(new { Message = "User not found." });
-            //}
+        [HttpGet("{start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllUser(int start)
+        {
 
-            return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+            if(users.Count - start >= 5)
+            {
+                return Ok(new
+                {
+                    list = users.GetRange(start, 5),
+                    count = users.Count
+                });
+            }
+            return Ok(new
+            {
+                list = users.GetRange(start, users.Count - start),
+                count = users.Count
+            });
+        }
+
+        [HttpGet("Active/{start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllActiveUser(int start)
+        {
+
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative && u.Status == UserStatus.Active).ToList();
+            if (users.Count - start >= 5)
+            {
+                return Ok(new
+                {
+                    list = users.GetRange(start, 5),
+                    count = users.Count
+                });
+            }
+            return Ok(new
+            {
+                list = users.GetRange(start, users.Count - start),
+                count = users.Count
+            });
+        }
+
+
+        [HttpGet("Inactive/{start}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllInactiveUser(int start)
+        {
+
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative && u.Status == UserStatus.Inactive).ToList();
+            if (users.Count - start >= 5)
+            {
+                return Ok(new
+                {
+                    list = users.GetRange(start, 5),
+                    count = users.Count
+                });
+            }
+            return Ok(new
+            {
+                list = users.GetRange(start, users.Count - start),
+                count = users.Count
+            });
         }
 
 
@@ -133,6 +187,10 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostUser([FromBody] UserRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (CheckUserRole())
             {
                 return Unauthorized(new { message = "Invalid role" });

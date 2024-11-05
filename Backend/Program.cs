@@ -20,9 +20,13 @@ namespace Backend
             });
             // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddSingleton<JwtTokenService>(); // Use Scoped for JWT service
+            builder.Services.AddSingleton<JwtTokenService>();
+            builder.Services.AddTransient<TimeLog>();
+            // Use Scoped for JWT service
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            
 
             builder.Services.AddCors(options =>
             {
@@ -39,7 +43,8 @@ namespace Backend
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(); 
+            builder.Services.AddSwaggerGen();
+
             
 
             var app = builder.Build();
@@ -56,7 +61,11 @@ namespace Backend
 
             app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigins");
+            
             app.UseMiddleware<Authenticate>();
+            app.UseMiddleware<TimeLog>();
+
+
             //app.UseMiddleware<RoleCheck>();
             //app.UseAuthorization();
             app.MapControllers();

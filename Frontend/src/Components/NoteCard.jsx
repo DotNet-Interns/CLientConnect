@@ -10,7 +10,7 @@ import { useUserInfo } from "../Contexts/User";
 
 const server = import.meta.env.VITE_SERVER;
 
-function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
+function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", updatedBy = "", initialStatus = 0, onChangingAnything = '', allowEdit = false }) {
 
     // console.log(`updatedby ${updatedBy}`)
     const { contextUser } = useUserInfo();
@@ -79,7 +79,24 @@ function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = ""
         }
     };
 
-    const handleNoteCardClick = () => {
+    const handleNoteCardClick = async () => {
+
+
+        try {
+            const Auth_Token = cookie.getCookie("Auth_Token")
+            const response = await axios.get(`${server}/api/ClientInteraction/note/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`
+                    }
+                }
+            );
+            console.log(response);
+
+        } catch (error) {
+            console.log(error);
+        }
+
         setNoteCard(true);
         document.getElementById("blurer").style.display = "block";
     };
@@ -141,7 +158,7 @@ function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = ""
                 <p className="card-text text-secondary mb-3 text-truncate" style={{ maxWidth: '100%' }}>
                     {Content}
                 </p>
-                <p className="note-card-date">Expected: {editedDateTime}</p>
+                <p className="note-card-date">Expected: {(!IDate) ? "N/A" : editedDateTime}</p>
                 <span
                     className={`badge rounded-pill mx-auto ${initialStatus === 0 ? 'text-secondary bg-warning' :
                         initialStatus === 1 ? 'bg-success-subtle text-success' :
@@ -189,8 +206,8 @@ function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = ""
                     </p>
                     {
                         IDate && ITime &&
-                        <p className="popup-date text-start p-1 text-dark rounded-1 d-flex gap-2">
-                            Due:{" "}
+                        <p className="popup-date m-0 d-flex">
+                            Due : {" "}
                             {isEditing ? (
                                 <>
                                     <input
@@ -203,15 +220,15 @@ function NoteCard({ IDate , ITime , Title = "", Content = "", id, createdBy = ""
                                 </>
                             ) : (
 
-                                <div className="text-danger">{editedDateTime}</div>
+                                <span className="text-danger">{editedDateTime}</span>
                             )}
                         </p>}
                     <p className="popup-date m-0 d-flex">
-                        Created by: {createdBy}
+                        Created by : {createdBy}
                     </p>
                     {updatedBy != null && updatedBy !== "Null data" && (
-                        <p className="popup-date mt-1 d-flex">
-                            Updated by: {updatedBy}
+                        <p className="popup-date mt-0 d-flex">
+                            Updated by : {updatedBy}
                         </p>
                     )}
                     {

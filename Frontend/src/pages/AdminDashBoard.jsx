@@ -11,40 +11,63 @@ import '../styles/AdminDashBoard.css'
 import PendingNotes from '../Components/PendingNotes'
 import CompletedNotesThisMonth from '../Components/CompletedNotesThisMonth'
 import TotalSalesReps from '../Components/TotalSalesReps'
+import AddNote from '../Components/AddNote'
 const server = import.meta.env.VITE_SERVER;
 
 function AdminDashBoard() {
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
     const [loading, setLoading] = useState(true);
-    const [analysisData , setAnalysisData] = useState({});
+    const [analysisData, setAnalysisData] = useState({});
+    const [addNote, setAddNote] = useState(false);
+    const [InternalNotes , setInternalNotes] = useState(null);
     //console.log(contextUser);
 
     const Auth_Token = getCookie("Auth_Token")
 
-    useEffect (()=>{
-        const getAnalysis = async ()=>{
+    useEffect(() => {
+        const getAnalysis = async () => {
             try {
-                const response = await axios.get(`${server}/api/Analytics/Admin`,{
-                    headers : {
-                        Authorization : `Bearer ${Auth_Token}`
+                const response = await axios.get(`${server}/api/Analytics/Admin`, {
+                    headers: {
+                        Authorization: `Bearer ${Auth_Token}`
                     }
                 });
-                //console.log(response);
                 setAnalysisData(response.data)
             } catch (error) {
                 console.log(error);
-                
             }
         }
         getAnalysis();
-    },[])
+    }, [])
+
+    useEffect(()=>{
+        const getInternalNotes = async () => {
+            try {
+                const response = await axios.get(`${server}/api/Notes/userNotes/${contextUser.userID}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Auth_Token}`
+                        }
+                    }
+                )
+                // console.log(response);
+                setInternalNotes(response.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        if(!addNote) getInternalNotes();
+    },[addNote])
+
+    const handleAddNoteClick = () => {
+        setAddNote(!addNote);
+    }
 
     return (
         <>
             {
                 (contextUser) ?
                     <>
-
                         <Navbar ifAdmin={true} setContextUser={setContextUser} />
 
                         <div className='row m-5 mt-3'>
@@ -55,19 +78,19 @@ function AdminDashBoard() {
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className="TotalCustomers p-3 bg-warning rounded h-100">
-                                    <TotalCustomers totalCustomers={analysisData?.totalCustomer}  />
+                                    <TotalCustomers totalCustomers={analysisData?.totalCustomer} />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className=" RecentInteractions p-3 bg-success text-white rounded h-100">
-                                    <RecentInteractions recentInteractions = {analysisData?.recentInteraction} />
+                                    <RecentInteractions recentInteractions={analysisData?.recentInteraction} />
                                 </div>
                             </div>
                             {/* </div>
                             <div className="row m-5"> */}
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className="p-3 border border-5 border-dark rounded h-100">
-                                    <TotalSalesReps totalSR = {analysisData?.totalSalesReps} />
+                                    <TotalSalesReps totalSR={analysisData?.totalSalesReps} />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
@@ -83,8 +106,18 @@ function AdminDashBoard() {
                         </div>
                         <div className="mx-5 mb-5">
                             <h3>Recent Notes</h3>
-                             <NoteSlider notes={analysisData.recentNotes} />
+                            <NoteSlider notes={analysisData.recentNotes} />
+
+                            <h3>Internal Notes</h3>
+
+                            <NoteSlider notes={InternalNotes} />
                         </div>
+
+                        <AddNote visibility={addNote} setAddNote={setAddNote} />
+
+                        <button className="add-note-button" onClick={handleAddNoteClick}>
+                            Add Note
+                        </button>
                     </> :
                     <h1>Loading...</h1>
             }

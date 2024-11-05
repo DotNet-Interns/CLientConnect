@@ -24,6 +24,7 @@ namespace Backend.Models
 
         [Required(ErrorMessage = "Title is required.")]
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
+        [RegularExpression(@"^(?=.*[^\s])[a-zA-Z0-9\s]+$", ErrorMessage = "Title must contain at least one non-space character and only letters, numbers, and spaces.")]
         public string Title { get; set; }
 
         [StringLength(500, ErrorMessage = "Summary cannot exceed 500 characters.")]
@@ -50,8 +51,11 @@ namespace Backend.Models
         [Required(ErrorMessage = "Customer ID is required.")]
         public int CreatedFor { get; set; } // Foreign key to Customer
 
-        [ForeignKey("CreatedFor")]
-        public Customer Customer { get; set; } // Navigation property for customer
+        [Required(ErrorMessage = "Is Customer is required")]
+        public bool isCustomer { get; set; }
+
+        //[ForeignKey("CreatedFor")]
+        //public Customer Customer { get; set; } // Navigation property for customer
 
         [Required]
         public DateTime CreatedAt { get; set; }
