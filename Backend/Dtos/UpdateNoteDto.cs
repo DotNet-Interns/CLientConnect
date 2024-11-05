@@ -9,6 +9,10 @@ namespace Backend.Dtos
 
         public string summary { get; set; }
 
+        public bool isCustomer { get; set; }
+
+        public int? CreatedFor { get; set; }
+
 
         public int updatedBy { get; set; }
 

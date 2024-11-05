@@ -19,7 +19,10 @@ namespace Backend.Dtos
 
         public int updatedBy { get; set; }
 
-        public int createdFor { get; set; }
+        public int? createdFor { get; set; }
+
+        public bool isCustomer { get; set; }
+        
 
         public DateTime createdAt { get; set; }
     }

@@ -20,10 +20,12 @@ namespace Backend
             });
             // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddSingleton<JwtTokenService>(); // Use Scoped for JWT service
+            builder.Services.AddSingleton<JwtTokenService>();
+            builder.Services.AddScoped<TimeLog>();
+            // Use Scoped for JWT service
             builder.Services.AddDbContext<ClientConnectContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+            
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigins",
@@ -56,7 +58,11 @@ namespace Backend
 
             app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigins");
+            
             app.UseMiddleware<Authenticate>();
+            app.UseMiddleware<TimeLog>();
+
+
             //app.UseMiddleware<RoleCheck>();
             //app.UseAuthorization();
             app.MapControllers();

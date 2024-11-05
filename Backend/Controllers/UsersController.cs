@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Backend.Controllers
 {
-    
+
 
     [Route("api/[controller]")]
     [ApiController]
@@ -58,26 +58,17 @@ namespace Backend.Controllers
         }
 
 
-        [HttpGet()]
+        [HttpGet("{start}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<User>>> GetAllUsesr()
+        public async Task<ActionResult<List<User>>> GetAllUsesr(int start)
         {
-            //Payload userPayload = _jwtTokenService.GetJwtPayload(_httpContextAccessor.HttpContext!);
 
-            //if (userPayload == null || string.IsNullOrEmpty(userPayload.UserId))
-            //{
-            //    return BadRequest(new { Message = "User ID not found in token." });
-            //}
-
-            //var userId = Int32.Parse(userPayload.UserId);
-            //var user = await _context.Users.FindAsync(userId);
-
-            //if (user == null)
-            //{
-            //    return NotFound(new { Message = "User not found." });
-            //}
-
+            var users = _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
+            if(users.Count - start >= 10)
+            {
+                return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList().GetRange(start, 10);
+            }
             return _context.Users.Where(u => u.Role == UserRole.SalesRepresentative).ToList();
         }
 
