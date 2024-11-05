@@ -103,8 +103,6 @@ function DisplayCustomer() {
                 );
                 setCustomers(customerResponse.data);
 
-                console.log(customers)
-
                 try {
                     const notesResponse = await axios.get(
                         `${server}/api/Notes/userNotes/${cid}`,
@@ -377,7 +375,7 @@ function DisplayCustomer() {
                                 </button>
                             </div>
                             <div className="d-flex gap-3 justify-content-evenly align-items-center flex-wrap my-3">
-                                {(notes || []).map((note, index) => {
+                                {notes?.map((note, index) => {
                                     const expectedCompletionDate = new Date(note.expectedCompletion);
                                     const formattedDate = expectedCompletionDate.toLocaleDateString();
                                     const formattedTime = expectedCompletionDate.toLocaleTimeString([], {
@@ -386,7 +384,7 @@ function DisplayCustomer() {
                                     });
 
                                     return (
-                                        <div className="">
+                                        <div key={note.noteID}>
                                             {note.expectedCompletion &&
 
                                                 <NoteCard

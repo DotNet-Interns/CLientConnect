@@ -19,7 +19,7 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
     const [noteCard, setNoteCard] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(Title);
-    const [updatedTime, setUpdatedTime] = useState(`${IDate}T${ITime}`);
+    const [updatedTime, setUpdatedTime] = useState(null);
     const [editedContent, setEditedContent] = useState(Content);
     const [editedDateTime, setEditedDateTime] = useState(`${IDate} ${ITime}`);
     const noteCardRef = useRef(null);
@@ -37,16 +37,14 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
         if (!editedTitle.trim()) newErrors.title = "Title cannot be empty.";
         if (!editedContent.trim()) newErrors.content = "Content cannot be empty.";
 
-        // Explicitly check for an empty date string
-        if (!updatedTime || updatedTime.trim() === "") {
-            newErrors.date = "Date and time cannot be empty.";
-        } else {
-            const now = new Date();
-            const inputDate = new Date(updatedTime);
-            if (inputDate <= now) {
-                newErrors.date = "Expected completion date must be in the future.";
-            }
-        }
+
+
+        const now = new Date();
+        const inputDate = new Date(updatedTime);
+        // if (inputDate <= now) {
+        //     newErrors.date = "Expected completion date must be in the future.";
+        // }
+
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -68,7 +66,7 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
             const response = await axios.put(`${server}/api/Notes`, updatedNote, {
                 headers: { Authorization: `Bearer ${authToken}` }
             });
-            console.log('Note updated successfully:', response.data);
+            // console.log('Note updated successfully:', response.data);
             setIsEditing(false);
             setEditedTitle(updatedNote.title);
             setEditedContent(updatedNote.summary);
@@ -91,7 +89,7 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
                     }
                 }
             );
-            console.log(response);
+            // console.log(response);
 
         } catch (error) {
             console.log(error);
