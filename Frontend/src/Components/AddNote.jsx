@@ -10,7 +10,7 @@ function AddNote({ visibility, setAddNote }) {
     const [loader, setLoader] = useState(false)
     const [dropdownData, setDropDownData] = useState(null);
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
-    console.log(note);
+    // console.log(note);
 
 
 
