@@ -2,9 +2,12 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { getCookie } from '../Utils/cookie';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../Components/Navbar';
+import { useUserInfo } from '../Contexts/User';
 const server = import.meta.env.VITE_SERVER;
 
 function AddSR() {
+    const { contextUser } = useUserInfo();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: "",
@@ -26,11 +29,11 @@ function AddSR() {
         switch (name) {
             case 'firstName':
                 if (!value) return "First Name is required!";
-                else if(!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) return "Invalid format!";
+                else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) return "Invalid format!";
                 break;
             case 'lastName':
                 if (!value) return "Last Name is required!";
-                else if(!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) return "Invalid format!";
+                else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) return "Invalid format!";
                 break;
             case 'email':
                 if (!value) return "Email is required!";
@@ -104,86 +107,89 @@ function AddSR() {
     };
 
     return (
-        <div className='container register-container'>
-            <form className='form-control' onSubmit={handleSubmit} noValidate>
-                <h2 style={{ textAlign: "center", marginBottom: "5vh" }}>Register Sales Representative</h2>
-                <div className='row'>
-                    <div className="form-group col-sm-6 mt-2">
-                        <label htmlFor="First_Name">First Name</label>
-                        <input
-                            onChange={handleChange}
-                            name='firstName'
-                            value={formData.firstName}
-                            type="text"
-                            className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
-                            id="First_Name"
-                            placeholder="Enter First Name"
-                            required
-                        />
-                        <small className="text-danger">{errors.firstName}</small>
+        <>
+            <Navbar ifAdmin={(contextUser?.role === 0) ? true : false} />
+            <div className='container register-container'>
+                <form className='form-control' onSubmit={handleSubmit} noValidate>
+                    <h2 style={{ textAlign: "center", marginBottom: "5vh" }}>Register Sales Representative</h2>
+                    <div className='row'>
+                        <div className="form-group col-sm-6 mt-2">
+                            <label htmlFor="First_Name">First Name</label>
+                            <input
+                                onChange={handleChange}
+                                name='firstName'
+                                value={formData.firstName}
+                                type="text"
+                                className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                                id="First_Name"
+                                placeholder="Enter First Name"
+                                required
+                            />
+                            <small className="text-danger">{errors.firstName}</small>
+                        </div>
+
+                        <div className="form-group col-sm-6 mt-2">
+                            <label htmlFor="Last_Name">Last Name</label>
+                            <input
+                                onChange={handleChange}
+                                name='lastName'
+                                value={formData.lastName}
+                                type="text"
+                                className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                                id="Last_Name"
+                                placeholder="Enter Last Name"
+                            />
+                            <small className="text-danger">{errors.lastName}</small>
+                        </div>
                     </div>
 
-                    <div className="form-group col-sm-6 mt-2">
-                        <label htmlFor="Last_Name">Last Name</label>
+                    <div className="form-group">
+                        <label htmlFor="exampleInputEmail1">Email address</label>
                         <input
                             onChange={handleChange}
-                            name='lastName'
-                            value={formData.lastName}
-                            type="text"
-                            className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
-                            id="Last_Name"
-                            placeholder="Enter Last Name"
+                            name='email'
+                            value={formData.email}
+                            type="email"
+                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                            id="exampleInputEmail1"
+                            aria-describedby="emailHelp"
+                            placeholder="Enter email"
                         />
-                        <small className="text-danger">{errors.lastName}</small>
+                        <small className="text-danger">{errors.email}</small>
                     </div>
-                </div>
 
-                <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Email address</label>
-                    <input
-                        onChange={handleChange}
-                        name='email'
-                        value={formData.email}
-                        type="email"
-                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                        id="exampleInputEmail1"
-                        aria-describedby="emailHelp"
-                        placeholder="Enter email"
-                    />
-                    <small className="text-danger">{errors.email}</small>
-                </div>
+                    <div className="form-group">
+                        <label htmlFor="exampleInputPassword1">Password</label>
+                        <input
+                            onChange={handleChange}
+                            name='password'
+                            value={formData.password}
+                            type="password"
+                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                            id="exampleInputPassword1"
+                            placeholder="Password"
+                        />
+                        <small className="text-danger">{errors.password}</small>
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="exampleInputPassword1">Password</label>
-                    <input
-                        onChange={handleChange}
-                        name='password'
-                        value={formData.password}
-                        type="password"
-                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                        id="exampleInputPassword1"
-                        placeholder="Password"
-                    />
-                    <small className="text-danger">{errors.password}</small>
-                </div>
+                    <div className="form-group">
+                        <label htmlFor="exampleInputPassword2">Confirm Password</label>
+                        <input
+                            onChange={handleChange}
+                            name='confirmPassword'
+                            value={formData.confirmPassword}
+                            type="password"
+                            className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                            id="exampleInputPassword2"
+                            placeholder="Confirm Password"
+                        />
+                        <small className="text-danger">{errors.confirmPassword}</small>
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="exampleInputPassword2">Confirm Password</label>
-                    <input
-                        onChange={handleChange}
-                        name='confirmPassword'
-                        value={formData.confirmPassword}
-                        type="password"
-                        className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                        id="exampleInputPassword2"
-                        placeholder="Confirm Password"
-                    />
-                    <small className="text-danger">{errors.confirmPassword}</small>
-                </div>
-
-                <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
-        </div>
+                    <button type="submit" className="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </>
     );
 }
 

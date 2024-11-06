@@ -3,6 +3,7 @@ import axios from 'axios';
 import { getCookie } from '../Utils/cookie.js';
 import { useUserInfo } from '../Contexts/User.jsx';
 import { Navigate } from 'react-router-dom';
+import Navbar from '../Components/Navbar.jsx';
 const server = import.meta.env.VITE_SERVER;
 
 function AddCustomer() {
@@ -28,18 +29,16 @@ function AddCustomer() {
         phone: ""
     });
 
-    const [submitted, setSubmitted] = useState(false);  // Track if the form is submitted
+    const [submitted, setSubmitted] = useState(false);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        // Update customer data
         setCustomerData((prevValue) => ({
             ...prevValue,
             [name]: value
         }));
 
-        // Validate field on change (live validation)
         validateField(name, value);
     };
 
@@ -53,7 +52,7 @@ function AddCustomer() {
                 } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
                     errors.firstName = "Invalid format!";
                 } else {
-                    errors.firstName = ""; // Clear error if valid
+                    errors.firstName = "";
                 }
                 break;
             case "lastName":
@@ -62,7 +61,7 @@ function AddCustomer() {
                 } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
                     errors.lastName = "Invalid format!";
                 } else {
-                    errors.lastName = ""; // Clear error if valid
+                    errors.lastName = "";
                 }
                 break;
             case "Address":
@@ -71,7 +70,7 @@ function AddCustomer() {
                 } else if (!/[A-Za-z0-9'\.\-\s\,]/.test(value)) {
                     errors.Address = "Invalid format!";
                 } else {
-                    errors.Address = ""; // Clear error if valid
+                    errors.Address = "";
                 }
                 break;
             case "Company_name":
@@ -80,7 +79,7 @@ function AddCustomer() {
                 } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
                     errors.Company_name = "Invalid format!";
                 } else {
-                    errors.Company_name = ""; // Clear error if valid
+                    errors.Company_name = "";
                 }
                 break;
             case "Position":
@@ -89,7 +88,7 @@ function AddCustomer() {
                 } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
                     errors.Position = "Invalid format!";
                 } else {
-                    errors.Position = ""; // Clear error if valid
+                    errors.Position = "";
                 }
                 break;
             case "email":
@@ -98,7 +97,7 @@ function AddCustomer() {
                 } else if (!/\S+@\S+\.\S+/.test(value)) {
                     errors.email = "Enter a valid email address.";
                 } else {
-                    errors.email = ""; // Clear error if valid
+                    errors.email = "";
                 }
                 break;
             case "phone":
@@ -107,7 +106,7 @@ function AddCustomer() {
                 } else if (!/^\d{10}$/.test(value)) {
                     errors.phone = "Enter a valid phone number.";
                 } else {
-                    errors.phone = ""; // Clear error if valid
+                    errors.phone = "";
                 }
                 break;
             default:
@@ -119,12 +118,10 @@ function AddCustomer() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setSubmitted(true);  // Mark the form as submitted
+        setSubmitted(true);
 
-        // Perform validation on all fields when the form is submitted
         Object.keys(customerData).forEach((key) => validateField(key, customerData[key]));
 
-        // If there are any errors, prevent submission
         if (Object.values(validationErrors).some((error) => error)) {
             return;
         }
@@ -154,12 +151,14 @@ function AddCustomer() {
                 setStatus(true);
             }
         } catch (error) {
-            alert("Error occurred while adding customer!");
+            
         }
     };
 
     return (
-        <div className="container register-container">
+        <>
+            <Navbar ifAdmin={(contextUser?.role === 0) ? true : false} />
+            <div className="container register-container">
             <form onSubmit={handleSubmit} className="needs-validation" noValidate>
                 <h2 style={{ textAlign: "center", marginBottom: "5vh" }}>Add New Customer</h2>
                 <div className="row">
@@ -272,6 +271,7 @@ function AddCustomer() {
             </form>
             {status && <Navigate to="/customers" />}
         </div>
+        </>
     );
 }
 
