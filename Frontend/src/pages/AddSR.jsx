@@ -95,7 +95,7 @@ function AddSR() {
                 },
                 { headers: { Authorization: `Bearer ${Auth_Token}` } }
             );
-            console.log(response);
+            // console.log(response);
             if (response.data) {
                 navigate("/srList");
             } else {
