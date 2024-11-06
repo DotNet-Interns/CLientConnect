@@ -8,7 +8,7 @@ import { Navigate } from 'react-router-dom';
 const server = import.meta.env.VITE_SERVER;
 
 function AddCustomer() {
-    console.log("AddCustomer");
+    // console.log("AddCustomer");
     const {contextUser} = useUserInfo();
     const [status , setStatus] = useState(false)
     const [customerData, setCustomerData] = useState({
@@ -70,11 +70,11 @@ function AddCustomer() {
                         }
                     }
                 )
-                console.log(response);
+                // console.log(response);
                 setStatus(true);
                 
             } catch (error) {
-                console.log(error);
+                alert("Customer already exists!");
             }
         }
 

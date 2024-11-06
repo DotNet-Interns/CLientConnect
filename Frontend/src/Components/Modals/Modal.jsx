@@ -37,7 +37,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
             } catch (error) {
                 // console.log(`Unable to add ${field}: ${error}`);
-                alert(`Unable to add ${field}`);
+                alert(`${field} already exists`);
             }
 
         } else if (action === "edit") {
