@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import "../../styles/CustomModal.css";
 import axios from 'axios';
 import * as cookie from "../../Utils/cookie";
+const server = import.meta.env.VITE_SERVER;
+
 
 function CustomerUpdateModal({ isOpen, onClose, customerId, currentDetails = {} }) {
     const [firstName, setFirstName] = useState(currentDetails.firstName || "");
@@ -36,7 +38,7 @@ function CustomerUpdateModal({ isOpen, onClose, customerId, currentDetails = {} 
 
         try {
             const response = await axios.put(
-                `http://172.20.68.11:5100/api/Customers`,
+                `${server}/api/Customers`,
                 data,
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
