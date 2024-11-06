@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
+using Azure.Core;
 
 namespace Backend.Controllers
 {
@@ -79,7 +80,10 @@ namespace Backend.Controllers
             {
                 return NotFound(new { Message = "Email not found." });
             }
-
+            if (await _context.Emails.AnyAsync(e => e.EmailAddress == email.email))
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
             existingEmail.EmailAddress = email.email;
 
             _context.Entry(existingEmail).State = EntityState.Modified;
@@ -113,6 +117,11 @@ namespace Backend.Controllers
             if(!_context.Customers.Any(c => c.CID == email.CID))
             {
                 return BadRequest("Customer does not exits");
+            }
+
+            if (await _context.Emails.AnyAsync(e => e.EmailAddress == email.email))
+            {
+                return Conflict(new { message = "Email already exists." });
             }
 
             var currEmail = new Email

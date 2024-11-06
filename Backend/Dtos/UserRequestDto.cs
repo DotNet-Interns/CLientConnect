@@ -11,6 +11,7 @@ namespace Backend.Dtos
         public required string LastName { get; set; }
 
         [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public required string Email { get; set; }
 
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
