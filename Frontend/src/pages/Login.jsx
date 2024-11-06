@@ -15,51 +15,65 @@ const Login = () => {
   const location = useLocation();
   const redirectPath = location.state?.from || '/';
 
-  const handleChange = (event) => {
-    setFormData((prevValue) => ({
-      ...prevValue,
-      [event.target.name]: event.target.value,
-    }));
-  };
-
+  // Validate email and password inputs
   const validateForm = () => {
     const errors = {};
+
     if (!formData.email) {
       errors.email = 'Email is required!';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Enter a valid email address.';
     }
+
     if (!formData.password) {
       errors.password = 'Password is required!';
     }
+
     return errors;
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevValue) => ({
+      ...prevValue,
+      [name]: value,
+    }));
+
+    // Revalidate the form on every change
+    const errors = validateForm();
+    setFormErrors(errors);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
 
+    // Validate the form on submit
     const errors = validateForm();
     setFormErrors(errors);
 
-    if (Object.keys(errors).length === 0) {
-      try {
-        const response = await axios.post(`${server}/api/Auth`, {
-          Password: formData.password,
-          Email: formData.email,
-        });
+    if (Object.keys(errors).length > 0) {
+      return; // If there are any errors, don't submit the form
+    }
 
-        setLoggedIn(true);
-        setCookie('Auth_Token', response.data.token, 1);
-        setContextUser(response.data.user);
-      } catch (error) {
-        console.log(error)
-        if(error.response?.data?.errors){
-            alert(error.response.data.errors.Email);
-        }
-        else{
-            alert(error.response?.data);
-        }
-        setFormData({ email: '', password: '' });
+    try {
+      const response = await axios.post(`${server}/api/Auth`, {
+        Password: formData.password,
+        Email: formData.email,
+      });
+
+      // On success, set the user and redirect
+      setLoggedIn(true);
+      setCookie('Auth_Token', response.data.token, 1);
+      setContextUser(response.data.user);
+    } catch (error) {
+      console.error(error);
+      if (error.response?.data?.errors) {
+        alert(error.response.data.errors.Email || 'Error occurred');
+      } else {
+        alert(error.response?.data || 'Error occurred');
       }
+      setFormData({ email: '', password: '' });
     }
   };
 
@@ -68,7 +82,7 @@ const Login = () => {
       <div className="login-container p-3 border rounded-3">
         <h3 className="text-center mb-4">Login</h3>
         <form
-          className="needs-validation"
+          className={`needs-validation`}
           noValidate
           onSubmit={handleSubmit}
         >
@@ -80,14 +94,14 @@ const Login = () => {
               type="email"
               id="email"
               name="email"
-              className={`form-control ${formErrors.email && submitted ? 'is-invalid' : ''}`}
+              className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
               value={formData.email}
               onChange={handleChange}
               aria-describedby="emailFeedback"
               required
             />
             <div id="emailFeedback" className="invalid-feedback">
-              {formErrors.email || 'Please provide a valid email address.'}
+              {formErrors.email || 'Email is required!'}
             </div>
           </div>
 
@@ -99,7 +113,7 @@ const Login = () => {
               type="password"
               id="password"
               name="password"
-              className={`form-control ${formErrors.password && submitted ? 'is-invalid' : ''}`}
+              className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
               value={formData.password}
               onChange={handleChange}
               required
