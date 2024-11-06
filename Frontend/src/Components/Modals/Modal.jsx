@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import "../../styles/CustomModal.css"; // Add any required styles here for your modal layout
 import axios from 'axios';
 import * as cookie from "../../Utils/cookie";
+const server = import.meta.env.VITE_SERVER;
+
 
 function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
     const [inputValue, setInputValue] = useState(currentValue);
@@ -18,7 +20,7 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
     const handleAction = async () => {
         if (action === "add") {
-            console.log(`Adding ${field}: ${inputValue} for customer ${Id}`);
+            // console.log(`Adding ${field}: ${inputValue} for customer ${Id}`);
             const data = {
                 cid: Id
             };
@@ -29,12 +31,12 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
                 data["phoneNumber"] = inputValue;
             }
             try {
-                const response = await axios.post(`http://172.20.68.11:5100/api/${field}`, data, {
+                const response = await axios.post(`${server}/api/${field}`, data, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
 
             } catch (error) {
-                console.log(`Unable to add ${field}: ${error}`);
+                // console.log(`Unable to add ${field}: ${error}`);
                 alert(`Unable to add ${field}`);
             }
 
@@ -53,31 +55,31 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
             try {
 
-                const response = await axios.put(`http://172.20.68.11:5100/api/${field}`, data, {
+                const response = await axios.put(`${server}/api/${field}`, data, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
 
             } catch (error) {
-                console.log(`Unable to edit ${field}: ${error}`);
+                // console.log(`Unable to edit ${field}: ${error}`);
                 alert(`Unable to edit ${field}`);
             }
 
 
-            console.log(`Editing ${field}: ${inputValue} for customer ${Id}`);
+            // console.log(`Editing ${field}: ${inputValue} for customer ${Id}`);
         } else if (action === "delete") {
 
 
             try {
-                const response = await axios.delete(`http://172.20.68.11:5100/api/${field}/${Id}`, {
+                const response = await axios.delete(`${server}/api/${field}/${Id}`, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
 
             } catch (error) {
-                console.log(`Unable to delete ${field}: ${error}`);
+                // console.log(`Unable to delete ${field}: ${error}`);
                 alert(`Unable to delete ${field}`);
             }
 
-            console.log(`Deleting ${field} for customer ${Id}`);
+            // console.log(`Deleting ${field} for customer ${Id}`);
         }
 
 
@@ -85,11 +87,11 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
             try {
               
-                const response = await axios.put(`http://172.20.68.11:5100/api/Customers/toggleStatus/${Id}`,{}, {
+                const response = await axios.put(`${server}/api/Customers/toggleStatus/${Id}`,{}, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 });
             } catch (error) {
-                console.log(`Unable to toggle status ${field}: ${error}`);
+                // console.log(`Unable to toggle status ${field}: ${error}`);
                 alert(`Unable to toggle Status ${field}`);
             }
         }

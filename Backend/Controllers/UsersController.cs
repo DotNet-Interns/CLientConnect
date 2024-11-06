@@ -12,6 +12,7 @@ using Backend.Services;
 using Backend.Dtos;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NuGet.Protocol.Core.Types;
+using Azure.Core;
 
 namespace Backend.Controllers
 {
@@ -154,6 +155,10 @@ namespace Backend.Controllers
             if (id != user.UserID)
             {
                 return BadRequest(new { message = "User ID in the URL does not match the user object." });
+            }
+            if (await _context.Users.AnyAsync(u => u.Email == user.Email))
+            {
+                return Conflict(new { message = "Email already exists." });
             }
 
             _context.Entry(user).State = EntityState.Modified;
