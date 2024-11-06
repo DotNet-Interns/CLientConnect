@@ -1,4 +1,3 @@
-
 const name_regex = /^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/;
 const address_regex = /[A-Za-z0-9'\.\-\s\,]/;
 const email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

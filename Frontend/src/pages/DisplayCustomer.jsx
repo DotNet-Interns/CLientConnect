@@ -375,7 +375,7 @@ function DisplayCustomer() {
                                 </button>
                             </div>
                             <div className="d-flex gap-3 justify-content-evenly align-items-center flex-wrap my-3">
-                                {notes?.map((note, index) => {
+                                {notes && notes?.map((note, index) => {
                                     const expectedCompletionDate = new Date(note.expectedCompletion);
                                     const formattedDate = expectedCompletionDate.toLocaleDateString();
                                     const formattedTime = expectedCompletionDate.toLocaleTimeString([], {
