@@ -28,88 +28,104 @@ function AddCustomer() {
         phone: ""
     });
 
+    const [submitted, setSubmitted] = useState(false);  // Track if the form is submitted
+
     const handleChange = (event) => {
         const { name, value } = event.target;
 
+        // Update customer data
         setCustomerData((prevValue) => ({
             ...prevValue,
             [name]: value
         }));
 
-        setValidationErrors((prevValue) => ({
-            ...prevValue,
-            [name]: ""
-        }));
+        // Validate field on change (live validation)
+        validateField(name, value);
     };
 
-    const validateForm = () => {
-        let errors = {};
-        let formIsValid = true;
+    const validateField = (name, value) => {
+        let errors = { ...validationErrors };
 
-        if (!customerData.firstName) {
-            errors.firstName = "First name is required.";
-            formIsValid = false;
-        }else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(customerData.firstName)) {
-            errors.firstName = "Invalid format!";
-            formIsValid = false;
-        }
-
-        if (!customerData.lastName) {
-            errors.lastName = "Last name is required.";
-            formIsValid = false;
-        }else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(customerData.lastName)) {
-            errors.lastName = "Invalid format!";
-            formIsValid = false;
-        }
-
-        if (!customerData.Address) {
-            errors.Address = "Address is required.";
-            formIsValid = false;
-        }else if (!/[A-Za-z0-9'\.\-\s\,]/.test(customerData.Address)) {
-            errors.Address = "Invalid format!";
-            formIsValid = false;
-        }
-
-        if (!customerData.Company_name) {
-            errors.Company_name = "Company name is required.";
-            formIsValid = false;
-        }else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(customerData.Company_name)) {
-            errors.Company_name = "Invalid format!";
-            formIsValid = false;
-        }
-
-        if (!customerData.Position) {
-            errors.Position = "Position is required.";
-            formIsValid = false;
-        }else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(customerData.Position)) {
-            errors.Position = "Invalid format!";
-            formIsValid = false;
-        }
-
-        if (!customerData.email) {
-            errors.email = "Email is required.";
-            formIsValid = false;
-        } else if (!/\S+@\S+\.\S+/.test(customerData.email)) {
-            errors.email = "Enter a valid email address.";
-            formIsValid = false;
-        }
-
-        if (!customerData.phone) {
-            errors.phone = "Phone number is required.";
-            formIsValid = false;
-        }else if (!/^\d{10}$/.test(customerData.phone)) {
-            errors.phone = "Enter a valid phone number";
-            formIsValid = false;
+        switch (name) {
+            case "firstName":
+                if (!value) {
+                    errors.firstName = "First name is required.";
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                    errors.firstName = "Invalid format!";
+                } else {
+                    errors.firstName = ""; // Clear error if valid
+                }
+                break;
+            case "lastName":
+                if (!value) {
+                    errors.lastName = "Last name is required.";
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                    errors.lastName = "Invalid format!";
+                } else {
+                    errors.lastName = ""; // Clear error if valid
+                }
+                break;
+            case "Address":
+                if (!value) {
+                    errors.Address = "Address is required.";
+                } else if (!/[A-Za-z0-9'\.\-\s\,]/.test(value)) {
+                    errors.Address = "Invalid format!";
+                } else {
+                    errors.Address = ""; // Clear error if valid
+                }
+                break;
+            case "Company_name":
+                if (!value) {
+                    errors.Company_name = "Company name is required.";
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                    errors.Company_name = "Invalid format!";
+                } else {
+                    errors.Company_name = ""; // Clear error if valid
+                }
+                break;
+            case "Position":
+                if (!value) {
+                    errors.Position = "Position is required.";
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                    errors.Position = "Invalid format!";
+                } else {
+                    errors.Position = ""; // Clear error if valid
+                }
+                break;
+            case "email":
+                if (!value) {
+                    errors.email = "Email is required.";
+                } else if (!/\S+@\S+\.\S+/.test(value)) {
+                    errors.email = "Enter a valid email address.";
+                } else {
+                    errors.email = ""; // Clear error if valid
+                }
+                break;
+            case "phone":
+                if (!value) {
+                    errors.phone = "Phone number is required.";
+                } else if (!/^\d{10}$/.test(value)) {
+                    errors.phone = "Enter a valid phone number.";
+                } else {
+                    errors.phone = ""; // Clear error if valid
+                }
+                break;
+            default:
+                break;
         }
 
         setValidationErrors(errors);
-        return formIsValid;
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setSubmitted(true);  // Mark the form as submitted
 
-        if (!validateForm()) {
+        // Perform validation on all fields when the form is submitted
+        Object.keys(customerData).forEach((key) => validateField(key, customerData[key]));
+
+        // If there are any errors, prevent submission
+        if (Object.values(validationErrors).some((error) => error)) {
             return;
         }
 
@@ -154,12 +170,12 @@ function AddCustomer() {
                             type="text"
                             name="firstName"
                             value={customerData.firstName}
-                            className={`form-control ${validationErrors.firstName ? 'is-invalid' : ''}`}
+                            className={`form-control ${validationErrors.firstName || (submitted && !customerData.firstName) ? 'is-invalid' : ''}`}
                             id="First_Name"
                             placeholder="Enter First Name"
                             required
                         />
-                        <div className="invalid-feedback">{validationErrors.firstName}</div>
+                        <div className="invalid-feedback">{validationErrors.firstName || (submitted && !customerData.firstName ? 'First name is required.' : '')}</div>
                     </div>
 
                     <div className="form-group col-sm-6 mt-2">
@@ -169,12 +185,12 @@ function AddCustomer() {
                             name="lastName"
                             value={customerData.lastName}
                             type="text"
-                            className={`form-control ${validationErrors.lastName ? 'is-invalid' : ''}`}
+                            className={`form-control ${validationErrors.lastName || (submitted && !customerData.lastName) ? 'is-invalid' : ''}`}
                             id="Last_Name"
                             placeholder="Enter Last Name"
                             required
                         />
-                        <div className="invalid-feedback">{validationErrors.lastName}</div>
+                        <div className="invalid-feedback">{validationErrors.lastName || (submitted && !customerData.lastName ? 'Last name is required.' : '')}</div>
                     </div>
                 </div>
 
@@ -185,12 +201,12 @@ function AddCustomer() {
                         name="Address"
                         value={customerData.Address}
                         type="text"
-                        className={`form-control ${validationErrors.Address ? 'is-invalid' : ''}`}
+                        className={`form-control ${validationErrors.Address || (submitted && !customerData.Address) ? 'is-invalid' : ''}`}
                         id="Cust_Address"
                         placeholder="Enter Customer's Address"
                         required
                     />
-                    <div className="invalid-feedback">{validationErrors.Address}</div>
+                    <div className="invalid-feedback">{validationErrors.Address || (submitted && !customerData.Address ? 'Address is required.' : '')}</div>
                 </div>
 
                 <div className="form-group">
@@ -200,12 +216,12 @@ function AddCustomer() {
                         name="Company_name"
                         value={customerData.Company_name}
                         type="text"
-                        className={`form-control ${validationErrors.Company_name ? 'is-invalid' : ''}`}
+                        className={`form-control ${validationErrors.Company_name || (submitted && !customerData.Company_name) ? 'is-invalid' : ''}`}
                         id="Cust_Company"
                         placeholder="Enter Customer's Company Name"
                         required
                     />
-                    <div className="invalid-feedback">{validationErrors.Company_name}</div>
+                    <div className="invalid-feedback">{validationErrors.Company_name || (submitted && !customerData.Company_name ? 'Company name is required.' : '')}</div>
                 </div>
 
                 <div className="form-group">
@@ -215,12 +231,12 @@ function AddCustomer() {
                         name="Position"
                         value={customerData.Position}
                         type="text"
-                        className={`form-control ${validationErrors.Position ? 'is-invalid' : ''}`}
+                        className={`form-control ${validationErrors.Position || (submitted && !customerData.Position) ? 'is-invalid' : ''}`}
                         id="Cust_Position"
                         placeholder="Enter Customer's Position in above Company"
                         required
                     />
-                    <div className="invalid-feedback">{validationErrors.Position}</div>
+                    <div className="invalid-feedback">{validationErrors.Position || (submitted && !customerData.Position ? 'Position is required.' : '')}</div>
                 </div>
 
                 <div className="form-group">
@@ -230,12 +246,12 @@ function AddCustomer() {
                         name="email"
                         value={customerData.email}
                         type="email"
-                        className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+                        className={`form-control ${validationErrors.email || (submitted && !customerData.email) ? 'is-invalid' : ''}`}
                         id="exampleInputEmail1"
                         placeholder="Enter email"
                         required
                     />
-                    <div className="invalid-feedback">{validationErrors.email}</div>
+                    <div className="invalid-feedback">{validationErrors.email || (submitted && !customerData.email ? 'Email is required.' : '')}</div>
                 </div>
 
                 <div className="form-group">
@@ -244,12 +260,12 @@ function AddCustomer() {
                         onChange={handleChange}
                         name="phone"
                         value={customerData.phone}
-                        className={`form-control ${validationErrors.phone ? 'is-invalid' : ''}`}
+                        className={`form-control ${validationErrors.phone || (submitted && !customerData.phone) ? 'is-invalid' : ''}`}
                         id="Phone_field"
                         placeholder="Enter Phone Number"
                         required
                     />
-                    <div className="invalid-feedback">{validationErrors.phone}</div>
+                    <div className="invalid-feedback">{validationErrors.phone || (submitted && !customerData.phone ? 'Phone number is required.' : '')}</div>
                 </div>
 
                 <button type="submit" className="btn btn-primary">Submit</button>
