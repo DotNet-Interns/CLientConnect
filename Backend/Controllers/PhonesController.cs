@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Dtos;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace Backend.Controllers
 {
@@ -68,6 +69,11 @@ namespace Backend.Controllers
                 return NotFound(new { Message = "Phone not found." });
             }
 
+            if (await _context.Phones.AnyAsync(p => p.PhoneNumber == phone.phone))
+            {
+                return Conflict(new { message = "phone already exists." });
+            }
+
             existingPhone.PhoneNumber = phone.phone;
 
             _context.Entry(existingPhone).State = EntityState.Modified;
@@ -103,6 +109,11 @@ namespace Backend.Controllers
 
             if(!_context.Customers.Any(p => p.CID == phone.CID)){
                 return BadRequest("Customer Does not exist");
+            }
+
+            if (await _context.Phones.AnyAsync(p => p.PhoneNumber == phone.PhoneNumber))
+            {
+                return Conflict(new { message = "phone already exists." });
             }
 
             var currPhone = new Phone
