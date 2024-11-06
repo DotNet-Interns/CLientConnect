@@ -5,6 +5,7 @@ import RecentInteractions from '../Components/RecentInteractions'
 import Greeting from '../Components/Greeting'
 import CustomersCreatedBySR from "../Components/CustomersCreatedBySR"
 import CompletedNotesThisMonthSR from "../Components/CompletedNotesThisMonthBySR"
+import PendingNotes from "../Components/PendingNotes"
 import Navbar from '../Components/Navbar'
 import { useUserInfo } from '../Contexts/User';
 import axios from 'axios'
@@ -111,7 +112,7 @@ function SRDashBoard() {
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
                                 <div className=" p-3 bg-danger text-white rounded h-100">
-                                    <CustomersCreatedBySR CustomersCreatedBySR={SRAnalysis.customersCreatedByYou} />
+                                    <PendingNotes pendingNotes={SRAnalysis.pendingNotes} />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
