@@ -16,7 +16,7 @@ const server = import.meta.env.VITE_SERVER;
 function SRDashBoard() {
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
     const [loading, setLoading] = useState(true);
-    console.log(contextUser);
+    // console.log(contextUser);
     const Auth_Token = getCookie("Auth_Token");
     const [SRAnalysis, setSRAnalysis] = useState({})
     const [addNote, setAddNote] = useState(false);
@@ -31,7 +31,7 @@ function SRDashBoard() {
                         Authorization: `Bearer ${Auth_Token}`
                     }
                 })
-                console.log(response);
+                // console.log(response);
                 setSRAnalysis(response.data)
             } catch (error) {
                 console.log(error);
@@ -50,7 +50,7 @@ function SRDashBoard() {
                         Authorization: `Bearer ${Auth_Token}`
                     }
                 })
-                console.log(response);
+                // console.log(response);
                 setSRAnalysis(response.data)
             } catch (error) {
                 console.log(error);
