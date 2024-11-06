@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Backend.Services;
 using Backend.Dtos;
+using Azure.Core;
 
 namespace Backend.Controllers
 {
@@ -340,12 +341,21 @@ namespace Backend.Controllers
                     PhoneNumbers = new List<Phone>(), // Initialize PhoneNumbers collection
                     Emails = new List<Email>() // Initialize Emails collection
                 };
-
+                if (_context.Phones.Any(p => p.PhoneNumber == registerCustomer.PhoneNumber))
+                {
+                    return Conflict("Phone Already exist");
+                }
+                if (_context.Emails.Any(e => e.EmailAddress == registerCustomer.Email))
+                {
+                    return Conflict("Email Already exist");
+                }
                 // Add phone and email
                 if (!string.IsNullOrEmpty(registerCustomer.PhoneNumber))
                 {
                     customer.PhoneNumbers.Add(new Phone { PhoneNumber = registerCustomer.PhoneNumber });
                 }
+
+                
 
                 if (!string.IsNullOrEmpty(registerCustomer.Email))
                 {

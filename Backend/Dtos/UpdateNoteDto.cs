@@ -6,7 +6,7 @@ namespace Backend.Dtos
 {
     public class UpdateNoteDto
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Note ID must be a positive integer.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "Note ID must be a positive integer.")]
         public int noteID { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
@@ -18,10 +18,10 @@ namespace Backend.Dtos
 
         public bool isCustomer { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "CreatedFor ID must be a positive integer.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "CreatedFor ID must be a positive integer.")]
         public int? CreatedFor { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "UpdatedBy ID must be a positive integer.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "UpdatedBy ID must be a positive integer.")]
         public int updatedBy { get; set; }
 
         public DateTime? expectedCompletion { get; set; } = null;

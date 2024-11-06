@@ -15,7 +15,7 @@ namespace Backend.Dtos
 
         public string Company { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "UserId must be a positive integer.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "UserId must be a positive integer.")]
         public int CreatedBy { get; set; }
 
         public string Position { get; set; }
@@ -25,6 +25,7 @@ namespace Backend.Dtos
         public string PhoneNumber { get; set; }
 
         [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string Email { get; set; }
     }
 }
