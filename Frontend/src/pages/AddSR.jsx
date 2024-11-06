@@ -22,7 +22,6 @@ function AddSR() {
         confirmPassword: ""
     });
 
-    // Validation function for individual fields
     const validateField = (name, value) => {
         switch (name) {
             case 'firstName':
@@ -48,20 +47,17 @@ function AddSR() {
             default:
                 return "";
         }
-        return ""; // No error
+        return "";
     };
 
-    // Handle input change with live validation
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        // Update form data
         setFormData((prevValue) => ({
             ...prevValue,
             [name]: value
         }));
 
-        // Validate the field and update error state
         const errorMessage = validateField(name, value);
         setErrors((prevValue) => ({
             ...prevValue,
@@ -72,7 +68,6 @@ function AddSR() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Perform final validation on form submission
         const validationErrors = Object.keys(formData).reduce((acc, key) => {
             const errorMessage = validateField(key, formData[key]);
             if (errorMessage) acc[key] = errorMessage;
@@ -82,7 +77,7 @@ function AddSR() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length > 0) {
-            return; // If there are errors, prevent form submission
+            return;
         }
 
         try {
@@ -113,7 +108,6 @@ function AddSR() {
             <form className='form-control' onSubmit={handleSubmit} noValidate>
                 <h2 style={{ textAlign: "center", marginBottom: "5vh" }}>Register Sales Representative</h2>
                 <div className='row'>
-                    {/* First Name */}
                     <div className="form-group col-sm-6 mt-2">
                         <label htmlFor="First_Name">First Name</label>
                         <input
@@ -129,7 +123,6 @@ function AddSR() {
                         <small className="text-danger">{errors.firstName}</small>
                     </div>
 
-                    {/* Last Name */}
                     <div className="form-group col-sm-6 mt-2">
                         <label htmlFor="Last_Name">Last Name</label>
                         <input
@@ -145,7 +138,6 @@ function AddSR() {
                     </div>
                 </div>
 
-                {/* Email */}
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
                     <input
@@ -161,7 +153,6 @@ function AddSR() {
                     <small className="text-danger">{errors.email}</small>
                 </div>
 
-                {/* Password */}
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword1">Password</label>
                     <input
@@ -176,7 +167,6 @@ function AddSR() {
                     <small className="text-danger">{errors.password}</small>
                 </div>
 
-                {/* Confirm Password */}
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword2">Confirm Password</label>
                     <input
@@ -191,7 +181,6 @@ function AddSR() {
                     <small className="text-danger">{errors.confirmPassword}</small>
                 </div>
 
-                {/* Submit Button */}
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
         </div>
