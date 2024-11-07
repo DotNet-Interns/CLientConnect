@@ -53,9 +53,8 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-
-    validateForm('email', formData.email);
     validateForm('password', formData.password);
+    validateForm('email', formData.email);
     if (formErrors.email?.length || formErrors.password?.length) {
       return;
     }
