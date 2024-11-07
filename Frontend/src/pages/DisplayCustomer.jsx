@@ -36,7 +36,7 @@ function DisplayCustomer() {
 
     let { cid } = useParams();
 
-    const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
+    const { contextUser } = useUserInfo();
 
     const copyToClipboard = (text, index) => {
         setActiveMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -112,7 +112,7 @@ function DisplayCustomer() {
                     );
                     setNotes(notesResponse.data);
                 } catch (error) {
-                    console.warn("No notes found for this customer.");
+                    console.warn("No notes found for this customer."+error);
                     setNotes([]);
                 }
             } catch (error) {

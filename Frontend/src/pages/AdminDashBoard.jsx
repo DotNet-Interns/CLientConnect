@@ -12,7 +12,11 @@ import PendingNotes from '../Components/PendingNotes'
 import CompletedNotesThisMonth from '../Components/CompletedNotesThisMonth'
 import TotalSalesReps from '../Components/TotalSalesReps'
 import AddNote from '../Components/AddNote'
+import UserPieChart from '../Components/charts/UserPieChart'
+import CompletedNotesChart from '../Components/charts/CompletedNotesChart'
+import profile from "../../public/profile.svg"
 const server = import.meta.env.VITE_SERVER;
+
 
 function AdminDashBoard() {
     const { loggedIn, setContextUser, setLoggedIn, contextUser } = useUserInfo();
@@ -33,6 +37,7 @@ function AdminDashBoard() {
                     }
                 });
                 setAnalysisData(response.data)
+                console.log(response.data)
             } catch (error) {
                 console.log(error);
             }
@@ -72,35 +77,50 @@ function AdminDashBoard() {
 
                         <div className='row m-5 mt-3'>
                             <div className="col-md-4 mt-sm-5 col-sm-6 stats">
-                                <div className="greeting rounded bg-primary text-white p-3 h-100">
+                                <div className="greeting rounded border shadow text-primary  p-3 h-100 d-flex gap-2 flex-wrap ">
+                                    <img src={profile} className='h-75  w-50 border p-2 rounded' alt="profileImage" />
+                                    <div >
+
                                     <Greeting name={contextUser?.firstName} />
+                                    <p className='text-secondary '>Maximize your efficiency by using the CRM to streamline customer and task management</p>
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
-                                <div className="TotalCustomers p-3 bg-warning rounded h-100">
+                                <div className="TotalCustomers p-3 border shadow rounded h-100 d-flex  gap-1 flex-wrap justify-content-center  ">
+                                    <div>
+
+                                    <UserPieChart   activeUsers={analysisData.activeCustomers} inactiveUsers={analysisData.inactiveCustomers}/>
+                                    </div>
+                                    <div>
+
                                     <TotalCustomers totalCustomers={analysisData?.totalCustomer} />
+                                    </div>
+                                 
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
-                                <div className=" RecentInteractions p-3 bg-success text-white rounded h-100">
+                                <div className=" RecentInteractions p-3 shadow border rounded h-100">
                                     <RecentInteractions recentInteractions={analysisData?.recentInteraction} />
                                 </div>
                             </div>
                             {/* </div>
                             <div className="row m-5"> */}
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
-                                <div className="p-3 border border-5 border-dark rounded h-100">
+                                <div className="p-3 border border shadow rounded h-100">
                                     <TotalSalesReps totalSR={analysisData?.totalSalesReps} />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
-                                <div className=" p-3 bg-danger text-white rounded h-100">
+                                <div className=" p-3 border shadow text-danger rounded h-100">
                                     <PendingNotes pendingNotes={analysisData?.pendingNotes} />
                                 </div>
                             </div>
                             <div className="col-md-4 mt-sm-5 mt-3 col-sm-6 stats">
-                                <div className="p-3 bg-dark text-white rounded h-100">
-                                    <CompletedNotesThisMonth completedNotes={analysisData?.completedNotesThisMonth} />
+                                <div className="p-3  text-success shadow border  rounded h-100">
+                                    {/* <CompletedNotesThisMonth completedNotes={analysisData?.completedNotesThisMonth} />
+                                     */}
+                                     <CompletedNotesChart completedNotesThisMonth={analysisData.completedNotesThisMonth} />
                                 </div>
                             </div>
                         </div>

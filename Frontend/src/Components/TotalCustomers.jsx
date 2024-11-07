@@ -3,10 +3,10 @@ import React from 'react'
 function TotalCustomers({totalCustomers}) {
   return (
     <div>
-        <h2>
+        <h2 >
             Total Customers
         </h2>
-        <h1>{totalCustomers}</h1>
+        <h3 className='text-secondary'>{totalCustomers}</h3>
     </div>
   )
 }
