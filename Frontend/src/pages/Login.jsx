@@ -15,21 +15,24 @@ const Login = () => {
   const location = useLocation();
   const redirectPath = location.state?.from || '/';
 
-  // Validate email and password inputs
-  const validateForm = () => {
+  const validateForm = (name, value) => {
     const errors = {};
 
-    if (!formData.email) {
+    if (name === 'email' && !value) {
       errors.email = 'Email is required!';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Enter a valid email address.';
+    } else {
+      errors.email = ''
     }
 
-    if (!formData.password) {
+    if (name === 'password' && !value) {
       errors.password = 'Password is required!';
+    } else {
+      errors.password = '';
     }
 
-    return errors;
+    setFormErrors(errors);
   };
 
   const handleChange = (event) => {
@@ -39,21 +42,22 @@ const Login = () => {
       [name]: value,
     }));
 
-    // Revalidate the form on every change
-    const errors = validateForm();
-    setFormErrors(errors);
+    validateForm(name, value);
   };
+
+  const handleBlur = async (event) => {
+    const { name, value } = event.target;
+    validateForm(name, value);
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
 
-    // Validate the form on submit
-    const errors = validateForm();
-    setFormErrors(errors);
-
-    if (Object.keys(errors).length > 0) {
-      return; // If there are any errors, don't submit the form
+    validateForm('email', formData.email);
+    validateForm('password', formData.password);
+    if (Object.keys(formErrors).length > 0) {
+      return;
     }
 
     try {
@@ -62,7 +66,6 @@ const Login = () => {
         Email: formData.email,
       });
 
-      // On success, set the user and redirect
       setLoggedIn(true);
       setCookie('Auth_Token', response.data.token, 1);
       setContextUser(response.data.user);
@@ -97,6 +100,7 @@ const Login = () => {
               className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
               value={formData.email}
               onChange={handleChange}
+              onBlur={handleBlur}
               aria-describedby="emailFeedback"
               required
             />
@@ -116,6 +120,7 @@ const Login = () => {
               className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
               value={formData.password}
               onChange={handleChange}
+              onBlur={handleBlur}
               required
             />
             <div id="passwordFeedback" className="invalid-feedback">
