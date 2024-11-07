@@ -67,7 +67,7 @@ function AddCustomer() {
             case "Address":
                 if (!value) {
                     errors.Address = "Address is required.";
-                } else if (!/^[A-Za-z0-9'\.\-\s\,]+$/.test(value)) {
+                } else if (!/^[A-Za-z0-9][A-Za-z0-9\s,.-]*[A-Za-z0-9\s.]$/.test(value)) {
                     errors.Address = "Invalid format!";
                 } else {
                     errors.Address = "";
@@ -125,7 +125,7 @@ function AddCustomer() {
         if (Object.values(validationErrors).some((error) => error)) {
             return;
         }
-
+        
         try {
             const Auth_Token = getCookie("Auth_Token");
             const response = await axios.post(
@@ -151,9 +151,11 @@ function AddCustomer() {
             }
         } catch (error) {
             // alert(error)
-            console.log(error);
-            
-            alert(error.response.data);
+            // console.log(error);
+            if(error.response.status === 409){
+                alert(error.response.data)
+            }
+            // alert(error.response.data.errors);
             
             // console.log(customerData);
         }

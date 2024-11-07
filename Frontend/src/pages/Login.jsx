@@ -22,17 +22,17 @@ const Login = () => {
       errors.email = 'Email is required!';
     } else if (name === 'email' && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
       errors.email = 'Enter a valid email address.';
-    } else if(name === 'email'){
-      errors.email = ''
+    } else if (name === 'email') {
+      errors.email = '';
     }
 
     if (name === 'password' && !value) {
       errors.password = 'Password is required!';
-    } else if(name === 'password'){
+    } else if (name === 'password') {
       errors.password = '';
     }
 
-    setFormErrors(errors);
+    return errors;
   };
 
   const handleChange = (event) => {
@@ -42,20 +42,32 @@ const Login = () => {
       [name]: value,
     }));
 
-    validateForm(name, value);
+    const newErrors = validateForm(name, value);
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: newErrors[name],
+    }));
   };
-
-  const handleBlur = async (event) => {
-    const { name, value } = event.target;
-    validateForm(name, value);
-  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-    validateForm('password', formData.password);
-    validateForm('email', formData.email);
-    if (formErrors.email?.length || formErrors.password?.length) {
+
+    // Validate email and password and collect errors
+    const emailError = validateForm('email', formData.email);
+    const passwordError = validateForm('password', formData.password);
+
+    // Check if there are any errors
+    const hasErrors = emailError.email || passwordError.password;
+
+    // Set errors state
+    setFormErrors({
+      email: emailError.email,
+      password: passwordError.password,
+    });
+
+    // If there are errors, do not submit the form
+    if (hasErrors) {
       return;
     }
 
@@ -65,17 +77,17 @@ const Login = () => {
         Email: formData.email,
       });
 
+      // On success, store token and user info, and navigate
       setLoggedIn(true);
       setCookie('Auth_Token', response.data.token, 1);
       setContextUser(response.data.user);
     } catch (error) {
-      console.error(error);
-      if (error.response?.data?.errors) {
-        alert(error.response.data.errors.Email || 'Error occurred');
-      } else {
-        alert(error.response?.data || 'Error occurred');
-      }
+      // Handle error (e.g., incorrect credentials)
       setFormData({ email: '', password: '' });
+      setFormErrors({
+        email: 'Invalid email or password.',
+        password: 'Invalid email or password.',
+      });
     }
   };
 
@@ -99,7 +111,6 @@ const Login = () => {
               className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
               value={formData.email}
               onChange={handleChange}
-              onBlur={handleBlur}
               aria-describedby="emailFeedback"
               required
             />
@@ -119,7 +130,6 @@ const Login = () => {
               className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
               value={formData.password}
               onChange={handleChange}
-              onBlur={handleBlur}
               required
             />
             <div id="passwordFeedback" className="invalid-feedback">
