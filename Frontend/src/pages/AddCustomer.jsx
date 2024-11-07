@@ -67,7 +67,7 @@ function AddCustomer() {
             case "Address":
                 if (!value) {
                     errors.Address = "Address is required.";
-                } else if (!/[A-Za-z0-9'\.\-\s\,]/.test(value)) {
+                } else if (!/^[A-Za-z0-9'\.\-\s\,]+$/.test(value)) {
                     errors.Address = "Invalid format!";
                 } else {
                     errors.Address = "";
