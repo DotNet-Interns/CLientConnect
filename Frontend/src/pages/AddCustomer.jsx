@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { getCookie } from '../Utils/cookie.js';
 import { useUserInfo } from '../Contexts/User.jsx';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar.jsx';
 const server = import.meta.env.VITE_SERVER;
 
 function AddCustomer() {
     const { contextUser } = useUserInfo();
-    const [status, setStatus] = useState(false);
+    const navigate = useNavigate();
     const [customerData, setCustomerData] = useState({
         firstName: "",
         lastName: "",
@@ -146,12 +146,12 @@ function AddCustomer() {
                     }
                 }
             );
-
-            if (response.data) {
-                setStatus(true);
+            if (response.status === 201) {
+                navigate('/customers');
             }
         } catch (error) {
-            
+            console.log(error);
+            // console.log(customerData);
         }
     };
 
@@ -269,7 +269,6 @@ function AddCustomer() {
 
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
-            {status && <Navigate to="/customers" />}
         </div>
         </>
     );
