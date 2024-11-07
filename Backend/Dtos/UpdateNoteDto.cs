@@ -21,7 +21,7 @@ namespace Backend.Dtos
         public bool isCustomer { get; set; }
 
         //[Range(1, int.MaxValue, ErrorMessage = "CreatedFor ID must be a positive integer.")]
-        [Required]
+        
         public int? CreatedFor { get; set; }
 
         //[Range(1, int.MaxValue, ErrorMessage = "UpdatedBy ID must be a positive integer.")]
