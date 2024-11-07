@@ -67,7 +67,7 @@ function AddCustomer() {
             case "Address":
                 if (!value) {
                     errors.Address = "Address is required.";
-                } else if (!/[A-Za-z0-9'\.\-\s\,]/.test(value)) {
+                } else if (!/^[A-Za-z0-9'\.\-\s\,]+$/.test(value)) {
                     errors.Address = "Invalid format!";
                 } else {
                     errors.Address = "";
@@ -85,7 +85,7 @@ function AddCustomer() {
             case "Position":
                 if (!value) {
                     errors.Position = "Position is required.";
-                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z0-9]+)*$/.test(value)) {
                     errors.Position = "Invalid format!";
                 } else {
                     errors.Position = "";
@@ -94,7 +94,7 @@ function AddCustomer() {
             case "email":
                 if (!value) {
                     errors.email = "Email is required.";
-                } else if (!/\S+@\S+\.\S+/.test(value)) {
+                } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
                     errors.email = "Enter a valid email address.";
                 } else {
                     errors.email = "";
@@ -150,7 +150,11 @@ function AddCustomer() {
                 navigate('/customers');
             }
         } catch (error) {
+            // alert(error)
             console.log(error);
+            
+            alert(error.response.data);
+            
             // console.log(customerData);
         }
     };

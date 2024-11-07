@@ -30,7 +30,7 @@ function DisplayCustomer() {
 
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [activeMenuIndex, setActiveMenuIndex] = useState(null); // for edit , update , delete options menu
+    const [activeMenuIndex, setActiveMenuIndex] = useState(null);
     const [authToken, setAuthToken] = useState(cookie.getCookie("Auth_Token"));
     const [refresh, setRefresh] = useState(false);
 

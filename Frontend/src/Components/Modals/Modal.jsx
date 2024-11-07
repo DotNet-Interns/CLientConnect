@@ -37,7 +37,13 @@ function Modal({ isOpen, onClose, field, action, Id, currentValue = "" }) {
 
             } catch (error) {
                 // console.log(`Unable to add ${field}: ${error}`);
-                alert(`${field} already exists`);
+                // console.log(error);
+                if(error.response.status === 409){
+                    alert(`${field} already exists`);
+                }
+                else{
+                    alert(error.response?.data.errors?.PhoneNumber || error.response?.data.errors.email[0])
+                }
             }
 
         } else if (action === "edit") {

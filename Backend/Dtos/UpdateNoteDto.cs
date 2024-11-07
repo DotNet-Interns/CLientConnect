@@ -14,14 +14,18 @@ namespace Backend.Dtos
         public string title { get; set; }
 
         [StringLength(500, ErrorMessage = "Summary cannot exceed 500 characters.")]
+        [Required(ErrorMessage = "Summary is required.")]
         public string summary { get; set; }
 
+        [Required(ErrorMessage = "True/False is required.")]
         public bool isCustomer { get; set; }
 
         //[Range(1, int.MaxValue, ErrorMessage = "CreatedFor ID must be a positive integer.")]
+        
         public int? CreatedFor { get; set; }
 
         //[Range(1, int.MaxValue, ErrorMessage = "UpdatedBy ID must be a positive integer.")]
+        [Required]
         public int updatedBy { get; set; }
 
         public DateTime? expectedCompletion { get; set; } = null;
