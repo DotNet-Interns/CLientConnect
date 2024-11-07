@@ -94,7 +94,7 @@ function AddCustomer() {
             case "email":
                 if (!value) {
                     errors.email = "Email is required.";
-                } else if (!/\S+@\S+\.\S+/.test(value)) {
+                } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
                     errors.email = "Enter a valid email address.";
                 } else {
                     errors.email = "";
@@ -150,7 +150,11 @@ function AddCustomer() {
                 navigate('/customers');
             }
         } catch (error) {
+            // alert(error)
             console.log(error);
+            
+            alert(error.response.data);
+            
             // console.log(customerData);
         }
     };

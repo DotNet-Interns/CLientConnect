@@ -20,7 +20,7 @@ const Login = () => {
 
     if (name === 'email' && !value) {
       errors.email = 'Email is required!';
-    } else if (name === 'email' && !/\S+@\S+\.\S+/.test(value)) {
+    } else if (name === 'email' && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
       errors.email = 'Enter a valid email address.';
     } else if(name === 'email'){
       errors.email = ''

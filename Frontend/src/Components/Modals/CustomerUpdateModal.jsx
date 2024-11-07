@@ -42,9 +42,8 @@ function CustomerUpdateModal({ isOpen, onClose, customerId, currentDetails = {} 
                 data,
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
-            console.log("Customer details updated successfully", response.data);
+            alert("Customer details updated successfully");
         } catch (error) {
-            console.log("Unable to update customer details:", error);
             alert("Unable to update customer details.");
         }
 

@@ -37,7 +37,7 @@ function AddSR() {
                 break;
             case 'email':
                 if (!value) return "Email is required!";
-                else if (!/\S+@\S+\.\S+/.test(value)) return "Email is invalid!";
+                else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return "Email is invalid!";
                 break;
             case 'password':
                 if (!value) return "Password is required!";
