@@ -20,15 +20,15 @@ const Login = () => {
 
     if (name === 'email' && !value) {
       errors.email = 'Email is required!';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (name === 'email' && !/\S+@\S+\.\S+/.test(value)) {
       errors.email = 'Enter a valid email address.';
-    } else {
+    } else if(name === 'email'){
       errors.email = ''
     }
 
     if (name === 'password' && !value) {
       errors.password = 'Password is required!';
-    } else {
+    } else if(name === 'password'){
       errors.password = '';
     }
 
@@ -56,7 +56,7 @@ const Login = () => {
 
     validateForm('email', formData.email);
     validateForm('password', formData.password);
-    if (Object.keys(formErrors).length > 0) {
+    if (formErrors.email?.length || formErrors.password?.length) {
       return;
     }
 
