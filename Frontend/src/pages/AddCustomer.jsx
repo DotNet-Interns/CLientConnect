@@ -85,7 +85,7 @@ function AddCustomer() {
             case "Position":
                 if (!value) {
                     errors.Position = "Position is required.";
-                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z]+)*$/.test(value)) {
+                } else if (!/^[a-zA-Z]+(?:[ .][a-zA-Z0-9]+)*$/.test(value)) {
                     errors.Position = "Invalid format!";
                 } else {
                     errors.Position = "";
