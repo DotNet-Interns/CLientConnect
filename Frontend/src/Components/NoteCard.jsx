@@ -126,7 +126,7 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
     }, []);
 
     const handleCancel = async () => {
-        const data = { status: 2 };
+        const data = { status: 2, updatedBy: contextUser?.userID};
         try {
             const response = await axios.put(`${server}/api/Notes/UpdateNoteStatus/${id}`, data, {
                 headers: { Authorization: `Bearer ${authToken}` }
@@ -138,7 +138,7 @@ function NoteCard({ IDate, ITime, Title = "", Content = "", id, createdBy = "", 
     };
 
     const handleComplete = async () => {
-        const data = { status: 1 };
+        const data = { status: 1, updatedBy: contextUser?.userID };
         try {
             const response = await axios.put(`${server}/api/Notes/UpdateNoteStatus/${id}`, data, {
                 headers: { Authorization: `Bearer ${authToken}` }
