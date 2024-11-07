@@ -10,7 +10,7 @@ namespace Backend.Dtos
         [RegularExpression(@"^[a-zA-Z]+(?:[.][a-zA-Z]+)*$", ErrorMessage = "Last name must contain only letters.")]
         public string LastName { get; set; }
 
-        [RegularExpression(@"^[A-Za-z0-9'\.\-\s\,]$", ErrorMessage = "Address contains invalid characters.")]
+        //[RegularExpression(@"^[A-Za-z0-9'\.\-\s\,]$", ErrorMessage = "Address contains invalid characters.")]
         public string Address { get; set; }
 
         [RegularExpression(@"^[a-zA-Z]+(?:[.][a-zA-Z]+)*$", ErrorMessage = "Company name contains invalid characters.")]

@@ -318,7 +318,7 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> PostCustomer([FromBody] RegisterCustomerDto registerCustomer)
+        public async Task<IActionResult> PostCustomer([FromBody] RegisterCustomerDto registerCustomer)
         {
             if (registerCustomer == null)
             {
@@ -341,6 +341,10 @@ namespace Backend.Controllers
                     PhoneNumbers = new List<Phone>(), // Initialize PhoneNumbers collection
                     Emails = new List<Email>() // Initialize Emails collection
                 };
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Customer registration data is not valid.");
+                }
                 if (_context.Phones.Any(p => p.PhoneNumber == registerCustomer.PhoneNumber))
                 {
                     return Conflict("Phone Already exist");
@@ -365,7 +369,8 @@ namespace Backend.Controllers
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
 
-                return Created();
+                //return Ok(new {Message = "Customer created Successfully" });
+                return StatusCode(201, "Customer created Successfully");
             }
             catch (DbUpdateException ex)
             {
