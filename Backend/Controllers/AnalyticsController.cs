@@ -109,11 +109,15 @@ namespace Backend.Controllers
                 srdto.customersCreatedByYou = await _context.Customers.CountAsync(c => c.CreatedBy == UserId);
                srdto.recentInteraction =   await _context.ClientInteractions.CountAsync(i => i.InteractionTime >= dayBefore && i.UserId == UserId);
 
+                srdto.pendingNotes = await _context.Notes.CountAsync(n => n.Status == NoteStatus.Pending && n.CreatedBy == UserId);
+
                 srdto.CompletedNotesThisMonth = await _context.Notes.CountAsync(n =>
                     n.Status == NoteStatus.Completed &&
                     n.CreatedAt >= startOfMonth &&
                     n.CreatedAt <= DateTime.Now &&
-                    n.CreatedBy == UserId);
+                    n.UpdatedBy == UserId);
+
+               
 
                 srdto.recentNotes = await _context.Notes
                     .Where(n => n.CreatedBy == UserId && n.isCustomer)

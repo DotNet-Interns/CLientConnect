@@ -95,6 +95,7 @@ namespace Backend.Controllers
                 }
 
                 note.Status = upnsdto.Status;
+                note.UpdatedBy = upnsdto.updatedBy;
 
                 _context.Entry(note).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
