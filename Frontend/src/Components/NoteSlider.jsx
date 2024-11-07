@@ -22,6 +22,7 @@ function NoteSlider({ notes }) {
                         Title={item.title}
                         Content={item.summary}
                         // CreatedDate={DateAndTime}
+                        initialStatus={item.status}
                         key={index}
                         id={item.noteID}
                         ITime={formattedTime}
