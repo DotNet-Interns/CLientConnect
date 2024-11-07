@@ -146,7 +146,7 @@ function AddCustomer() {
                     }
                 }
             );
-            if (response.status === 204) {
+            if (response.status === 201) {
                 navigate('/customers');
             }
         } catch (error) {
