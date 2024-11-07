@@ -22,6 +22,7 @@ namespace Backend.Dtos
         public DateTime? expectedCompletion { get; set; } = null;
 
         //[Range(1, int.MaxValue, ErrorMessage = "CreatedBy ID must be a positive integer.")]
+        [Required]
         public int createdBy { get; set; }
 
         //[Range(1, int.MaxValue, ErrorMessage = "UpdatedBy ID must be a positive integer.")]

@@ -35,9 +35,12 @@ namespace Backend.Models
         public string LastName { get; set; }
 
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
+        [Required(ErrorMessage = "Address is required.")]
         public string Address { get; set; }
 
         [StringLength(50, ErrorMessage = "Company name cannot exceed 50 characters.")]
+        [Required(ErrorMessage = "Company is required.")]
+
         public string Company { get; set; }
 
         [Required(ErrorMessage = "CreatedBy is required.")]
@@ -50,6 +53,8 @@ namespace Backend.Models
         public CustomerStatus Status { get; set; }
 
         [StringLength(50, ErrorMessage = "Position cannot exceed 50 characters.")]
+        [Required(ErrorMessage = "Position is required.")]
+
         public string Position { get; set; }
 
         [Required]
